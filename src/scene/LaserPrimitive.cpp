@@ -984,7 +984,7 @@ LaserPointListList LaserEllipse::updateMachiningPoints(ProgressItem* parentProgr
     if (parentProgress) 
         progress = new ProgressItem(tr("%1 update machining points").arg(name()), ProgressItem::PT_Simple, parentProgress);
     machiningUtils::path2Points(progress, path, d->machiningPointsList, indices, d->machiningCenter);
-    QImage image(8192, 8192, QImage::Format_RGB888);
+    /*QImage image(8192, 8192, QImage::Format_RGB888);
     QPainter painter(&image);
     QTransform t = LaserApplication::device->to1stQuad();
     t = t * QTransform::fromScale(8192 * 1.0 / Config::SystemRegister::xMaxLength(), 8192 * 1.0 / Config::SystemRegister::xMaxLength());
@@ -997,7 +997,7 @@ LaserPointListList LaserEllipse::updateMachiningPoints(ProgressItem* parentProgr
         pt = t.map(pt);
         painter.drawPoint(pt);
     }
-    image.save("tmp/circle.tiff", "TIFF");
+    image.save("tmp/circle.tiff", "TIFF");*/
 
     if (indices.length() <= Config::PathOptimization::maxStartingPoints())
     {

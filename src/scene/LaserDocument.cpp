@@ -1545,7 +1545,7 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
             painter.setBrush(Qt::NoBrush);
         }
         image = image.mirrored(true, false);
-        QString fileName = "tmp/images/"+QString::number(i)+"_img.png";
+        QString fileName = "tmp/stamp_img_" + QString::number(i) + ".png";
         image.save(fileName);
         item.layer = layer;
         item.imagePath = fileName;
