@@ -5,15 +5,10 @@ INSTALL(TARGETS ${PROJECT_NAME}
     DESTINATION "${CMAKE_INSTALL_PREFIX}_Release" COMPONENT runtime
 	CONFIGURATIONS Release)
 
-#get_target_property(TBB_DLL_PATH_RELEASE TBB::tbb IMPORTED_LOCATION_RELEASE)
-#get_target_property(TBBMALLOC_DLL_PATH_RELEASE TBB::tbbmalloc IMPORTED_LOCATION_RELEASE)
-
 INSTALL(FILES 
             "${CMAKE_SOURCE_DIR}/third/bin/LaserLib32.dll"
             "${CMAKE_SOURCE_DIR}/third/others/AccBuf.txt"
             "${CMAKE_SOURCE_DIR}/ReleaseNotes.md"
-            #"${TBB_DLL_PATH_RELEASE}"
-            #"${TBBMALLOC_DLL_PATH_RELEASE}"
         DESTINATION ${CMAKE_INSTALL_PREFIX}_Release
 		CONFIGURATIONS Release)
 
@@ -23,9 +18,7 @@ INSTALL(FILES
 	CONFIGURATIONS Release)
 
 foreach(_lib IN LISTS OpenCV_LIBS)
-	#get_target_property(${_lib}_location_Debug ${_lib} IMPORTED_LOCATION_DEBUG)
 	get_target_property(${_lib}_location_Release ${_lib} IMPORTED_LOCATION_RELEASE)
-	#get_target_property(${_lib}_location_RelWithDebInfo ${_lib} IMPORTED_LOCATION_RELWITHDEUBINFO)
 	INSTALL(FILES 
 		${${_lib}_location_Release}
 		DESTINATION ${CMAKE_INSTALL_PREFIX}_Release

@@ -51,7 +51,7 @@
 #include "qdebug.h"
 
 #ifndef QT_NO_COMPRESS
-#include <zlib.h>
+//#include <zlib.h>
 #endif
 
 QT_BEGIN_NAMESPACE
@@ -70,98 +70,98 @@ QSvgTinyDocument::~QSvgTinyDocument()
 {
 }
 
-#ifndef QT_NO_COMPRESS
-#   ifdef QT_BUILD_INTERNAL
-Q_AUTOTEST_EXPORT QByteArray qt_inflateGZipDataFrom(QIODevice *device);
-#   else
-static QByteArray qt_inflateGZipDataFrom(QIODevice *device);
-#   endif
-
-QByteArray qt_inflateGZipDataFrom(QIODevice *device)
-{
-    if (!device)
-        return QByteArray();
-
-    if (!device->isOpen())
-        device->open(QIODevice::ReadOnly);
-
-    Q_ASSERT(device->isOpen() && device->isReadable());
-
-    static const int CHUNK_SIZE = 4096;
-    int zlibResult = Z_OK;
-
-    QByteArray source;
-    QByteArray destination;
-
-    // Initialize zlib stream struct
-    z_stream zlibStream;
-    zlibStream.next_in = Z_NULL;
-    zlibStream.avail_in = 0;
-    zlibStream.avail_out = 0;
-    zlibStream.zalloc = Z_NULL;
-    zlibStream.zfree = Z_NULL;
-    zlibStream.opaque = Z_NULL;
-
-    // Adding 16 to the window size gives us gzip decoding
-    if (inflateInit2(&zlibStream, MAX_WBITS + 16) != Z_OK) {
-        qCWarning(lcSvgHandler, "Cannot initialize zlib, because: %s",
-                (zlibStream.msg != NULL ? zlibStream.msg : "Unknown error"));
-        return QByteArray();
-    }
-
-    bool stillMoreWorkToDo = true;
-    while (stillMoreWorkToDo) {
-
-        if (!zlibStream.avail_in) {
-            source = device->read(CHUNK_SIZE);
-
-            if (source.isEmpty())
-                break;
-
-            zlibStream.avail_in = source.size();
-            zlibStream.next_in = reinterpret_cast<Bytef*>(source.data());
-        }
-
-        do {
-            // Prepare the destination buffer
-            int oldSize = destination.size();
-            destination.resize(oldSize + CHUNK_SIZE);
-            zlibStream.next_out = reinterpret_cast<Bytef*>(
-                    destination.data() + oldSize - zlibStream.avail_out);
-            zlibStream.avail_out += CHUNK_SIZE;
-
-            zlibResult = inflate(&zlibStream, Z_NO_FLUSH);
-            switch (zlibResult) {
-                case Z_NEED_DICT:
-                case Z_DATA_ERROR:
-                case Z_STREAM_ERROR:
-                case Z_MEM_ERROR: {
-                    inflateEnd(&zlibStream);
-                    qCWarning(lcSvgHandler, "Error while inflating gzip file: %s",
-                            (zlibStream.msg != NULL ? zlibStream.msg : "Unknown error"));
-                    destination.chop(zlibStream.avail_out);
-                    return destination;
-                }
-            }
-
-        // If the output buffer still has more room after calling inflate
-        // it means we have to provide more data, so exit the loop here
-        } while (!zlibStream.avail_out);
-
-        if (zlibResult == Z_STREAM_END) {
-            // Make sure there are no more members to process before exiting
-            if (!(zlibStream.avail_in && inflateReset(&zlibStream) == Z_OK))
-                stillMoreWorkToDo = false;
-        }
-    }
-
-    // Chop off trailing space in the buffer
-    destination.chop(zlibStream.avail_out);
-
-    inflateEnd(&zlibStream);
-    return destination;
-}
-#endif
+//#ifndef QT_NO_COMPRESS
+//#   ifdef QT_BUILD_INTERNAL
+//Q_AUTOTEST_EXPORT QByteArray qt_inflateGZipDataFrom(QIODevice *device);
+//#   else
+//static QByteArray qt_inflateGZipDataFrom(QIODevice *device);
+//#   endif
+//
+//QByteArray qt_inflateGZipDataFrom(QIODevice *device)
+//{
+//    if (!device)
+//        return QByteArray();
+//
+//    if (!device->isOpen())
+//        device->open(QIODevice::ReadOnly);
+//
+//    Q_ASSERT(device->isOpen() && device->isReadable());
+//
+//    static const int CHUNK_SIZE = 4096;
+//    int zlibResult = Z_OK;
+//
+//    QByteArray source;
+//    QByteArray destination;
+//
+//    // Initialize zlib stream struct
+//    z_stream zlibStream;
+//    zlibStream.next_in = Z_NULL;
+//    zlibStream.avail_in = 0;
+//    zlibStream.avail_out = 0;
+//    zlibStream.zalloc = Z_NULL;
+//    zlibStream.zfree = Z_NULL;
+//    zlibStream.opaque = Z_NULL;
+//
+//    // Adding 16 to the window size gives us gzip decoding
+//    if (inflateInit2(&zlibStream, MAX_WBITS + 16) != Z_OK) {
+//        qCWarning(lcSvgHandler, "Cannot initialize zlib, because: %s",
+//                (zlibStream.msg != NULL ? zlibStream.msg : "Unknown error"));
+//        return QByteArray();
+//    }
+//
+//    bool stillMoreWorkToDo = true;
+//    while (stillMoreWorkToDo) {
+//
+//        if (!zlibStream.avail_in) {
+//            source = device->read(CHUNK_SIZE);
+//
+//            if (source.isEmpty())
+//                break;
+//
+//            zlibStream.avail_in = source.size();
+//            zlibStream.next_in = reinterpret_cast<Bytef*>(source.data());
+//        }
+//
+//        do {
+//            // Prepare the destination buffer
+//            int oldSize = destination.size();
+//            destination.resize(oldSize + CHUNK_SIZE);
+//            zlibStream.next_out = reinterpret_cast<Bytef*>(
+//                    destination.data() + oldSize - zlibStream.avail_out);
+//            zlibStream.avail_out += CHUNK_SIZE;
+//
+//            zlibResult = inflate(&zlibStream, Z_NO_FLUSH);
+//            switch (zlibResult) {
+//                case Z_NEED_DICT:
+//                case Z_DATA_ERROR:
+//                case Z_STREAM_ERROR:
+//                case Z_MEM_ERROR: {
+//                    inflateEnd(&zlibStream);
+//                    qCWarning(lcSvgHandler, "Error while inflating gzip file: %s",
+//                            (zlibStream.msg != NULL ? zlibStream.msg : "Unknown error"));
+//                    destination.chop(zlibStream.avail_out);
+//                    return destination;
+//                }
+//            }
+//
+//        // If the output buffer still has more room after calling inflate
+//        // it means we have to provide more data, so exit the loop here
+//        } while (!zlibStream.avail_out);
+//
+//        if (zlibResult == Z_STREAM_END) {
+//            // Make sure there are no more members to process before exiting
+//            if (!(zlibStream.avail_in && inflateReset(&zlibStream) == Z_OK))
+//                stillMoreWorkToDo = false;
+//        }
+//    }
+//
+//    // Chop off trailing space in the buffer
+//    destination.chop(zlibStream.avail_out);
+//
+//    inflateEnd(&zlibStream);
+//    return destination;
+//}
+//#endif
 
 QSvgTinyDocument * QSvgTinyDocument::load(const QString &fileName)
 {
@@ -172,12 +172,12 @@ QSvgTinyDocument * QSvgTinyDocument::load(const QString &fileName)
         return 0;
     }
 
-#ifndef QT_NO_COMPRESS
-    if (fileName.endsWith(QLatin1String(".svgz"), Qt::CaseInsensitive)
-            || fileName.endsWith(QLatin1String(".svg.gz"), Qt::CaseInsensitive)) {
-        return load(qt_inflateGZipDataFrom(&file));
-    }
-#endif
+//#ifndef QT_NO_COMPRESS
+//    if (fileName.endsWith(QLatin1String(".svgz"), Qt::CaseInsensitive)
+//            || fileName.endsWith(QLatin1String(".svg.gz"), Qt::CaseInsensitive)) {
+//        return load(qt_inflateGZipDataFrom(&file));
+//    }
+//#endif
 
     QSvgTinyDocument *doc = 0;
     QSvgHandler handler(&file);
@@ -194,13 +194,13 @@ QSvgTinyDocument * QSvgTinyDocument::load(const QString &fileName)
 
 QSvgTinyDocument * QSvgTinyDocument::load(const QByteArray &contents)
 {
-#ifndef QT_NO_COMPRESS
-    // Check for gzip magic number and inflate if appropriate
-    if (contents.startsWith("\x1f\x8b")) {
-        QBuffer buffer(const_cast<QByteArray *>(&contents));
-        return load(qt_inflateGZipDataFrom(&buffer));
-    }
-#endif
+//#ifndef QT_NO_COMPRESS
+//    // Check for gzip magic number and inflate if appropriate
+//    if (contents.startsWith("\x1f\x8b")) {
+//        QBuffer buffer(const_cast<QByteArray *>(&contents));
+//        return load(qt_inflateGZipDataFrom(&buffer));
+//    }
+//#endif
 
     QSvgHandler handler(contents);
 

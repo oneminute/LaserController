@@ -98,8 +98,6 @@
 
 #include "opencv2/features2d.hpp"
 #include "opencv2/xfeatures2d.hpp"
-#include <boost/multiprecision/cpp_dec_float.hpp>
-#include <boost/math/special_functions/gamma.hpp>
 #include <ui/StampFrameDialog.h>
 #include <ui/StampCircleDialog.h>
 #include <ui/StampStripDialog.h>
