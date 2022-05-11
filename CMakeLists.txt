@@ -286,7 +286,9 @@ add_custom_target (GenerateTranslations
     Qt5::lupdate ${CMAKE_SOURCE_DIR}/src -ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_zh_CN.ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_en_US.ts
 )
 
-set(CMAKE_INSTALL_PREFIX ../oem/africa_release_x86)
+set(CMAKE_INSTALL_PREFIX ../oem/africa_x86)
+get_filename_component(CMAKE_INSTALL_PREFIX "../oem/africa_x86" ABSOLUTE)
+message(status CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX})
 
 include(cmake_install_Debug.cmake)
 include(cmake_install_Release.cmake)
