@@ -8,7 +8,6 @@
 #include <QtMath>
 #include <QGraphicsTextItem> 
 #include <opencv2/opencv.hpp>
-#include <Eigen/Core>
 #include <QTextEdit>
 #include <QGraphicsSceneMouseEvent>
 #include <QJsonArray>

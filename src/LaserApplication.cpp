@@ -521,7 +521,7 @@ void LaserApplication::cleanCachedFiles()
 
 void LaserApplication::initLog()
 {
-    google::InitGoogleLogging(this->arguments()[0].toStdString().c_str());
+    //QStringList args = arguments();
     google::InstallFailureSignalHandler();
 
     FLAGS_stderrthreshold = google::GLOG_ERROR;

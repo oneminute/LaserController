@@ -4,8 +4,6 @@
 #include <QImage>
 #include <opencv2/opencv.hpp>
 #include <QMap>
-#include <Eigen/Core>
-#include <Eigen/Dense>
 
 class ProgressItem;
 

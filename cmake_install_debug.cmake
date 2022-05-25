@@ -3,7 +3,7 @@ INSTALL(TARGETS ${PROJECT_NAME}
 	CONFIGURATIONS Debug)
 
 INSTALL(FILES 
-            "${CMAKE_SOURCE_DIR}/third/bin/LaserLib32.dll"
+            "${CMAKE_SOURCE_DIR}/third/bin/LaserLib${CNELaser_ARCH}.dll"
             "${CMAKE_SOURCE_DIR}/third/others/AccBuf.txt"
             "${CMAKE_SOURCE_DIR}/ReleaseNotes.md"
         DESTINATION ${CMAKE_INSTALL_PREFIX}_Debug

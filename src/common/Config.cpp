@@ -237,7 +237,8 @@ void Config::loadGeneralItems()
                 return;
 
             comboBox->addItem("English", static_cast<int>(QLocale::English));
-            comboBox->addItem("简体中文", static_cast<int>(QLocale::Chinese));
+            comboBox->addItem(u8"简体中文", static_cast<int>(QLocale::Chinese));
+            comboBox->addItem(u8"Русский", static_cast<int>(QLocale::Russian));
 
             QTimer::singleShot(0, 
                 [=]() {
