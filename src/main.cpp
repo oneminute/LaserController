@@ -2,7 +2,10 @@
 #include "LaserApplication.h"
 #include "laser/LaserDriver.h"
 
+#include <QPainterPath>
+
 #include <opencv2/opencv.hpp>
+#include <glog/logging.h>
 
 #ifdef _MSC_VER
 #    ifdef NDEBUG
@@ -15,6 +18,7 @@
 
 int main(int argc, char *argv[])
 {
+    google::InitGoogleLogging(argv[0]);
     LaserApplication *app = new LaserApplication(argc, argv);
 
     qRegisterMetaType<QPainterPath>("QPainterPath");

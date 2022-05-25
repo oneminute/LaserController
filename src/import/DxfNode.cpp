@@ -7,9 +7,6 @@
 #include "task/ProgressItem.h"
 #include "task/ProgressModel.h"
 
-#include <Eigen/Core>
-#include <Eigen/Geometry>
-
 class DxfStreamPrivate
 {
     Q_DECLARE_PUBLIC(DxfStream)

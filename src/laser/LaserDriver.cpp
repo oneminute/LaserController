@@ -81,8 +81,12 @@ bool LaserDriver::load()
         return true;
 
     qRegisterMetaType<DeviceState>("DeviceState");
-
-    m_library.setFileName("LaserLib32.dll");
+    QString cpuArch = QSysInfo::currentCpuArchitecture();
+    qLogD << "cpuArch: " << cpuArch;
+    QString libName = "LaserLib32.dll";
+    if (cpuArch == "x86_64")
+        libName = "LaserLib64.dll";
+    m_library.setFileName(libName);
     if (!m_library.load())
     {
         qDebug() << "load LaserLib failure:" << m_library.errorString();

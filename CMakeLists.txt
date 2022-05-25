@@ -22,32 +22,29 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 # declare variables
 set(QT_WIN32_PATH "" CACHE PATH "")
 set(OPENCV_WIN32_PATH "" CACHE PATH "")
+set(CNELaser_ARCH "64" CACHE STRING "")
+#set(LZ4_DEBUG "" CACHE FILEPATH "")
+#set(LZ4_RELEASE "" CACHE FILEPATH "")
+option(CNELASER_BUILD_EXAMPLES "Build Examples and Tech tests" OFF)
 list(APPEND CMAKE_PROGRAM_PATH ${QT_WIN32_PATH} ${OPENCV_WIN32_PATH})
+
+list(APPEND CMAKE_CXX_FLAGS " /bigobj")
 
 set(NEW_PATH ${QT_WIN32_PATH} ${OPENCV_WIN32_PATH} $ENV{PATH})
 set(CMAKE_MSVCIDE_RUN_PATH ${NEW_PATH})
 
+message(STATUS CMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR})
+
 # Find the QtWidgets library
-set(Boost_USE_STATIC_LIBS ON)
-set(Boost_USE_MULTITHREADED ON)
-find_package(Eigen3 REQUIRED)
-#find_package(Boost 1.66 COMPONENTS timer REQUIRED)
+find_package(Eigen3 REQUIRED REQUIRED)
 find_package(Qt5 COMPONENTS Widgets Charts LinguistTools OpenGL Concurrent Multimedia MultimediaWidgets Test CONFIG REQUIRED)
 find_package(OpenCV COMPONENTS core imgcodecs imgproc highgui video videoio flann features2d xfeatures2d calib3d tracking REQUIRED)
-#find_package(OpenMP REQUIRED QUIET)
-#find_package(ZLIB REQUIRED QUIET)
 find_package(glog REQUIRED QUIET)
 find_package(gflags REQUIRED QUIET)
+find_package(LZ4 REQUIRED)
 find_package(FLANN REQUIRED QUIET)
-#find_package(TBB REQUIRED QUIET)
-#find_package(OpenMP)
-#if (OPENMP_FOUND)
-#    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-#    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-#endif()
 
-set(TS_FILES translations/${PROJECT_NAME}_zh_CN.ts)
+set(TS_FILES translations/*.ts)
 set(VG_CORE_AUTO_TLI "${PROJECT_SOURCE_DIR}/third/cdr/include/VGCoreAuto.tli")
 configure_file(${PROJECT_SOURCE_DIR}/third/cdr/include/VGCoreAuto.tlh.in VGCoreAuto.tlh)
 
@@ -57,10 +54,8 @@ add_subdirectory(src/widget/ADS)
 set(INCLUDE_DIRS
     ${INCLUDE_DIRS}
     src
-    #${Boost_INCLUDE_DIR}
     ${EIGEN3_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
-    #${ZLIB_INCLUDE_DIR}
     ${FLANN_INCLUDE_DIR}
     src/widget/LRWidgets
 	${PROJECT_BINARY_DIR}
@@ -219,7 +214,9 @@ ENDIF(MSVC)
 
 include_directories(${INCLUDE_DIRS})
 set(LINK_LIBRARIES 
+    Eigen3::Eigen
     Qt5::Widgets Qt5::Charts Qt5::OpenGL Qt5::Concurrent Qt5::Test Qt5::Multimedia Qt5::MultimediaWidgets
+    LZ4::lz4_static
     FLANN::FLANN
     ${OpenCV_LIBRARIES} 
     ${Boost_LIBRARIES} 
@@ -254,25 +251,26 @@ set_target_properties(
 #    DEPENDS CNELaser
 #)
 
+if(CNELASER_BUILD_EXAMPLES)
+    add_executable(TestBoostGeometry test/TestBoostGeometry.cpp)
+    target_link_libraries(TestBoostGeometry PRIVATE ${LINK_LIBRARIES})
+    add_executable(TestQtClosestPoint test/TestQtClosestPoint.cpp)
+    target_link_libraries(TestQtClosestPoint PRIVATE ${LINK_LIBRARIES})
+    add_executable(TestOpenCVFlann test/TestOpenCVFlann.cpp)
+    target_link_libraries(TestOpenCVFlann PRIVATE ${LINK_LIBRARIES})
+    add_executable(TestQPainterPath test/TestQPainterPath.cpp)
+    target_link_libraries(TestQPainterPath PRIVATE ${LINK_LIBRARIES})
+    add_executable(TestDriver test/TestDriver.cpp)
+    target_link_libraries(TestDriver PRIVATE ${LINK_LIBRARIES})
+    add_executable(TestException test/TestException.cpp src/exception/LaserException.h src/exception/LaserException.cpp)
+    target_link_libraries(TestException PRIVATE ${LINK_LIBRARIES})
+    add_executable(TestGeometry test/TestGeometry.cpp)
+    target_link_libraries(TestGeometry PRIVATE ${LINK_LIBRARIES})
 
-add_executable(TestBoostGeometry test/TestBoostGeometry.cpp)
-target_link_libraries(TestBoostGeometry PRIVATE ${LINK_LIBRARIES})
-add_executable(TestQtClosestPoint test/TestQtClosestPoint.cpp)
-target_link_libraries(TestQtClosestPoint PRIVATE ${LINK_LIBRARIES})
-add_executable(TestOpenCVFlann test/TestOpenCVFlann.cpp)
-target_link_libraries(TestOpenCVFlann PRIVATE ${LINK_LIBRARIES})
-add_executable(TestQPainterPath test/TestQPainterPath.cpp)
-target_link_libraries(TestQPainterPath PRIVATE ${LINK_LIBRARIES})
-add_executable(TestDriver test/TestDriver.cpp)
-target_link_libraries(TestDriver PRIVATE ${LINK_LIBRARIES})
-add_executable(TestException test/TestException.cpp src/exception/LaserException.h src/exception/LaserException.cpp)
-target_link_libraries(TestException PRIVATE ${LINK_LIBRARIES})
-add_executable(TestGeometry test/TestGeometry.cpp)
-target_link_libraries(TestGeometry PRIVATE ${LINK_LIBRARIES})
-
-FILE(GLOB TestDelphiLibrarySrc test/DelphiLibraryTest/*.*)
-add_executable(TestDelphiLibrary ${TestDelphiLibrarySrc})
-target_link_libraries(TestDelphiLibrary PRIVATE ${LINK_LIBRARIES})
+    FILE(GLOB TestDelphiLibrarySrc test/DelphiLibraryTest/*.*)
+    add_executable(TestDelphiLibrary ${TestDelphiLibrarySrc})
+    target_link_libraries(TestDelphiLibrary PRIVATE ${LINK_LIBRARIES})
+endif()
 
 set(QM_FILES
     ${QM_FILES}
@@ -283,9 +281,8 @@ set(QM_FILES
 #qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR}/src ${TS_FILES})
 
 add_custom_target (GenerateTranslations 
-    Qt5::lupdate ${CMAKE_SOURCE_DIR}/src -ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_zh_CN.ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_en_US.ts
+    Qt5::lupdate ${CMAKE_SOURCE_DIR}/src -ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_zh_CN.ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_en_US.ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_ru_RU.ts
 )
 
 include(cmake_install_Debug.cmake)
 include(cmake_install_Release.cmake)
-#include(cmake_install_RelWithDebInfo.txt)

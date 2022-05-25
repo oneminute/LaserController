@@ -3,4 +3,4 @@
 	url = https://gitee.com/EngineRender/LRWidgets.git
 [submodule "src/widget/ADS"]
 	path = src/widget/ADS
-	url = https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System.git
+	url = https://gitee.com/EngineRender/qt-advanced-docking-system.git
