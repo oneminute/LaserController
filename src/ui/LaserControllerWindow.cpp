@@ -728,8 +728,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_textLayout->addWidget(m_fontItalic, 0, 9);
     m_textLayout->addWidget(new QLabel(tr("Upper Case")), 1, 6, 1, 2);
     m_textLayout->addWidget(m_fontUpper, 1, 8);
-    //set up align action
-    //m_ui->actionAlignHorizontal->
+    
     //text family
     connect(m_fontFamily, QOverload<int>::of(&QComboBox::highlighted), this, &LaserControllerWindow::onFontComboBoxHighLighted);
     connect(m_viewer, &LaserViewer::creatingText, this, &LaserControllerWindow::onChangeFontComboBoxByEditingText);
@@ -3284,6 +3283,14 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     m_aFWidthLabel = new QLabel(tr("Line Width"));
     m_aFWidth = new LaserDoubleSpinBox();
     m_aFWidth->setValue(0.1);
+    //fingerprint
+    m_fingerprintBt = new QPushButton(tr("fingerprint"));
+    m_fingerprintClearBt = new QPushButton(tr("clear"));
+    m_fingerprintOtherBt = new QPushButton(tr("other"));
+    m_fingerprintDensityLabel = new QLabel(tr("proportion"));
+    m_fingerprintDensitySpinBox = new LaserDoubleSpinBox();
+    m_fingerprintDensitySpinBox->setMaximum(999);
+    m_fingerprintDensitySpinBox->setSuffix("%");
     //stampBitmap
     m_lockSizeRatio = new QToolButton();
     m_lockSizeRatio->setDefaultAction(m_ui->actionLock);
@@ -3662,7 +3669,19 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     connect(m_aFLines, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
         shapePropertyTextFont(11);
     });
-
+    //fingerprint
+    connect(m_fingerprintBt, &QPushButton::clicked, this, [=] {
+        shapePropertyTextFont(12);
+    });
+    connect(m_fingerprintDensitySpinBox, &LaserDoubleSpinBox::enterOrLostFocus, this, [=] {
+        shapePropertyTextFont(15);
+    });
+    connect(m_fingerprintClearBt, &QPushButton::clicked, this, [=] {
+        shapePropertyTextFont(13);
+    });
+    connect(m_fingerprintOtherBt, &QPushButton::clicked, this, [=] {
+        shapePropertyTextFont(14);
+    });
     //预览字体
     connect(m_textFamily, QOverload<int>::of(&QComboBox::highlighted), this, [=](int index) {
         LaserStampText*  text = shapePropertyTextFont(4);
@@ -3725,7 +3744,7 @@ LaserStampText* LaserControllerWindow::shapePropertyTextFont(int fontProperty)
     LaserStampText* text = qgraphicsitem_cast<LaserStampText*>(firstPrimitive);
     LaserStampBase* stampBase = qgraphicsitem_cast<LaserStampBase*>(firstPrimitive);
     if (text != nullptr || stampBase != nullptr) {
-        
+        qreal fingerprintDensity = m_fingerprintDensitySpinBox->value();
         switch (fontProperty) {
             case 0: {
                 /*bool checked = m_textItalic->isChecked();
@@ -3899,14 +3918,128 @@ LaserStampText* LaserControllerWindow::shapePropertyTextFont(int fontProperty)
 
                 break;
             }
-            
+            case 12: {
+                if (fingerprintDensity <= 0) {
+                    stampBase->setFingerMap(QPixmap());
+                    stampBase->setFingerMapDensity(0);
+                    break;
+                }
+                if (m_fingerprintRotateAngle == 180) {
+                    m_fingerprintRotateAngle = -90;
+                }
+                else {
+                    m_fingerprintRotateAngle += 90;
+                }
+                qsrand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
+                int i = qrand() % 7;   //随机生成0到9的随机数
+                QString path = m_fingerprintImagePath[i];
+                QImage image(path);
+                QRgb tRgb = stampBase->document()->layers()[stampBase->layerIndex()]->color().rgb();
+                int tR = qRed(tRgb);
+                int tG = qGreen(tRgb);
+                int tB = qBlue(tRgb);
+                image = image.convertToFormat(QImage::Format_ARGB32);
+                for (int row = 0; row < image.width(); row++) {
+                    for (int col = 0; col < image.height(); col++) {
+                         QRgb rgb = image.pixel(row, col);
+                         int r = qRed(rgb);
+                         int g = qGreen(rgb);
+                         int b = qBlue(rgb);
+                         int a = qAlpha(rgb);
+                         if ((r == 255 && g == 255 && b == 255) || a == 0) {
+                             a = 0;
+                         }
+                         else {
+                             a = 255;
+                             r = tR;
+                             g = tG;
+                             b = tB;
+                         }
+                         image.setPixel(row, col, QColor(r, g, b, a).rgba());
+                    }
+                }
+                QTransform t;
+                t.rotate(m_fingerprintRotateAngle);
+                image = image.transformed(t);
+                m_curFingerprintImage = image;
+                setStampFingerprint(stampBase, fingerprintDensity);
+                break;
+            }
+            case 13: {
+                m_curFingerprintImage = QImage();
+                m_fingerprintDensitySpinBox->setValue(0);
+                setStampFingerprint(stampBase, 0);
+                break;
+            }
+            case 14: {
+                
+                if (fingerprintDensity <= 0) {
+                    stampBase->setFingerMap(QPixmap());
+                    stampBase->setFingerMapDensity(0);
+                    break;
+                }
+
+                QString path = QFileDialog::getOpenFileName(nullptr, tr("Open File"), ".", "File(*.png *.bmp *.jpg)");;
+                QImage originalImage(path);
+                QRgb tRgb = stampBase->document()->layers()[stampBase->layerIndex()]->color().rgb();
+                int tR = qRed(tRgb);
+                int tG = qGreen(tRgb);
+                int tB = qBlue(tRgb);
+                QImage image = originalImage.convertToFormat(QImage::Format_Grayscale8);
+                QImage newImage = originalImage.convertToFormat(QImage::Format_ARGB32);
+                for (int row = 0; row < image.width(); row++) {
+                    for (int col = 0; col < image.height(); col++) {
+                        QRgb rgb = image.pixel(row, col);
+                        int gray = qGray(rgb);
+                        int a = qAlpha(rgb);
+                        qreal ratio = gray /255.0;
+                        qreal r = tR * ratio;
+                        qreal g = tG * ratio;
+                        qreal b = tB * ratio;
+                        newImage.setPixel(row, col, QColor(r, g, b, a).rgba());
+                    }
+                }
+                m_curFingerprintImage = newImage;
+                setStampFingerprint(stampBase, fingerprintDensity);
+                break;
+            }
+            case 15: {
+                if (fingerprintDensity <= 0) {
+                    stampBase->setFingerMap(QPixmap());
+                    stampBase->setFingerMapDensity(0);
+                    break;
+                }
+                setStampFingerprint(stampBase, fingerprintDensity);
+                break;
+            }
         }
-        
+       
         m_viewer->viewport()->repaint();
         return text;
     }
     else {
         return nullptr;
+    }
+}
+
+void LaserControllerWindow::setStampFingerprint(LaserStampBase* stampBase, qreal density)
+{
+    if (m_curFingerprintImage == QImage()) {
+        stampBase->setFingerMap(QPixmap());
+    }
+    else {
+        QPixmap map;
+        map = QPixmap::fromImage(m_curFingerprintImage);
+        stampBase->setFingerMap(map);
+        
+    }
+    qreal rate = density / 100.0;
+    stampBase->setFingerMapDensity(rate);
+
+    if (stampBase->primitiveType() == LPT_STAMPBITMAP) {
+        LaserStampBitmap* bitmap = qgraphicsitem_cast<LaserStampBitmap*>(stampBase);
+        bitmap->setFingerprint();
+        bitmap->computeMask();
     }
 }
 
@@ -4235,8 +4368,19 @@ void LaserControllerWindow::showShapePropertyPanel()
             layoutAntiFake->addRow(m_aFWidthLabel, m_aFWidth);
             layoutAntiFake->addRow(m_aFAverageCheckbox, m_aFAntifakeBtn);
             m_verticalTextPropertyLayout->addWidget(antiFakeB, 8, 0, 1, 2);
+            //fingerprint
+            QGroupBox* fingerprintB = new QGroupBox();
+            fingerprintB->setTitle(tr("fingerprint"));
+            QGridLayout* layoutFingerprint = new QGridLayout(fingerprintB);
+            layoutFingerprint->addWidget(m_fingerprintDensityLabel, 0, 0);
+            layoutFingerprint->addWidget(m_fingerprintDensitySpinBox, 0, 1, 1, 2);
+            layoutFingerprint->addWidget(m_fingerprintBt, 1, 0);
+            layoutFingerprint->addWidget(m_fingerprintOtherBt, 1, 1);
+            layoutFingerprint->addWidget(m_fingerprintClearBt, 1, 2);
+            fingerprintB->setLayout(layoutFingerprint);
+            m_verticalTextPropertyLayout->addWidget(fingerprintB, 9, 0, 1, 2);
             //set value
-            setAntiFakePanelValue(text);
+            setCommonStampPanelValue(text);
             
             break;
         }
@@ -4294,8 +4438,19 @@ void LaserControllerWindow::showShapePropertyPanel()
             layoutAntiFake->addRow(m_aFWidthLabel, m_aFWidth);
             layoutAntiFake->addRow(m_aFAverageCheckbox, m_aFAntifakeBtn);
             m_horizontalTextPropertyLayout->addWidget(antiFakeB, 8, 0, 1, 2);
+            //fingerprint
+            QGroupBox* fingerprintB = new QGroupBox();
+            fingerprintB->setTitle(tr("fingerprint"));
+            QGridLayout* layoutFingerprint = new QGridLayout(fingerprintB);
+            layoutFingerprint->addWidget(m_fingerprintDensityLabel, 0, 0);
+            layoutFingerprint->addWidget(m_fingerprintDensitySpinBox, 0, 1, 1, 2);
+            layoutFingerprint->addWidget(m_fingerprintBt, 1, 0);
+            layoutFingerprint->addWidget(m_fingerprintOtherBt, 1, 1);
+            layoutFingerprint->addWidget(m_fingerprintClearBt, 1, 2);
+            fingerprintB->setLayout(layoutFingerprint);
+            m_horizontalTextPropertyLayout->addWidget(fingerprintB, 9, 0, 1, 2);
             //set value
-            setAntiFakePanelValue(text);
+            setCommonStampPanelValue(text);
 
             break;
         }
@@ -4362,8 +4517,19 @@ void LaserControllerWindow::showShapePropertyPanel()
             layoutAntiFake->addRow(m_aFWidthLabel, m_aFWidth);
             layoutAntiFake->addRow(m_aFAverageCheckbox, m_aFAntifakeBtn);
             m_circleTextPropertyLayout->addWidget(antiFakeB, 10, 0, 1, 2);
+            //fingerprint
+            QGroupBox* fingerprintB = new QGroupBox();
+            fingerprintB->setTitle(tr("fingerprint"));
+            QGridLayout* layoutFingerprint = new QGridLayout(fingerprintB);
+            layoutFingerprint->addWidget(m_fingerprintDensityLabel, 0, 0);
+            layoutFingerprint->addWidget(m_fingerprintDensitySpinBox, 0, 1, 1, 2);
+            layoutFingerprint->addWidget(m_fingerprintBt, 1, 0);
+            layoutFingerprint->addWidget(m_fingerprintOtherBt, 1, 1);
+            layoutFingerprint->addWidget(m_fingerprintClearBt, 1, 2);
+            fingerprintB->setLayout(layoutFingerprint);
+            m_circleTextPropertyLayout->addWidget(fingerprintB, 11, 0, 1, 2);
             //set value
-            setAntiFakePanelValue(text);
+            setCommonStampPanelValue(text);
             break;
         }
         case LPT_FRAME: {
@@ -4395,8 +4561,19 @@ void LaserControllerWindow::showShapePropertyPanel()
             layoutAntiFake->addRow(m_aFSurpassOuterCheckbox, m_aFSurpassInnerCheckbox);
             layoutAntiFake->addRow(nullptr, m_aFAntifakeBtn);
             m_framePropertyLayout->addWidget(antiFakeB, 6, 0, 1, 2);
+            //fingerprint
+            QGroupBox* fingerprintB = new QGroupBox();
+            fingerprintB->setTitle(tr("fingerprint"));
+            QGridLayout* layoutFingerprint = new QGridLayout(fingerprintB);
+            layoutFingerprint->addWidget(m_fingerprintDensityLabel, 0, 0);
+            layoutFingerprint->addWidget(m_fingerprintDensitySpinBox, 0, 1, 1, 2);
+            layoutFingerprint->addWidget(m_fingerprintBt, 1, 0);
+            layoutFingerprint->addWidget(m_fingerprintOtherBt, 1, 1);
+            layoutFingerprint->addWidget(m_fingerprintClearBt, 1, 2);
+            fingerprintB->setLayout(layoutFingerprint);
+            m_framePropertyLayout->addWidget(fingerprintB, 7, 0, 1, 2);
             //set value
-            setAntiFakePanelValue(frame);
+            setCommonStampPanelValue(frame);
 
             //value
             m_locked->setText(tr("Locked"));
@@ -4441,8 +4618,19 @@ void LaserControllerWindow::showShapePropertyPanel()
             layoutAntiFake->addRow(m_aFSurpassOuterCheckbox, m_aFSurpassInnerCheckbox);
             layoutAntiFake->addRow(nullptr, m_aFAntifakeBtn);
             m_ringPropertyLayout->addWidget(antiFakeB, 4, 0, 1, 2);
+            //fingerprint
+            QGroupBox* fingerprintB = new QGroupBox();
+            fingerprintB->setTitle(tr("fingerprint"));
+            QGridLayout* layoutFingerprint = new QGridLayout(fingerprintB);
+            layoutFingerprint->addWidget(m_fingerprintDensityLabel, 0, 0);
+            layoutFingerprint->addWidget(m_fingerprintDensitySpinBox, 0, 1, 1, 2);
+            layoutFingerprint->addWidget(m_fingerprintBt, 1, 0);
+            layoutFingerprint->addWidget(m_fingerprintOtherBt, 1, 1);
+            layoutFingerprint->addWidget(m_fingerprintClearBt, 1, 2);
+            fingerprintB->setLayout(layoutFingerprint);
+            m_ringPropertyLayout->addWidget(fingerprintB, 5, 0, 1, 2);
             //set value
-            setAntiFakePanelValue(ring);
+            setCommonStampPanelValue(ring);
             //value
             m_locked->setText(tr("Locked"));
             m_borderWidth->setVisible(true);
@@ -4479,8 +4667,19 @@ void LaserControllerWindow::showShapePropertyPanel()
             layoutAntiFake->addRow(m_aFWidthLabel, m_aFWidth);
             layoutAntiFake->addRow(m_aFAverageCheckbox, m_aFAntifakeBtn);
             m_starPropertyLayout->addWidget(antiFakeB, 2, 0, 1, 2);
+            //fingerprint
+            QGroupBox* fingerprintB = new QGroupBox();
+            fingerprintB->setTitle(tr("fingerprint"));
+            QGridLayout* layoutFingerprint = new QGridLayout(fingerprintB);
+            layoutFingerprint->addWidget(m_fingerprintDensityLabel, 0, 0);
+            layoutFingerprint->addWidget(m_fingerprintDensitySpinBox, 0, 1, 1, 2);
+            layoutFingerprint->addWidget(m_fingerprintBt, 1, 0);
+            layoutFingerprint->addWidget(m_fingerprintOtherBt, 1, 1);
+            layoutFingerprint->addWidget(m_fingerprintClearBt, 1, 2);
+            fingerprintB->setLayout(layoutFingerprint);
+            m_starPropertyLayout->addWidget(fingerprintB, 3, 0, 1, 2);
             //set value
-            setAntiFakePanelValue(star);
+            setCommonStampPanelValue(star);
 
             m_originalBoundsSize->setValue(star->radius() * 2 * 0.001);
             break;
@@ -4507,8 +4706,19 @@ void LaserControllerWindow::showShapePropertyPanel()
             layoutAntiFake->addRow(m_aFWidthLabel, m_aFWidth);
             layoutAntiFake->addRow(m_aFAverageCheckbox, m_aFAntifakeBtn);
             m_partyEmblePropertyLayout->addWidget(antiFakeB, 2, 0, 1, 2);
+            //fingerprint
+            QGroupBox* fingerprintB = new QGroupBox();
+            fingerprintB->setTitle(tr("fingerprint"));
+            QGridLayout* layoutFingerprint = new QGridLayout(fingerprintB);
+            layoutFingerprint->addWidget(m_fingerprintDensityLabel, 0, 0);
+            layoutFingerprint->addWidget(m_fingerprintDensitySpinBox, 0, 1, 1, 2);
+            layoutFingerprint->addWidget(m_fingerprintBt, 1, 0);
+            layoutFingerprint->addWidget(m_fingerprintOtherBt, 1, 1);
+            layoutFingerprint->addWidget(m_fingerprintClearBt, 1, 2);
+            fingerprintB->setLayout(layoutFingerprint);
+            m_partyEmblePropertyLayout->addWidget(fingerprintB, 3, 0, 1, 2);
             //set value
-            setAntiFakePanelValue(emblem);
+            setCommonStampPanelValue(emblem);
             break;
         }
         case LPT_STAMPBITMAP: {
@@ -4539,14 +4749,26 @@ void LaserControllerWindow::showShapePropertyPanel()
             layoutAntiFake->addRow(m_aFWidthLabel, m_aFWidth);
             layoutAntiFake->addRow(m_aFAverageCheckbox, m_aFAntifakeBtn);
             m_stampBitmapPropertyLayout->addWidget(antiFakeB, 3, 0, 1, 2);
+            //fingerprint
+            QGroupBox* fingerprintB = new QGroupBox();
+            fingerprintB->setTitle(tr("fingerprint"));
+            QGridLayout* layoutFingerprint = new QGridLayout(fingerprintB);
+            layoutFingerprint->addWidget(m_fingerprintDensityLabel, 0, 0);
+            layoutFingerprint->addWidget(m_fingerprintDensitySpinBox, 0, 1, 1, 2);
+            layoutFingerprint->addWidget(m_fingerprintBt, 1, 0);
+            layoutFingerprint->addWidget(m_fingerprintOtherBt, 1, 1);
+            layoutFingerprint->addWidget(m_fingerprintClearBt, 1, 2);
+            fingerprintB->setLayout(layoutFingerprint);
+            m_stampBitmapPropertyLayout->addWidget(fingerprintB, 4, 0, 1, 2);
             //set value
-            setAntiFakePanelValue(bitmap);
+            
+            setCommonStampPanelValue(bitmap);
             break;
         }
     }
 }
 
-void LaserControllerWindow::setAntiFakePanelValue(LaserStampBase* p)
+void LaserControllerWindow::setCommonStampPanelValue(LaserStampBase* p)
 {
     m_aFType->setCurrentIndex(p->antiFakeType());
     m_aFLines->setValue(p->antiFakeLine());
@@ -4555,6 +4777,8 @@ void LaserControllerWindow::setAntiFakePanelValue(LaserStampBase* p)
     m_aFSurpassOuterCheckbox->setChecked(p->surpassOuter());
     m_aFSurpassInnerCheckbox->setChecked(p->surpassInner());
     m_aFRandomMoveCheckbox->setChecked(p->randomMove());
+    qreal v = p->fingerMapDensity();
+    m_fingerprintDensitySpinBox->setValue(p->fingerMapDensity()*100);
 }
 
 void LaserControllerWindow::createPrimitivePropertiesPanel()
@@ -5109,7 +5333,7 @@ void LaserControllerWindow::onActionOpen(bool checked)
 void LaserControllerWindow::onActionZoomIn(bool checked)
 {
 	m_viewer->zoomIn();
-    //m_scene->document()->generateStampImages();
+    m_scene->document()->generateStampImages();
 }
 
 void LaserControllerWindow::onActionZoomOut(bool checked)

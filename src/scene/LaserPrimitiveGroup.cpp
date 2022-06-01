@@ -108,6 +108,10 @@ void LaserPrimitiveGroup::paint(QPainter * painter, const QStyleOptionGraphicsIt
 void LaserPrimitiveGroup::addToGroup(LaserPrimitive * primitive)
 {
     primitive->setParentItem(this);
+    int zVal = primitive->zValue();
+    if (zVal > zValue()) {
+        setZValue(zVal);
+    }
     emit childrenChanged();
 }
 
@@ -117,6 +121,13 @@ void LaserPrimitiveGroup::removeFromGroup(LaserPrimitive * primitive)
     primitive->setParentItem(0);
     primitive->setTransform(transform);
     primitive->setPos(0, 0);
+    int zMaxVal = 0;
+    for (QGraphicsItem* item : childItems()) {
+        if (item->zValue() > zMaxVal) {
+            zMaxVal = item->zValue();
+        }
+    }
+    setZValue(zMaxVal);
     emit childrenChanged();
 }
 

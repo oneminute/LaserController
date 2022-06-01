@@ -486,8 +486,12 @@ public:
         int layerIndex, int antiFakeType = 0, int antiFakeLine = 0, bool isAverageDistribute = false, qreal lineWidth = 0,
         bool surpassOuter = false, bool surpassInner = false, bool randomMove = false);
     ~LaserStampBase();
+    void setFingerMap(QPixmap map);
+    QPixmap& fingerMap();
+    void setFingerMapDensity(qreal density);
+    qreal fingerMapDensity();
+    void setStampBrush(QPainter* painter, QColor color, QSize size, QTransform otherTransform = QTransform(), bool isResetColor = false);
     virtual void setAntiFakePath(QPainterPath path);
-    void setFingerPrintPath(QPainterPath path);
     bool stampIntaglio();
     virtual void setStampIntaglio(bool bl);
     int antiFakeType();
@@ -806,7 +810,12 @@ public:
     virtual LaserPrimitive* clone(QTransform t);
     virtual QJsonObject toJson();
     virtual void draw(QPainter* painter);
+    void setOriginalImage(QImage image);
+    void setFingerprint();
+    void computeMask();
     void setBounds(QRect bounds);
+    QImage generateStampImage();
+
     virtual void setBoundingRectWidth(qreal width);
     virtual void setBoundingRectHeight(qreal height);
     virtual void setAntiFakePath(QPainterPath path);
