@@ -28,6 +28,7 @@ public:
     void addGroupItemsToTreeNode();
 	void removeLaserPrimitive(LaserPrimitive* primitive);
 	LaserBackgroundItem* backgroundItem() { return m_background; }
+    void resetGroupZValue();
 
     LaserDocument* document() { return m_doc; }
 
