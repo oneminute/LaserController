@@ -447,7 +447,7 @@ StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* 
     m_ui->emblemComboBox->addItem(QIcon(partyEmblem), tr("Party Emblem"));
     m_ui->emblemComboBox->addItem(QIcon(), tr("Import Image"));
     m_ui->emblemComboBox->setItemDelegate(new QStyledItemDelegate());
-    connect(m_ui->emblemComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
+    connect(m_ui->emblemComboBox, QOverload<int>::of(&QComboBox::activated), [=](int index) {
         if (index == 2) {
             QString name = QFileDialog::getOpenFileName(nullptr, "open image", ".", "Images (*.png)");           
             m_importEmblemPath = name;

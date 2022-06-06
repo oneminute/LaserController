@@ -162,9 +162,10 @@ protected:
     //shape properties panel / dock panel
     void createShapePropertyDockPanel();
     LaserStampText* shapePropertyTextFont(int fontProperty);
+    void setStampFingerprint(LaserStampBase* stampBase, qreal density);
     //show shape properties
     void showShapePropertyPanel();
-    void setAntiFakePanelValue(LaserStampBase* p);
+    void setCommonStampPanelValue(LaserStampBase* p);
     void createPrimitivePropertiesPanel();
     //shape properties panel / dock panel
     void createPrimitiveLinePropertyPanel();
@@ -663,6 +664,24 @@ private:
     QCheckBox* m_aFSurpassOuterCheckbox;
     QCheckBox* m_aFSurpassInnerCheckbox;
     QPushButton* m_aFAntifakeBtn;
+    //fingerprint
+    QLabel* m_fingerprintDensityLabel;
+    LaserDoubleSpinBox* m_fingerprintDensitySpinBox;
+    QPushButton* m_fingerprintBt;
+    QPushButton* m_fingerprintClearBt;
+    QPushButton* m_fingerprintOtherBt;
+    QString m_fingerprintImagePath[7] = {
+        ":/ui/icons/images/fingerprint1.png", 
+        ":/ui/icons/images/fingerprint2.png",
+        ":/ui/icons/images/fingerprint3.png",
+        ":/ui/icons/images/fingerprint4.png",
+        ":/ui/icons/images/fingerprint5.png",
+        ":/ui/icons/images/fingerprint6.png",
+        ":/ui/icons/images/fingerprint7.png"
+
+    };
+    int m_fingerprintRotateAngle = 0;
+    QImage m_curFingerprintImage;
     //stampBitmap
     QToolButton* m_lockSizeRatio;
     
