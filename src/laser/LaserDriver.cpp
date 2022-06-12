@@ -81,11 +81,10 @@ bool LaserDriver::load()
         return true;
 
     qRegisterMetaType<DeviceState>("DeviceState");
-    QString cpuArch = QSysInfo::currentCpuArchitecture();
-    qLogD << "cpuArch: " << cpuArch;
     QString libName = "LaserLib32.dll";
-    if (cpuArch == "x86_64")
-        libName = "LaserLib64.dll";
+#ifdef ARCH_x64
+    libName = "LaserLib64.dll";
+#endif
     m_library.setFileName(libName);
     if (!m_library.load())
     {
@@ -117,7 +116,8 @@ bool LaserDriver::load()
     m_fnSysMessageCallBack = (FNSysMessageCallBack)m_library.resolve("SysMessageCallBack");
     CHECK_FN(m_fnSysMessageCallBack)
 
-    m_fnGetComPortList = (FN_WCHART_VOID)m_library.resolve("GetComPortList");
+    m_fnGetComPortList = (FN_WCHART_VOID)m_library.resolve("GetComPortListEx");
+    //m_fnGetComPortList = (FN_WCHART_VOID)m_library.resolve("GetComPortList");
     CHECK_FN(m_fnGetComPortList)
 
     m_fnInitComPort = (FN_INT_INT)m_library.resolve("InitComPort");
@@ -357,7 +357,8 @@ void LaserDriver::unInit()
 
 QStringList LaserDriver::getPortList()
 {
-    QString portList = QString::fromWCharArray(m_fnGetComPortList());
+    wchar_t* str = m_fnGetComPortList();
+    QString portList = QString::fromWCharArray(str);
     QStringList portNames = portList.split(";");
 
     return portNames;

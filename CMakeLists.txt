@@ -22,22 +22,27 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 # declare variables
 set(QT_WIN32_PATH "" CACHE PATH "")
 set(OPENCV_WIN32_PATH "" CACHE PATH "")
-set(CNELaser_ARCH "64" CACHE STRING "")
-#set(LZ4_DEBUG "" CACHE FILEPATH "")
-#set(LZ4_RELEASE "" CACHE FILEPATH "")
 option(CNELASER_BUILD_EXAMPLES "Build Examples and Tech tests" OFF)
 list(APPEND CMAKE_PROGRAM_PATH ${QT_WIN32_PATH} ${OPENCV_WIN32_PATH})
 
-list(APPEND CMAKE_CXX_FLAGS " /bigobj")
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    message(STATUS x64)
+    set(CNELaser_ARCH "64")
+    add_compile_definitions(ARCH_x64)
+elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    message(STATUS x32)
+    set(CNELaser_ARCH "32")
+    add_compile_definitions(ARCH_x32)
+endif()
+
 
 set(NEW_PATH ${QT_WIN32_PATH} ${OPENCV_WIN32_PATH} $ENV{PATH})
 set(CMAKE_MSVCIDE_RUN_PATH ${NEW_PATH})
 
-message(STATUS CMAKE_SYSTEM_PROCESSOR=${CMAKE_SYSTEM_PROCESSOR})
 
 # Find the QtWidgets library
 find_package(Eigen3 REQUIRED REQUIRED)
-find_package(Qt5 COMPONENTS Widgets Charts LinguistTools OpenGL Concurrent Multimedia MultimediaWidgets Test CONFIG REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Charts LinguistTools OpenGL Concurrent Multimedia MultimediaWidgets SerialPort Test CONFIG REQUIRED)
 find_package(OpenCV COMPONENTS core imgcodecs imgproc highgui video videoio flann features2d xfeatures2d calib3d tracking REQUIRED)
 find_package(glog REQUIRED QUIET)
 find_package(gflags REQUIRED QUIET)
@@ -66,6 +71,9 @@ FILE(GLOB BASE_SOURCES src/*.cpp)
 
 FILE(GLOB COMMON_HEADERS src/common/*.h)
 FILE(GLOB COMMON_SOURCES src/common/*.cpp)
+
+FILE(GLOB COMPORT_HEADERS src/comport/*.h)
+FILE(GLOB COMPORT_SOURCES src/comport/*.cpp)
 
 FILE(GLOB CAMERA_HEADERS src/camera/*.h)
 FILE(GLOB CAMERA_SOURCES src/camera/*.cpp)
@@ -180,6 +188,8 @@ set(SRC_FILES
 IF(MSVC)
     source_group("source\\common" FILES ${COMMON_SOURCES})
     source_group("header\\common" FILES ${COMMON_HEADERS})
+    source_group("source\\comport" FILES ${COMPORT_SOURCES})
+    source_group("header\\comport" FILES ${COMPORT_HEADERS})
     source_group("source\\camera" FILES ${CAMERA_SOURCES})
     source_group("header\\camera" FILES ${CAMERA_HEADERS})
     source_group("source\\algorithm" FILES ${ALGORITHM_SOURCES})
@@ -212,7 +222,21 @@ IF(MSVC)
     source_group("res" FILES ${RES})
 ENDIF(MSVC)
 
-include_directories(${INCLUDE_DIRS})
+add_library(CNEComPort SHARED ${COMPORT_HEADERS} ${COMPORT_SOURCES})
+target_link_libraries(CNEComPort PRIVATE
+    Qt5::SerialPort
+)
+target_compile_definitions(CNEComPort PRIVATE COMPORT_LIBRARY)
+
+add_executable(CNEComPortTesting src/testing/comport/ComPortTesting.cpp)
+add_test(NAME CNEComPortTesting COMMAND CNEComPortTesting)
+target_include_directories(CNEComPortTesting PUBLIC src/comport)
+target_link_libraries(CNEComPortTesting PRIVATE
+    Qt5::SerialPort
+    Qt5::Test
+    CNEComPort
+)
+
 set(LINK_LIBRARIES 
     Eigen3::Eigen
     Qt5::Widgets Qt5::Charts Qt5::OpenGL Qt5::Concurrent Qt5::Test Qt5::Multimedia Qt5::MultimediaWidgets
@@ -240,6 +264,7 @@ endif()
 add_dependencies(CNELaser GenerateConstraints)
 
 target_link_libraries(CNELaser PRIVATE ${LINK_LIBRARIES})
+target_include_directories(CNELaser PUBLIC ${INCLUDE_DIRS})
 set_target_properties(
     ${PROJECT_NAME} PROPERTIES
     VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"

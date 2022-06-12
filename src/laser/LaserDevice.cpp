@@ -330,6 +330,7 @@ void LaserDevice::load()
             d->driver->setupCallbacks();
             d->isInit = true;
             d->driver->getPortList();
+            //connectDevice("COM8");
             updateDriverLanguage();
             QString dongleId = d->driver->getDongleId();
             if (!dongleId.isEmpty() && !dongleId.isNull())
