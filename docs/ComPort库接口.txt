@@ -1,0 +1,20 @@
+串口DLL接口
+
+function OpenComPort(const _ComPort: Integer; const _BaudRate: Integer): Integer; //打开串口 成功返回串口号，失败返回-1
+
+procedure ComPortAfterOpen; //串口打开后 以回调形式实现
+
+function CloseComPort:integer;//关闭串口 成功返回串口号，失败返回-1
+
+procedure ComPortAfterClose; //串口关闭后 以回调形式实现
+
+function Connected:Boolean; //获取串口状态 打开成功返回TRUE
+
+procedure ComPortError; //串口错误 以回调形式实现
+
+procedure ComPortRxChar(Count: Integer); //串口接收到数据时的事件，以回调形式实现 (Count是数据长度)
+说明：ComPortRxChar事件，指串口缓冲区有数据时，EXE通过此回调过程，主动执行下面的Read函数获取到缓冲区数据
+
+function Read(var Buffer; Count: Integer): Integer; //串口读数据 (返回Buffer是读取到的数据，Count是数据长度)
+
+function Write(const Buffer; Count: Integer): Integer; //串口写数据 （Buffer是发往串口的数据，Count是数据长度）

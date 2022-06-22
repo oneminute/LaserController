@@ -15,9 +15,7 @@ INSTALL(FILES
 	CONFIGURATIONS Debug)
 
 foreach(_lib IN LISTS OpenCV_LIBS)
-	#get_target_property(${_lib}_location_Debug ${_lib} IMPORTED_LOCATION_DEBUG)
-	get_target_property(${_lib}_location_Release ${_lib} IMPORTED_LOCATION_RELEASE)
-	#get_target_property(${_lib}_location_RelWithDebInfo ${_lib} IMPORTED_LOCATION_RELWITHDEUBINFO)
+	get_target_property(${_lib}_location_Debug ${_lib} IMPORTED_LOCATION_DEBUG)
 	INSTALL(FILES 
 		${${_lib}_location_Debug}
 		DESTINATION ${CMAKE_INSTALL_PREFIX}_Debug
@@ -45,7 +43,9 @@ if(Qt5_FOUND AND WIN32 AND TARGET Qt5::qmake AND NOT TARGET Qt5::windeployqt)
     endif()
 endif()
 
-set(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+set(CMAKE_INSTALL_DEBUG_LIBRARIES TRUE)
+set(CMAKE_INSTALL_DEBUG_LIBRARIES_ONLY TRUE)
+set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
 include(InstallRequiredSystemLibraries)
 install(
     PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}

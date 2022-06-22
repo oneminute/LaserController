@@ -39,7 +39,7 @@ LaserDriver::~LaserDriver()
     qLogD << "driver destroyed";
 }
 
-void LaserDriver::ProgressCallBackHandler(void* ptr, int position, int totalCount)
+void LaserDriver::ProgressCallBackHandler(int position, int totalCount)
 {
     if (LaserApplication::driver->m_isClosed)
         return;
@@ -49,7 +49,7 @@ void LaserDriver::ProgressCallBackHandler(void* ptr, int position, int totalCoun
     emit LaserApplication::driver->progress(position, totalCount, progress);
 }
 
-void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysMsgCode, wchar_t* sysEventData)
+void LaserDriver::SysMessageCallBackHandler(int sysMsgIndex, int sysMsgCode, wchar_t* sysEventData)
 {
     if (LaserApplication::driver->m_isClosed)
         return;
@@ -68,7 +68,7 @@ void LaserDriver::SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysM
     }
 }
 
-void LaserDriver::ProcDataProgressCallBackHandler(void* ptr, int position, int totalCount)
+void LaserDriver::ProcDataProgressCallBackHandler(int position, int totalCount)
 {
     float progress = position * 1.0f / totalCount;
     qDebug() << "Proc progress callback handler:" << position << totalCount << QString("%1%").arg(static_cast<double>(progress * 100), 3, 'g', 4);
@@ -81,11 +81,10 @@ bool LaserDriver::load()
         return true;
 
     qRegisterMetaType<DeviceState>("DeviceState");
-    QString cpuArch = QSysInfo::currentCpuArchitecture();
-    qLogD << "cpuArch: " << cpuArch;
     QString libName = "LaserLib32.dll";
-    if (cpuArch == "x86_64")
-        libName = "LaserLib64.dll";
+#ifdef ARCH_x64
+    libName = "LaserLib64.dll";
+#endif
     m_library.setFileName(libName);
     if (!m_library.load())
     {
@@ -117,6 +116,7 @@ bool LaserDriver::load()
     m_fnSysMessageCallBack = (FNSysMessageCallBack)m_library.resolve("SysMessageCallBack");
     CHECK_FN(m_fnSysMessageCallBack)
 
+    //m_fnGetComPortList = (FN_WCHART_VOID)m_library.resolve("GetComPortListEx");
     m_fnGetComPortList = (FN_WCHART_VOID)m_library.resolve("GetComPortList");
     CHECK_FN(m_fnGetComPortList)
 
@@ -305,8 +305,8 @@ bool LaserDriver::load()
 
 void LaserDriver::unload()
 {
-    if (m_isLoaded)
-        m_fnUnInitLib();
+    //if (m_isLoaded)
+        //m_fnUnInitLib();
     m_isLoaded = false;
     m_isClosed = true;
 }
@@ -357,8 +357,10 @@ void LaserDriver::unInit()
 
 QStringList LaserDriver::getPortList()
 {
-    QString portList = QString::fromWCharArray(m_fnGetComPortList());
+    wchar_t* str = m_fnGetComPortList();
+    QString portList = QString::fromWCharArray(str);
     QStringList portNames = portList.split(";");
+    qLogD << "portNames: " << portNames;
 
     return portNames;
 }

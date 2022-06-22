@@ -15,6 +15,7 @@
 #include <QFileDialog> 
 #include <FloatingDockContainer.h>
 #include <QCheckBox>
+#include <QTextCodec>
 #include <QComboBox>
 #include <QDesktopServices>
 #include <QErrorMessage>
@@ -24,6 +25,7 @@
 #include <QGroupBox>
 #include <QImage>
 #include <QImageReader>
+#include <QInputDialog>
 #include <QLabel>
 #include <QMessageBox>
 #include <QPushButton>
@@ -282,6 +284,14 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     stampMenu->addAction(m_ui->actionStampImport);
 
     m_toolButtonStampShapes->setMenu(stampMenu);
+
+    connect(m_ui->actionTestCommand1, &QAction::triggered, [=]()
+        {
+            int comPort = QInputDialog::getInt(this, tr("COM Port"), tr("COM Port"), 4, 0, 100);
+            QString portName = QString("COM%1").arg(comPort);
+            LaserApplication::device->connectDevice(portName);
+        }
+    );
     
     connect(m_ui->actionStar, &QAction::triggered, this, &LaserControllerWindow::onActionStar);
     connect(m_ui->actionPartyEmblem, &QAction::triggered, this, &LaserControllerWindow::onActionPartyEmblem);
@@ -2167,6 +2177,7 @@ void LaserControllerWindow::loadRecentFilesMenu()
     }   
     try {
         QString path = RecentFilesFilePath();
+        qLogD << "recent files file path: " << path;
         QFile file(path);
         if (file.exists()) {
             if(!file.open(QFile::Text | QFile::ReadOnly)) {
@@ -2180,6 +2191,7 @@ void LaserControllerWindow::loadRecentFilesMenu()
             return;
         }       
         QTextStream fileStream(&file);
+        fileStream.setCodec(QTextCodec::codecForName("UTF-8"));
         m_recentFileList.clear();
         int size = m_recentFileList.size();
         while (!fileStream.atEnd() && size < m_maxRecentFilesSize) {
@@ -2276,6 +2288,7 @@ void LaserControllerWindow::updataRecentFilesFile()
             return;
         }
         QTextStream fileStream(&file);
+        fileStream.setCodec(QTextCodec::codecForName("UTF-8"));
         for (QString path : m_recentFileList) {
             QString name = path.trimmed() + QString("\n");
             fileStream << name;
@@ -3207,7 +3220,7 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     m_lockedLabel = new QLabel(tr("Locked"));
     m_textContentLabel = new QLabel(tr("Content"));
     m_textContent = new QLineEdit();
-    m_textContent->setText(QString::fromLocal8Bit("属性面板中修改文字"));
+    m_textContent->setText(QString::fromLocal8Bit(u8"属性面板中修改文字"));
     m_borderWidthLabel = new QLabel(tr("Border Width"));
     m_borderWidth = new LaserDoubleSpinBox();
     m_borderWidth->setMaximum(DBL_MAX);
