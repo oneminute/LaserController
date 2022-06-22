@@ -78,6 +78,9 @@ FILE(GLOB COMPORT_SOURCES src/comport/*.cpp)
 FILE(GLOB CAMERA_HEADERS src/camera/*.h)
 FILE(GLOB CAMERA_SOURCES src/camera/*.cpp)
 
+FILE(GLOB DLLTEST_HEADERS src/dlltest/*.h)
+FILE(GLOB DLLTEST_SOURCES src/dlltest/*.cpp)
+
 FILE(GLOB EXCEPTION_HEADERS src/exception/*.h)
 FILE(GLOB EXCEPTION_SOURCES src/exception/*.cpp)
 
@@ -149,6 +152,7 @@ set(HEADER_FILES
     ${BASE_HEADERS}
     ${COMMON_HEADERS}
     ${CAMERA_HEADERS}
+    ${DLLTEST_HEADERS}
     ${EXCEPTION_HEADERS}
     ${ALGORITHM_HEADERS}
     ${HALFTONE_HEADERS}
@@ -168,6 +172,7 @@ set(SRC_FILES
     ${BASE_SOURCES}
     ${COMMON_SOURCES}
     ${CAMERA_SOURCES}
+    ${DLLTEST_SOURCES}
     ${EXCEPTION_SOURCES}
     ${ALGORITHM_SOURCES}
     ${WYKOBI_SOURCES}
@@ -192,6 +197,8 @@ IF(MSVC)
     source_group("header\\comport" FILES ${COMPORT_HEADERS})
     source_group("source\\camera" FILES ${CAMERA_SOURCES})
     source_group("header\\camera" FILES ${CAMERA_HEADERS})
+    source_group("source\\dlltest" FILES ${DLLTEST_SOURCES})
+    source_group("header\\dlltest" FILES ${DLLTEST_HEADERS})
     source_group("source\\algorithm" FILES ${ALGORITHM_SOURCES})
     source_group("header\\algorithm" FILES ${ALGORITHM_HEADERS})
     source_group("source\\exception" FILES ${EXCEPTION_SOURCES})
@@ -235,6 +242,21 @@ target_link_libraries(CNEComPortTesting PRIVATE
     Qt5::SerialPort
     Qt5::Test
     CNEComPort
+)
+
+add_library(DllTest SHARED ${DLLTEST_HEADERS} ${DLLTEST_SOURCES})
+target_link_libraries(DllTest PRIVATE
+    Qt5::SerialPort
+)
+target_compile_definitions(DllTest PRIVATE DLLTEST_LIBRARY)
+
+add_executable(DllTestTesting src/testing/dlltest/DllTest.cpp)
+add_test(NAME DllTestTesting COMMAND DllTestTesting)
+target_include_directories(DllTestTesting PUBLIC src/dlltest)
+target_link_libraries(DllTestTesting PRIVATE
+    Qt5::SerialPort
+    Qt5::Test
+    DllTest
 )
 
 set(LINK_LIBRARIES 

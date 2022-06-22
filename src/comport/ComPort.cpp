@@ -127,10 +127,10 @@ void ComPort::writeAsync(const QByteArray& data)
 void ComPort::read()
 {
     QMutexLocker locker(&m_mutex);
-    qDebug() << "ComPort::read(): empty: " << m_dataRead.isEmpty() << m_dataRead.size();
-    if (m_dataRead.isEmpty())
+    qDebug() << "ComPort::read(): empty: " << m_inputBuffer.isEmpty() << m_inputBuffer.size();
+    if (m_inputBuffer.isEmpty())
     {
-    qDebug() << "ComPort::read() start to reading:" << m_dataRead.toHex();
+    qDebug() << "ComPort::read() start to reading:" << m_inputBuffer.toHex();
         readDataInternal();
     }
 }
@@ -138,8 +138,8 @@ void ComPort::read()
 QByteArray ComPort::readSync()
 {
     emit readSyncSignal();
-    qDebug() << "ComPort::readSync() data ptr:" << (void*)m_dataRead.data();
-    return m_dataRead;
+    qDebug() << "ComPort::readSync() data ptr:" << (void*)m_inputBuffer.data();
+    return m_inputBuffer;
 }
 
 void ComPort::readAsync()
@@ -149,8 +149,8 @@ void ComPort::readAsync()
 
 int ComPort::readBuffer(char*& buf, int& length)
 {
-    length = m_dataRead.length();
-    buf = m_dataRead.data();
+    length = m_inputBuffer.length();
+    buf = m_inputBuffer.data();
     return length;
 }
 
@@ -164,6 +164,26 @@ bool ComPort::isOpen()
 int ComPort::port() const
 {
     return m_port;
+}
+
+int ComPort::bufferLength() const
+{
+    QMutexLocker locker(const_cast<QMutex*>(&m_mutex));
+    return m_inputBuffer.length();
+}
+
+int ComPort::readBufferTo(char* buf, int length)
+{
+    QMutexLocker locker(&m_mutex);
+    if (length < m_inputBuffer.length())
+    {
+        return -1;
+    }
+    else
+    {
+        std::copy(m_inputBuffer.data(), m_inputBuffer.data() + m_inputBuffer.length(), buf);
+        return length;
+    }
 }
 
 void ComPort::onErrorOccurred(QSerialPort::SerialPortError error)
@@ -183,10 +203,10 @@ bool ComPort::readDataInternal()
 {
     if (m_serial->waitForReadyRead(100))
     {
-        m_dataRead = m_serial->readAll();
+        m_inputBuffer = m_serial->readAll();
         while (m_serial->waitForReadyRead(10))
-            m_dataRead += m_serial->readAll();
-        qDebug() << "ComPort::readDataInternal():" << m_dataRead.toHex();
+            m_inputBuffer += m_serial->readAll();
+        qDebug() << "ComPort::readDataInternal():" << m_inputBuffer.toHex();
         return true;
     }
     else

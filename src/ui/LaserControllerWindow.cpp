@@ -15,6 +15,7 @@
 #include <QFileDialog> 
 #include <FloatingDockContainer.h>
 #include <QCheckBox>
+#include <QTextCodec>
 #include <QComboBox>
 #include <QDesktopServices>
 #include <QErrorMessage>
@@ -2176,6 +2177,7 @@ void LaserControllerWindow::loadRecentFilesMenu()
     }   
     try {
         QString path = RecentFilesFilePath();
+        qLogD << "recent files file path: " << path;
         QFile file(path);
         if (file.exists()) {
             if(!file.open(QFile::Text | QFile::ReadOnly)) {
@@ -2189,6 +2191,7 @@ void LaserControllerWindow::loadRecentFilesMenu()
             return;
         }       
         QTextStream fileStream(&file);
+        fileStream.setCodec(QTextCodec::codecForName("UTF-8"));
         m_recentFileList.clear();
         int size = m_recentFileList.size();
         while (!fileStream.atEnd() && size < m_maxRecentFilesSize) {
@@ -2285,6 +2288,7 @@ void LaserControllerWindow::updataRecentFilesFile()
             return;
         }
         QTextStream fileStream(&file);
+        fileStream.setCodec(QTextCodec::codecForName("UTF-8"));
         for (QString path : m_recentFileList) {
             QString name = path.trimmed() + QString("\n");
             fileStream << name;

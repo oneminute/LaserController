@@ -1412,7 +1412,7 @@ void LaserDocument::stampBaseLoad(LaserPrimitive* p, QJsonObject& object, bool i
     bool surpassInner = object["surpassInner"].toBool();
     bool randomMove = object["randomMove"].toBool();
     stampP->setStampIntaglio(stampIntaglio);
-    if (isLoadAntiFakePath) {
+    if (isLoadAntiFakePath && object.contains("antiFakePathData")) {
         stampP->createAntiFakePath(antiFakeType, antiFakeLine, isAverageDistribute, antiFakeLineWidth,
             surpassOuter, surpassInner, randomMove);
         //antiFakePath

@@ -153,6 +153,34 @@ int ComPortController::readBuffer(int port, char*& buf)
     return length;
 }
 
+int ComPortController::bufferLength(int port)
+{
+    ComPort* comPort = nullptr;
+    if (m_comPorts.contains(port))
+    {
+        comPort = m_comPorts[port];
+    }
+    else
+    {
+        return -1;
+    }
+    return comPort->bufferLength();
+}
+
+int ComPortController::readBufferTo(int port, char* buf, int length)
+{
+    ComPort* comPort = nullptr;
+    if (m_comPorts.contains(port))
+    {
+        comPort = m_comPorts[port];
+    }
+    else
+    {
+        return -1;
+    }
+    return comPort->readBufferTo(buf, length);
+}
+
 bool ComPortController::exist(int port) const
 {
     return m_comPorts.contains(port);
@@ -189,7 +217,7 @@ void ComPortController::setDataArrivedHandler(ComPortDataArrivedHandler handler)
     m_fnDataArrivedHandler = handler;
 }
 
-COMPORT_C_EXPORT PCHAR GetComPortList()
+PCHAR GetComPortList()
 {
     static std::wstring portsString;
     QStringList ports = ComPortController::instance().getAvailablePorts();
@@ -199,7 +227,7 @@ COMPORT_C_EXPORT PCHAR GetComPortList()
     return const_cast<wchar_t*>(portsString.c_str());
 }
 
-COMPORT_C_EXPORT bool InitComPortLib()
+bool InitComPortLib()
 {
     if (g_app == nullptr)
     {
@@ -210,7 +238,7 @@ COMPORT_C_EXPORT bool InitComPortLib()
     return true;
 }
 
-COMPORT_C_EXPORT bool UninitComPortLib()
+bool UninitComPortLib()
 {
     ComPortController::destroy();
     if (g_app != nullptr)
@@ -221,37 +249,47 @@ COMPORT_C_EXPORT bool UninitComPortLib()
     return true;
 }
 
-COMPORT_C_EXPORT int OpenComPort(int port, int baudRate)
+int OpenComPort(int port, int baudRate)
 {
     return ComPortController::instance().openComPort(port, baudRate);
 }
 
-COMPORT_C_EXPORT int CloseComPort(int port)
+int CloseComPort(int port)
 {
     return ComPortController::instance().closeComPort(port);
 }
 
-COMPORT_C_EXPORT bool IsComPortExisted(int port)
+bool IsComPortExisted(int port)
 {
     return ComPortController::instance().exist(port);
 }
 
-COMPORT_C_EXPORT void SetAfterOpen(ComPortOpenCloseHandler handler)
+int GetBufferLength(int port)
+{
+    return ComPortController::instance().bufferLength(port);
+}
+
+int ReadDataTo(int port, char* buf, int length)
+{
+    return ComPortController::instance().readBufferTo(port, buf, length);
+}
+
+void SetAfterOpen(ComPortOpenCloseHandler handler)
 {
     ComPortController::instance().setAfterOpenHandler(handler);
 }
 
-COMPORT_C_EXPORT void SetAfterClose(ComPortOpenCloseHandler handler)
+void SetAfterClose(ComPortOpenCloseHandler handler)
 {
     ComPortController::instance().setAfterCloseHandler(handler);
 }
 
-COMPORT_C_EXPORT void SetDataArrived(ComPortDataArrivedHandler handler)
+void SetDataArrived(ComPortDataArrivedHandler handler)
 {
     ComPortController::instance().setDataArrivedHandler(handler);
 }
 
-COMPORT_C_EXPORT int WriteData(int port, char* buf, int length)
+int WriteData(int port, char* buf, int length)
 {
     qDebug() << "write to port" << port;
     QByteArray data(buf, length);
@@ -259,18 +297,18 @@ COMPORT_C_EXPORT int WriteData(int port, char* buf, int length)
 }
 
 
-COMPORT_C_EXPORT int ReadData(int port, char*& buf)
+int ReadData(int port, char*& buf)
 {
     int length = ComPortController::instance().readBuffer(port, buf);
     return length;
 }
 
-//COMPORT_C_EXPORT void LockReadBuffer()
+//void LockReadBuffer()
 //{
 //    return void();
 //}
 //
-//COMPORT_C_EXPORT void UnlockReadBuffer()
+//void UnlockReadBuffer()
 //{
 //    return void();
 //}

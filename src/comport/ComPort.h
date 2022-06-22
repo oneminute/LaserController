@@ -33,6 +33,9 @@ public slots:
     bool isOpen();
     int port() const;
 
+    int bufferLength() const;
+    int readBufferTo(char* buf, int length);
+
 protected slots:
     void open(int port, const QSerialPortInfo& portInfo, int baudRate);
     void close();
@@ -66,7 +69,7 @@ private:
     QSerialPort* m_serial;
     QThread* m_thread;
     int m_byteWritten = 0;
-    QByteArray m_dataRead;
+    QByteArray m_inputBuffer;
     QString m_errorString;
 };
 

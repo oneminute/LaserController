@@ -93,11 +93,13 @@ void ComPortTesting::test_write3()
     int length = WriteData(8, data.data(), data.length());
     QCOMPARE(length, data.length());
     QThread::currentThread()->msleep(100);
-    char* buf;
-    length = ReadData(8, buf);
+    length = GetBufferLength(8);
+    char* buf = new char[length];
+    length = ReadDataTo(8, buf, length);
     QByteArray result(buf, length);
     qDebug() << "result:" << result.toHex();
     QVERIFY(result.length());
+    delete[] buf;
 }
 
 void ComPortTesting::test_close()
