@@ -1318,18 +1318,22 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 //bounds
                 QJsonArray boundsArray = primitiveJson["bounds"].toArray();
                 QRect bounds = QRect(boundsArray[0].toDouble(), boundsArray[1].toDouble(), boundsArray[2].toDouble(), boundsArray[3].toDouble());
-                //image
+                //original image
                 QString imgStr = primitiveJson["originalImage"].toString();
                 QByteArray array = QByteArray::fromBase64(imgStr.toLatin1());
                 QImage img = QImage::fromData(array, "tiff");
                 LaserStampBitmap* stampBitmap = new LaserStampBitmap(img, bounds, false, this, saveTransform, layerIndex);
                 primitive = stampBitmap;
+                //antifake
                 QString antiFakeImgStr = primitiveJson["antiFakeImage"].toString();
                 QByteArray antiFakeArray = QByteArray::fromBase64(antiFakeImgStr.toLatin1());
                 QImage antiFakeImage = QImage::fromData(antiFakeArray, "tiff");
                 stampBaseLoad(primitive, primitiveJson, false);
                 stampBitmap->setAntiFakeImage(antiFakeImage);
-                
+                //fingerprint
+                stampBitmap->setFingerprint();
+                //mask
+                stampBitmap->computeMask();
             }
             
             if (primitive)
@@ -1408,7 +1412,7 @@ void LaserDocument::stampBaseLoad(LaserPrimitive* p, QJsonObject& object, bool i
     bool surpassInner = object["surpassInner"].toBool();
     bool randomMove = object["randomMove"].toBool();
     stampP->setStampIntaglio(stampIntaglio);
-    if (isLoadAntiFakePath) {
+    if (isLoadAntiFakePath && object.contains("antiFakePathData")) {
         stampP->createAntiFakePath(antiFakeType, antiFakeLine, isAverageDistribute, antiFakeLineWidth,
             surpassOuter, surpassInner, randomMove);
         //antiFakePath
@@ -1458,7 +1462,14 @@ void LaserDocument::stampBaseLoad(LaserPrimitive* p, QJsonObject& object, bool i
         }
         stampP->setAntiFakePath(path);
     }
-    
+    //fingerprint
+    QString fingerprintStr = object["fingerNoDensityMap"].toString();
+    QByteArray array = QByteArray::fromBase64(fingerprintStr.toLatin1());
+    QPixmap fingerprintMap;
+    fingerprintMap.loadFromData(array, "tiff");
+    qreal fingerMapDensity = object["fingerMapDensity"].toDouble();
+    stampP->setFingerMap(fingerprintMap);
+    stampP->setFingerMapDensity(fingerMapDensity);
 }
 
 int LaserDocument::totalNodes()
@@ -1553,16 +1564,23 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
             painter.setPen(Qt::NoPen);
             painter.setBrush(Qt::NoBrush);
             int type = sp->primitiveType();
-            qreal penSize = 1;
-            if (type == LPT_HORIZONTALTEXT || type == LPT_VERTICALTEXT || type == LPT_CIRCLETEXT) {
-                LaserStampText* text = qgraphicsitem_cast<LaserStampText*>(p);
-                //penSize = text->weight();
+            //laserStampBitmap
+            if (type == LPT_STAMPBITMAP) {
+                LaserStampBitmap* stampBitmap = qgraphicsitem_cast<LaserStampBitmap*>(sp);
+               
+                QRectF bounds = sp->boundingRect();
+                QImage image = stampBitmap->generateStampImage();
+                image = image.transformed(sp->sceneTransform() * t1 * t2, Qt::SmoothTransformation);
+                QPolygonF polygon = sp->sceneTransform().map(bounds);
+                polygon = t1.map(polygon);
+                polygon = t2.map(polygon);
+                painter.drawImage(polygon.boundingRect(), image);
+                continue;
             }
+            //path类图元
             QPen pen;
-            pen.setWidthF(penSize);
+            QPainterPath pPath;
             if (!sp->stampIntaglio()) {
-                QPainterPath pPath;
-
                 if (type == LPT_FRAME) {
                     LaserFrame* frame = qgraphicsitem_cast<LaserFrame*>(p);
                     pPath = frame->outerPath();
@@ -1573,7 +1591,6 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
                     painter.drawPath(pPath);
                 }
                 else if (type == LPT_RING) {
-
                     LaserRing* ring = qgraphicsitem_cast<LaserRing*>(p);
                     pPath = ring->outerPath();
                     painter.setBrush(Qt::black);
@@ -1582,30 +1599,19 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
                     pPath = t2.map(pPath);
                     painter.drawPath(pPath);
                 }
-                pPath = sp->getPath();
                 pen.setColor(Qt::white);
-                
-                painter.setPen(pen);
-                painter.setBrush(Qt::white);
-                pPath = sp->sceneTransform().map(pPath);
-                pPath = t1.map(pPath);
-                pPath = t2.map(pPath);
-                painter.drawPath(pPath);
-                
-                
-                               
+                painter.setPen(pen);         
             }
             else {
                 pen.setColor(Qt::black);
                 painter.setPen(pen);
-                painter.setBrush(Qt::black);
-                QPainterPath pPath = sp->getPath();
-                pPath = sp->sceneTransform().map(pPath);
-                pPath = t1.map(pPath);
-                pPath = t2.map(pPath);
-                painter.drawPath(pPath);
             }
-            painter.setBrush(Qt::NoBrush);
+            sp->setStampBrush(&painter, pen.color(), QSize(sp->boundingRect().width(), sp->boundingRect().height()), t1 * t2, true);
+            pPath = sp->sceneTransform().map(pPath);
+            pPath = sp->getPath();
+            pPath = t1.map(pPath);
+            pPath = t2.map(pPath);
+            painter.drawPath(pPath);
         }
         image = image.mirrored(true, false);
         QString fileName = "tmp/stamp_img_" + QString::number(i) + ".png";

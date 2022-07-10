@@ -58,7 +58,6 @@ protected slots:
     void onCameraConnected();
     void onCameraDisconnected();
     void onMarkIndexChanged(bool checked);
-    void onDeviceStateChanged(DeviceState state);
 
 private:
     QLabel* m_labelStatus;

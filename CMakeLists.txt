@@ -22,33 +22,35 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 # declare variables
 set(QT_WIN32_PATH "" CACHE PATH "")
 set(OPENCV_WIN32_PATH "" CACHE PATH "")
-option(BUILD_TEST_EXAMPLES "BUILD_TEST_EXAMPLES" OFF)
+option(CNELASER_BUILD_EXAMPLES "Build Examples and Tech tests" OFF)
+option(CNELASER_BUILD_COMPORT "Build Comport" OFF)
 list(APPEND CMAKE_PROGRAM_PATH ${QT_WIN32_PATH} ${OPENCV_WIN32_PATH})
+
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    message(STATUS x64)
+    set(CNELaser_ARCH "64")
+    add_compile_definitions(ARCH_x64)
+elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    message(STATUS x32)
+    set(CNELaser_ARCH "32")
+    add_compile_definitions(ARCH_x32)
+endif()
+
 
 set(NEW_PATH ${QT_WIN32_PATH} ${OPENCV_WIN32_PATH} $ENV{PATH})
 set(CMAKE_MSVCIDE_RUN_PATH ${NEW_PATH})
 
+
 # Find the QtWidgets library
-set(Boost_USE_STATIC_LIBS ON)
-set(Boost_USE_MULTITHREADED ON)
-find_package(Eigen3 REQUIRED)
-#find_package(Boost 1.66 COMPONENTS timer REQUIRED)
-find_package(Qt5 COMPONENTS Widgets Charts LinguistTools OpenGL Concurrent Multimedia MultimediaWidgets Test CONFIG REQUIRED)
+find_package(Eigen3 REQUIRED REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Charts LinguistTools OpenGL Concurrent Multimedia MultimediaWidgets SerialPort Test CONFIG REQUIRED)
 find_package(OpenCV COMPONENTS core imgcodecs imgproc highgui video videoio flann features2d xfeatures2d calib3d tracking REQUIRED)
-#find_package(OpenMP REQUIRED QUIET)
-#find_package(ZLIB REQUIRED QUIET)
 find_package(glog REQUIRED QUIET)
 find_package(gflags REQUIRED QUIET)
+find_package(LZ4 REQUIRED)
 find_package(FLANN REQUIRED QUIET)
-#find_package(TBB REQUIRED QUIET)
-#find_package(OpenMP)
-#if (OPENMP_FOUND)
-#    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-#    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
-#endif()
 
-set(TS_FILES translations/${PROJECT_NAME}_zh_CN.ts)
+set(TS_FILES translations/*.ts)
 set(VG_CORE_AUTO_TLI "${PROJECT_SOURCE_DIR}/third/cdr/include/VGCoreAuto.tli")
 configure_file(${PROJECT_SOURCE_DIR}/third/cdr/include/VGCoreAuto.tlh.in VGCoreAuto.tlh)
 
@@ -58,10 +60,8 @@ add_subdirectory(src/widget/ADS)
 set(INCLUDE_DIRS
     ${INCLUDE_DIRS}
     src
-    #${Boost_INCLUDE_DIR}
     ${EIGEN3_INCLUDE_DIRS}
     ${OpenCV_INCLUDE_DIRS}
-    #${ZLIB_INCLUDE_DIR}
     ${FLANN_INCLUDE_DIR}
     src/widget/LRWidgets
 	${PROJECT_BINARY_DIR}
@@ -73,8 +73,14 @@ FILE(GLOB BASE_SOURCES src/*.cpp)
 FILE(GLOB COMMON_HEADERS src/common/*.h)
 FILE(GLOB COMMON_SOURCES src/common/*.cpp)
 
+FILE(GLOB COMPORT_HEADERS src/comport/*.h)
+FILE(GLOB COMPORT_SOURCES src/comport/*.cpp)
+
 FILE(GLOB CAMERA_HEADERS src/camera/*.h)
 FILE(GLOB CAMERA_SOURCES src/camera/*.cpp)
+
+FILE(GLOB DLLTEST_HEADERS src/dlltest/*.h)
+FILE(GLOB DLLTEST_SOURCES src/dlltest/*.cpp)
 
 FILE(GLOB EXCEPTION_HEADERS src/exception/*.h)
 FILE(GLOB EXCEPTION_SOURCES src/exception/*.cpp)
@@ -123,15 +129,14 @@ LIST(FILTER DOCS EXCLUDE REGEX "[$]")
 set(OTHER_FILES
     README.md
     ReleaseNotes.md
-    cmake_install_debug.cmake
-    cmake_install_release.cmake
+    cmake_install_Debug.cmake
+    cmake_install_Release.cmake
     cmake_install_relwithdebinfo.txt
     third/cdr/include/VGCoreAuto.tlh.in
     src/res/icons.qrc
     src/res/laser.rc
     res/constraints.csv
-    cmake/Compress_debug.cmake
-    cmake/Compress_release.cmake
+    cmake/compress.cmake
     cmake/GenerateConstraints.cmake
     .gitignore
     ${TRANSLATIONS}
@@ -147,6 +152,7 @@ set(HEADER_FILES
     ${BASE_HEADERS}
     ${COMMON_HEADERS}
     ${CAMERA_HEADERS}
+    ${DLLTEST_HEADERS}
     ${EXCEPTION_HEADERS}
     ${ALGORITHM_HEADERS}
     ${HALFTONE_HEADERS}
@@ -166,6 +172,7 @@ set(SRC_FILES
     ${BASE_SOURCES}
     ${COMMON_SOURCES}
     ${CAMERA_SOURCES}
+    ${DLLTEST_SOURCES}
     ${EXCEPTION_SOURCES}
     ${ALGORITHM_SOURCES}
     ${WYKOBI_SOURCES}
@@ -186,8 +193,12 @@ set(SRC_FILES
 IF(MSVC)
     source_group("source\\common" FILES ${COMMON_SOURCES})
     source_group("header\\common" FILES ${COMMON_HEADERS})
+    source_group("source\\comport" FILES ${COMPORT_SOURCES})
+    source_group("header\\comport" FILES ${COMPORT_HEADERS})
     source_group("source\\camera" FILES ${CAMERA_SOURCES})
     source_group("header\\camera" FILES ${CAMERA_HEADERS})
+    source_group("source\\dlltest" FILES ${DLLTEST_SOURCES})
+    source_group("header\\dlltest" FILES ${DLLTEST_HEADERS})
     source_group("source\\algorithm" FILES ${ALGORITHM_SOURCES})
     source_group("header\\algorithm" FILES ${ALGORITHM_HEADERS})
     source_group("source\\exception" FILES ${EXCEPTION_SOURCES})
@@ -218,9 +229,42 @@ IF(MSVC)
     source_group("res" FILES ${RES})
 ENDIF(MSVC)
 
-include_directories(${INCLUDE_DIRS})
+if (${CNELASER_BUILD_COMPORT})
+    add_library(CNEComPort SHARED ${COMPORT_HEADERS} ${COMPORT_SOURCES})
+    target_link_libraries(CNEComPort PRIVATE
+        Qt5::SerialPort
+    )
+    target_compile_definitions(CNEComPort PRIVATE COMPORT_LIBRARY)
+
+    add_executable(CNEComPortTesting src/testing/comport/ComPortTesting.cpp)
+    add_test(NAME CNEComPortTesting COMMAND CNEComPortTesting)
+    target_include_directories(CNEComPortTesting PUBLIC src/comport)
+    target_link_libraries(CNEComPortTesting PRIVATE
+        Qt5::SerialPort
+        Qt5::Test
+        CNEComPort
+    )
+
+    add_library(DllTest SHARED ${DLLTEST_HEADERS} ${DLLTEST_SOURCES})
+    target_link_libraries(DllTest PRIVATE
+        Qt5::SerialPort
+    )
+    target_compile_definitions(DllTest PRIVATE DLLTEST_LIBRARY)
+
+    add_executable(DllTestTesting src/testing/dlltest/DllTest.cpp)
+    add_test(NAME DllTestTesting COMMAND DllTestTesting)
+    target_include_directories(DllTestTesting PUBLIC src/dlltest)
+    target_link_libraries(DllTestTesting PRIVATE
+        Qt5::SerialPort
+        Qt5::Test
+        DllTest
+    )
+endif()
+
 set(LINK_LIBRARIES 
+    Eigen3::Eigen
     Qt5::Widgets Qt5::Charts Qt5::OpenGL Qt5::Concurrent Qt5::Test Qt5::Multimedia Qt5::MultimediaWidgets
+    LZ4::lz4_static
     FLANN::FLANN
     ${OpenCV_LIBRARIES} 
     ${Boost_LIBRARIES} 
@@ -244,6 +288,7 @@ endif()
 add_dependencies(CNELaser GenerateConstraints)
 
 target_link_libraries(CNELaser PRIVATE ${LINK_LIBRARIES})
+target_include_directories(CNELaser PUBLIC ${INCLUDE_DIRS})
 set_target_properties(
     ${PROJECT_NAME} PROPERTIES
     VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
@@ -255,8 +300,9 @@ set_target_properties(
 #    DEPENDS CNELaser
 #)
 
-
-if (BUILD_TEST_EXAMPLES)
+if(CNELASER_BUILD_EXAMPLES)
+    add_executable(TestBoostGeometry test/TestBoostGeometry.cpp)
+    target_link_libraries(TestBoostGeometry PRIVATE ${LINK_LIBRARIES})
     add_executable(TestQtClosestPoint test/TestQtClosestPoint.cpp)
     target_link_libraries(TestQtClosestPoint PRIVATE ${LINK_LIBRARIES})
     add_executable(TestOpenCVFlann test/TestOpenCVFlann.cpp)
@@ -269,6 +315,7 @@ if (BUILD_TEST_EXAMPLES)
     target_link_libraries(TestException PRIVATE ${LINK_LIBRARIES})
     add_executable(TestGeometry test/TestGeometry.cpp)
     target_link_libraries(TestGeometry PRIVATE ${LINK_LIBRARIES})
+
     FILE(GLOB TestDelphiLibrarySrc test/DelphiLibraryTest/*.*)
     add_executable(TestDelphiLibrary ${TestDelphiLibrarySrc})
     target_link_libraries(TestDelphiLibrary PRIVATE ${LINK_LIBRARIES})
@@ -283,13 +330,10 @@ set(QM_FILES
 #qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR}/src ${TS_FILES})
 
 add_custom_target (GenerateTranslations 
-    Qt5::lupdate ${CMAKE_SOURCE_DIR}/src -ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_zh_CN.ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_en_US.ts
+    Qt5::lupdate ${CMAKE_SOURCE_DIR}/src -ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_zh_CN.ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_en_US.ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_ru_RU.ts
 )
 
-set(CMAKE_INSTALL_PREFIX ../oem/africa_x86)
-get_filename_component(CMAKE_INSTALL_PREFIX "../oem/africa_x86" ABSOLUTE)
-message(status CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX})
-
-include(cmake_install_Debug.cmake)
-include(cmake_install_Release.cmake)
-#include(cmake_install_RelWithDebInfo.txt)
+message(STATUS "CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
+message(STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
+include(cmake_install_${CMAKE_BUILD_TYPE}.cmake)
+#include(cmake_install_release.cmake)

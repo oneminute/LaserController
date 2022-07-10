@@ -8,7 +8,6 @@
 #include <QtMath>
 #include <QGraphicsTextItem> 
 #include <opencv2/opencv.hpp>
-#include <Eigen/Core>
 #include <QTextEdit>
 #include <QGraphicsSceneMouseEvent>
 #include <QJsonArray>
@@ -153,7 +152,12 @@ void setSelectedInGroup(bool selected) {
 void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 {
     Q_D(LaserPrimitive);
-    QString className = this->scene()->metaObject()->className();
+    QGraphicsScene* scene = this->scene();
+    if (!scene)
+    {
+        return;
+    }
+    QString className = scene->metaObject()->className();
     if (className == "LaserScene") {
         if (!visible())
             return;
@@ -3130,10 +3134,11 @@ public:
     bool surpassInner;
     bool randomMove;
     int m_antiFakeLineSeed;
-    QPainterPath fingerPrintPath;
+
     QPainterPath antiFakePath;
     QPainterPath originalPath;
-    //
+    QPixmap fingerNoDensityMap;
+    qreal fingerMapDensity;
     struct AntiFakePathData
     {
         QRectF bounds;
@@ -3170,24 +3175,92 @@ LaserStampBase::LaserStampBase(LaserStampBasePrivate* ptr, LaserDocument* doc, L
     d->surpassInner = surpassInner;
     d->randomMove = randomMove;
     d->m_antiFakeLineSeed = 0;
+    d->fingerNoDensityMap = QPixmap();
+    d->fingerMapDensity = 0;
 }
 
 LaserStampBase::~LaserStampBase()
 {
 }
 
+void LaserStampBase::setFingerMap(QPixmap map)
+{
+    Q_D(LaserStampBase);
+    d->fingerNoDensityMap = map;
+}
+
+QPixmap& LaserStampBase::fingerMap()
+{
+    Q_D(LaserStampBase);
+    return d->fingerNoDensityMap;
+}
+
+void LaserStampBase::setFingerMapDensity(qreal density)
+{
+    Q_D(LaserStampBase);
+    d->fingerMapDensity = density;
+}
+
+qreal LaserStampBase::fingerMapDensity()
+{
+    Q_D(LaserStampBase);
+    return d->fingerMapDensity;
+}
+
+void LaserStampBase::setStampBrush(QPainter* painter, QColor color, QSize size,  QTransform otherTransform, bool isResetColor)
+{
+    Q_D(LaserStampBase);
+    if (d->fingerNoDensityMap == QPixmap() || d->fingerMapDensity == 0) {
+        painter->setBrush(QBrush(color));
+    }
+    else {
+        QPixmap map;
+        map = d->fingerNoDensityMap;
+        QImage image = map.toImage();
+        int tR = qRed(color.rgb());
+        int tG = qGreen(color.rgb());
+        int tB = qBlue(color.rgb());
+        if (isResetColor) {
+            for (int row = 0; row < image.width(); row++) {
+                for (int col = 0; col < image.height(); col++) {
+                    QRgb rgb = image.pixel(row, col);
+                    int r = qRed(rgb);
+                    int g = qGreen(rgb);
+                    int b = qBlue(rgb);
+                    int a = qAlpha(rgb);
+                    if ((r == 255 && g == 255 && b == 255) || a == 0) {
+                        a = 0;
+                    }
+                    else {
+                        a = 255;
+                        r = tR;
+                        g = tG;
+                        b = tB;
+                    }
+                    image.setPixel(row, col, QColor(r, g, b, a).rgba());
+                }
+            }
+            map = QPixmap::fromImage(image);
+        }
+        QBrush brush(color, map);
+        QTransform t;
+        qreal rate = d->fingerMapDensity;
+        qreal imageW = image.width();
+        qreal imageH = image.height();
+        qreal x = d->fingerMapDensity / (imageW / size.width());
+        qreal y = d->fingerMapDensity / (imageH / size.height());
+        t.scale(x, y);
+        
+        //t.translate(-d->boundingRect.width() * 0.5, -d->boundingRect.height() * 0.5);
+        brush.setTransform(t * otherTransform);
+        painter->setBrush(brush);
+    }
+}
+
 void LaserStampBase::setAntiFakePath(QPainterPath path) {
     Q_D(LaserStampBase);
     d->antiFakePath = path;
-    d->path = d->originalPath - d->antiFakePath - d->fingerPrintPath;
-    
-}
-
-void LaserStampBase::setFingerPrintPath(QPainterPath path)
-{
-    Q_D(LaserStampBase);
-    d->fingerPrintPath = path;
-    d->path = d->originalPath - d->antiFakePath - d->fingerPrintPath;
+    d->path = d->originalPath - d->antiFakePath;
 }
 
 bool LaserStampBase::stampIntaglio() {
@@ -3769,6 +3842,8 @@ void LaserStampBase::stampBaseClone(LaserStampBase* cloneP)
     cloneP->setSurpassInner(d->surpassInner);
     cloneP->setSurpassOuter(d->surpassOuter);
     cloneP->setRandomMove(d->randomMove);
+    cloneP->setFingerMap(d->fingerNoDensityMap);
+    cloneP->setFingerMapDensity(d->fingerMapDensity);
 }
 void LaserStampBase::stampBaseToJson(QJsonObject& object)
 {
@@ -3832,6 +3907,16 @@ void LaserStampBase::stampBaseToJson(QJsonObject& object)
     antiFakePathData.insert("type", d->antiFakePathData.type);
     antiFakePathData.insert("curveAmplitude", d->antiFakePathData.curveAmplitude);
     object.insert("antiFakePathData", antiFakePathData);
+    //fingerprint
+    object.insert("fingerMapDensity", d->fingerMapDensity);
+    //fingerprintImage
+    QByteArray fingerprintImageBits;
+    QBuffer fingerprintBuffer(&fingerprintImageBits);
+    fingerprintBuffer.open(QIODevice::ReadWrite);
+    d->fingerNoDensityMap.save(&fingerprintBuffer, "tiff");
+    fingerprintBuffer.close();
+    object.insert("fingerNoDensityMap", QLatin1String(fingerprintImageBits.toBase64()));
+
 }
 class LaserStarPrivate : public LaserStampBasePrivate
 {
@@ -3874,7 +3959,8 @@ void LaserStar::draw(QPainter * painter)
     if (!d->stampIntaglio) {
         //painter->setBrush(QBrush(this->layer()->color()));
 
-        painter->setBrush(QBrush(d->doc->layers()[d->layerIndex]->color()));
+        //painter->setBrush(QBrush(d->doc->layers()[d->layerIndex]->color()));
+        setStampBrush(painter, d->doc->layers()[d->layerIndex]->color(),QSize(d->boundingRect.width(), d->boundingRect.height()),  QTransform(), true);
         /*if (layer()) {
             painter->setBrush(QBrush(this->layer()->color()));
         }
@@ -3885,7 +3971,8 @@ void LaserStar::draw(QPainter * painter)
         painter->setBrush(Qt::NoBrush);
     }
     else {
-        painter->setBrush(Qt::white);
+        //painter->setBrush(Qt::white);
+        setStampBrush(painter, Qt::white, QSize(d->boundingRect.width(), d->boundingRect.height()), QTransform(), true);
         painter->drawPath(d->path);
         painter->setBrush(Qt::NoBrush);
 
@@ -4079,16 +4166,12 @@ void LaserPartyEmblem::draw(QPainter* painter)
     Q_D(const LaserPartyEmblem);
     if (!d->stampIntaglio) {
         //painter->setBrush(QBrush(this->layer()->color()));
-        painter->setBrush(QBrush(d->doc->layers()[d->layerIndex]->color()));
-        /*(if (layer()) {
-            painter->setBrush(QBrush(this->layer()->color()));
-        }
-        else {
-            painter->setBrush(QBrush(Qt::red));
-        }*/
+        //painter->setBrush(QBrush(d->doc->layers()[d->layerIndex]->color()));
+        setStampBrush(painter, d->doc->layers()[d->layerIndex]->color(), QSize(d->boundingRect.width(), d->boundingRect.height()));
     }
     else {
-        painter->setBrush(QBrush(Qt::white));
+        //painter->setBrush(QBrush(Qt::white));
+        setStampBrush(painter, Qt::white, QSize(d->boundingRect.width(), d->boundingRect.height()), QTransform(), true);
     }
     painter->drawPath(d->path);
     painter->setBrush(Qt::NoBrush);
@@ -4333,13 +4416,13 @@ void LaserRing::draw(QPainter * painter)
         if (!d->stampIntaglio) {
             painter->setBrush(Qt::white);
             painter->drawPath(d->outerPath);
-            painter->setBrush(QBrush(color));
-            
+            //painter->setBrush(QBrush(color));
+            setStampBrush(painter, color, QSize(d->boundingRect.width(), d->boundingRect.height()));
             painter->drawPath(d->path);
         }
         else {
-            //painter->setBrush(QBrush(this->layer()->color()));
-            painter->setBrush(QBrush(color));
+            //painter->setBrush(QBrush(color));
+            setStampBrush(painter, color, QSize(d->boundingRect.width(), d->boundingRect.height()));
             painter->drawPath(d->outerPath - d->antiFakePath);
         }
     }
@@ -4347,13 +4430,15 @@ void LaserRing::draw(QPainter * painter)
         if (!d->stampIntaglio) {
             painter->setBrush(Qt::white);
             painter->drawPath(d->outerPath);
-            painter->setBrush(QBrush(color));
+            //painter->setBrush(QBrush(color));
+            setStampBrush(painter, color, QSize(d->boundingRect.width(), d->boundingRect.height()));
             painter->drawPath(d->path);
         }
         else {
             painter->setBrush(QBrush(color));
             painter->drawPath(d->outerPath);
-            painter->setBrush(Qt::white);
+            //painter->setBrush(Qt::white);
+            setStampBrush(painter, Qt::white, QSize(d->boundingRect.width(), d->boundingRect.height()), QTransform(), true);
             painter->drawPath(d->path);
         }
     }
@@ -4582,11 +4667,13 @@ void LaserFrame::draw(QPainter * painter)
         if (!d->stampIntaglio) {
             painter->setBrush(Qt::white);
             painter->drawPath(d->outerPath);
-            painter->setBrush(QBrush(color));
+            //painter->setBrush(QBrush(color));
+            setStampBrush(painter, color, QSize(d->boundingRect.width(), d->boundingRect.height()));
             painter->drawPath(d->path);
         }
         else {
-            painter->setBrush(QBrush(color));
+            //painter->setBrush(QBrush(color));
+            setStampBrush(painter, color, QSize(d->boundingRect.width(), d->boundingRect.height()));
             painter->drawPath(d->outerPath- d->antiFakePath);
         }
     }
@@ -4595,15 +4682,17 @@ void LaserFrame::draw(QPainter * painter)
         if (!d->stampIntaglio) {
             painter->setBrush(Qt::white);
             painter->drawPath(d->outerPath);
-            painter->setBrush(QBrush(color));
-            painter->drawPath(d->path);
+            //painter->setBrush(QBrush(color));
+            setStampBrush(painter, color, QSize(d->boundingRect.width(), d->boundingRect.height()));
         }
         else {
             painter->setBrush(QBrush(color));
             painter->drawPath(d->innerPath);
-            painter->setBrush(Qt::white);
-            painter->drawPath(d->path);
+            //painter->setBrush(Qt::white);
+            setStampBrush(painter, Qt::white, QSize(d->boundingRect.width(), d->boundingRect.height()), QTransform(), true);
         }
+        
+        painter->drawPath(d->path);
     }
     
     painter->setBrush(Qt::NoBrush);
@@ -4831,6 +4920,7 @@ public:
     QString family;
     qreal fontPiexlSize;
     QPainterPath stampPath;
+    
 };
 LaserStampText::LaserStampText(LaserStampTextPrivate* ptr, LaserDocument* doc,LaserPrimitiveType type, QString content, QTransform transform, int layerIndex, 
     QSize size, qreal space, bool bold, bool italic, bool uppercase, bool stampIntaglio, QString family, qreal weight)
@@ -4848,6 +4938,7 @@ LaserStampText::LaserStampText(LaserStampTextPrivate* ptr, LaserDocument* doc,La
     d->fontPiexlSize = size.height();
     //d->stampIntaglio = stampIntaglio;
     setZValue(3);
+    
 }
 
 LaserStampText::~LaserStampText() {}
@@ -4877,12 +4968,9 @@ void LaserStampText::draw(QPainter* painter)
     pen.setJoinStyle(Qt::RoundJoin);
     pen.setCapStyle(Qt::RoundCap);
     painter->setPen(pen);
-    painter->setBrush(QBrush(color));
+    //painter->setBrush(QBrush(color));
+    setStampBrush(painter, color, QSize(d->boundingRect.width(), d->boundingRect.height()));
     painter->drawPath(d->path);
-    painter->setBrush(Qt::NoBrush);
-    //painter->setPen(QPen(Qt::red, 100));
-    //painter->setBrush(QBrush(Qt::red));
-    //painter->drawPath(d->antiFakePath);
 }
 
 void LaserStampText::setContent(QString content)
@@ -5772,6 +5860,7 @@ void LaserHorizontalText::computeTextPath()
     d->boundingRect = d->path.boundingRect().toRect();  
     //d->originalBoundingRect = d->boundingRect;
     d->originalPath = d->path;
+    
 }
 
 void LaserHorizontalText::toCenter()
@@ -6132,6 +6221,7 @@ public:
     QImage image;
     QImage originalImage;
     QImage antiFakeImage;
+    QImage fingerprintImage;
 };
 LaserStampBitmap::LaserStampBitmap(const QImage& image, const QRect& bounds, bool stampIntaglio, LaserDocument* doc, QTransform transform, int layerIndex)
     :LaserStampBase(new LaserStampBitmapPrivate(this), doc, LPT_STAMPBITMAP, stampIntaglio, transform, layerIndex)
@@ -6139,8 +6229,9 @@ LaserStampBitmap::LaserStampBitmap(const QImage& image, const QRect& bounds, boo
     Q_D(LaserStampBitmap);
     setTransform(transform);
     d->boundingRect = bounds;
+    
     d->image = image.convertToFormat(QImage::Format_ARGB32);
-    d->stampIntaglio = stampIntaglio;
+    d->originalImage = d->image;
     setBounds(bounds);
     setZValue(3);
     //QSize s = d->image.size();
@@ -6194,7 +6285,7 @@ void LaserStampBitmap::computeImage(bool generateStamp)
                 else {
                     if (d->stampIntaglio) {
                         if (generateStamp) {
-                            col = Qt::black;
+                            col = Qt::white;
                         }
                         else {
                             col = Qt::white;
@@ -6223,13 +6314,19 @@ void LaserStampBitmap::setStampIntaglio(bool bl)
     Q_D(LaserStampBitmap);
     LaserStampBase::setStampIntaglio(bl);
     computeImage();
+
 }
 
 LaserPrimitive* LaserStampBitmap::clone(QTransform t)
 {
     Q_D(LaserStampBitmap);
-    
-    return nullptr;
+    LaserStampBitmap* p = new LaserStampBitmap(d->originalImage, d->boundingRect, 
+        d->stampIntaglio, d->doc, t, d->layerIndex);
+    stampBaseClone(p);
+    p->setAntiFakeImage(d->antiFakeImage);
+    p->setFingerprint();
+    p->computeMask();
+    return p;
 }
 
 QJsonObject LaserStampBitmap::toJson()
@@ -6259,6 +6356,7 @@ QJsonObject LaserStampBitmap::toJson()
     d->originalImage.save(&buffer, "tiff");
     buffer.close();
     object.insert("originalImage", QLatin1String(imageBits.toBase64()));
+    //antiFakeImage
     QByteArray antiFakeImageBits;
     QBuffer antiFakeBuffer(&antiFakeImageBits);
     antiFakeBuffer.open(QIODevice::ReadWrite);
@@ -6274,6 +6372,57 @@ void LaserStampBitmap::draw(QPainter* painter)
 {
     Q_D(LaserStampBitmap);
     painter->drawImage(d->boundingRect, d->image);
+
+}
+
+void LaserStampBitmap::setOriginalImage(QImage image)
+{
+    Q_D(LaserStampBitmap);
+    d->originalImage = image;
+}
+
+void LaserStampBitmap::setFingerprint()
+{
+    Q_D(LaserStampBitmap);   
+    if (d->fingerNoDensityMap == QPixmap()) {
+
+        d->fingerprintImage = QImage();
+    }
+    else {
+        QImage maskImage(d->image.width(), d->image.height(), QImage::Format_ARGB32);
+        maskImage.fill(Qt::transparent);
+        QPainter maskPainter(&maskImage);
+        QRect bounds(0, 0, d->boundingRect.width(), d->boundingRect.height());
+        setStampBrush(&maskPainter, d->doc->layers()[d->layerIndex]->color(), QSize(d->image.width(), d->image.height()));
+        maskPainter.drawRect(bounds);
+        d->fingerprintImage = maskImage;
+    }
+}
+
+void LaserStampBitmap::computeMask()
+{
+    Q_D(LaserStampBitmap);
+    QPixmap antiFakeMap, fingerprintMap;
+    if (d->antiFakeImage != QImage()) {
+        antiFakeMap = QPixmap::fromImage(d->originalImage);
+        antiFakeMap.setMask(QBitmap(QPixmap::fromImage(d->antiFakeImage)));
+    }
+    
+    if (d->fingerprintImage != QImage()) {
+        fingerprintMap = QPixmap::fromImage(d->originalImage);
+        fingerprintMap.setMask(QPixmap::fromImage(d->fingerprintImage).mask());
+    }
+    if (antiFakeMap != QPixmap() && fingerprintMap != QPixmap()) {
+        antiFakeMap.setMask(fingerprintMap.mask());
+        d->image = antiFakeMap.toImage();
+    }
+    else if (antiFakeMap != QPixmap()) {
+        d->image = antiFakeMap.toImage();
+    }
+    else if (fingerprintMap != QPixmap()) {
+        d->image = fingerprintMap.toImage();
+    }
+    
 }
 
 void LaserStampBitmap::setBounds(QRect bounds)
@@ -6285,6 +6434,52 @@ void LaserStampBitmap::setBounds(QRect bounds)
     d->path.addRect(d->boundingRect);
     d->outline = QPainterPath();
     d->outline.addRect(bounds);
+}
+QImage LaserStampBitmap::generateStampImage()
+{
+    Q_D(LaserStampBitmap);
+    QImage image(d->image.size(), d->image.format());
+    for (int x = 0; x < d->image.width(); x++) {
+        for (int y = 0; y < d->image.height(); y++) {
+            QRgb rgb = QRgb(d->image.pixel(x, y));
+            QColor col(rgb);
+            if (d->stampIntaglio) {
+                if (col == Qt::white) {
+                    col = Qt::black;
+                }
+                else {
+                    col = Qt::white;
+                }
+            }
+            else {
+                if (col == d->doc->layers()[d->layerIndex]->color()) {
+                    col = Qt::white;
+                }
+                else {
+                    col = Qt::black;
+                }
+            }
+            
+            /*if (d->stampIntaglio) {
+                if (col == Qt::white) {
+                    col = Qt::black;
+                }
+                else {
+
+                }
+            }
+            else {
+                if (col == Qt::white) {
+
+                }
+                else {
+
+                }
+            }*/
+            image.setPixel(x, y, col.rgba());
+        }
+    }
+    return image;
 }
 void LaserStampBitmap::setBoundingRectWidth(qreal width)
 {
@@ -6333,15 +6528,14 @@ void LaserStampBitmap::setAntiFakePath(QPainterPath path)
     path = t1.map(path);
     painter.drawPath(path);
     setAntiFakeImage(antiFakeImage);
+    computeMask();
 }
 
 void LaserStampBitmap::setAntiFakeImage(QImage image)
 {
     Q_D(LaserStampBitmap);
     d->antiFakeImage = image;
-    QPixmap map = QPixmap::fromImage(d->originalImage);
-    map.setMask(QBitmap(QPixmap::fromImage(image)));
-    d->image = map.toImage();
+    
 }
 
 void LaserStampBitmap::mousePressEvent(QGraphicsSceneMouseEvent* event)

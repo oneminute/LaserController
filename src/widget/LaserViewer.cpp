@@ -4614,9 +4614,7 @@ void LaserViewer::createGroup()
     QList<LaserPrimitive*>list = m_scene->document()->selectedPrimitives();
     m_group = m_scene->createItemGroup(list);
     connect(m_group, &LaserPrimitiveGroup::childrenChanged, LaserApplication::mainWindow, &LaserControllerWindow::onLaserPrimitiveGroupChildrenChanged);
-    m_group->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    m_group->setSelected(true);
-    m_group->setZValue(2);
+    
 }
 //目前只在画完图元使用
 QMap<QGraphicsItem*, QTransform> LaserViewer::onReplaceGroup(LaserPrimitive* item)

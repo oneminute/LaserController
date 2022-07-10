@@ -120,6 +120,7 @@ void LaserScene::removeLaserPrimitive(LaserPrimitive * primitive)
 {
     primitive->removeAllTreeNode();
 	removeItem(primitive);
+    
 }
 
 QList<LaserPrimitive*> LaserScene::selectedPrimitives() const
@@ -187,7 +188,8 @@ LaserPrimitiveGroup * LaserScene::createItemGroup(const QList<LaserPrimitive*>& 
         LaserViewer* viewer = qobject_cast<LaserViewer*>(views()[0]);
         emit viewer->selectedSizeChanged();
     }
-    
+    group->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    group->setSelected(true);
 	return group;
 }
 

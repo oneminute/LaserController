@@ -2,6 +2,7 @@
 #include "ConfigItem.h"
 #include "Config.h"
 
+#include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
 

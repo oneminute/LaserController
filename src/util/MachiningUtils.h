@@ -1,12 +1,13 @@
 #ifndef MACHININGUTILS_H
 #define MACHININGUTILS_H
 
-#include <Eigen/Core>
 #include <QImage>
 #include <QPoint>
 #include <QVector>
 #include <QPainterPath>
 #include <opencv2/opencv.hpp>
+#include <Eigen/Core>
+#include <Eigen/Dense>
 
 #include "laser/LaserPointList.h"
 #include "laser/LaserLineList.h"

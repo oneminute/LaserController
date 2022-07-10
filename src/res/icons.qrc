@@ -178,7 +178,13 @@
         <file>images/newInvoiceB.png</file>
         <file>images/embleEllipseStamp.png</file>
         <file>images/horizontalTextEllipseStamp.png</file>
-        <file>images/fingerprint.png</file>
+        <file>images/fingerprint1.png</file>
+		<file>images/fingerprint2.png</file>
+		<file>images/fingerprint3.png</file>
+		<file>images/fingerprint4.png</file>
+		<file>images/fingerprint5.png</file>
+		<file>images/fingerprint6.png</file>
+		<file>images/fingerprint7.png</file>
         <file>images/start_stamp.png</file>
         <file>images/CNE_banner.png</file>
         <file>images/stampImport.png</file>

@@ -237,7 +237,8 @@ void Config::loadGeneralItems()
                 return;
 
             comboBox->addItem("English", static_cast<int>(QLocale::English));
-            comboBox->addItem("简体中文", static_cast<int>(QLocale::Chinese));
+            comboBox->addItem(u8"简体中文", static_cast<int>(QLocale::Chinese));
+            comboBox->addItem(u8"Русский", static_cast<int>(QLocale::Russian));
 
             QTimer::singleShot(0, 
                 [=]() {
@@ -1393,6 +1394,12 @@ void Config::loadDeviceItems()
 
     ConfigItem* switchToU = group->addConfigItem(
         "switchToU",
+        false,
+        DT_BOOL
+    );
+
+    ConfigItem* enableDetailedLog = group->addConfigItem(
+        "enableDetailedLog",
         false,
         DT_BOOL
     );
@@ -3564,6 +3571,10 @@ void Config::updateTitlesAndDescriptions()
     Device::switchToUItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Switch To U", nullptr), 
         QCoreApplication::translate("Config", "Switch To U", nullptr));
+
+    Device::enableDetailedLogItem()->setTitleAndDesc(
+        QCoreApplication::translate("Config", "Enable Detailed Log", nullptr), 
+        QCoreApplication::translate("Config", "Enable Detailed Log", nullptr));
 
     UserRegister::headItem()->setTitleAndDesc(
         QCoreApplication::translate("Config", "Head Data", nullptr), 

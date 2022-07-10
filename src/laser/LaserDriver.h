@@ -16,29 +16,29 @@ class LaserDriver : public QObject
 
 public:
 private:
-    typedef wchar_t* (*FN_WCHART_VOID)();
-    typedef void(__stdcall *FN_VOID_INT)(int value);
-    typedef bool(__stdcall *FN_BOOL_INT)(int value);
-    typedef void(*FN_VOID_VOID)();
-    typedef void(__stdcall* FN_VOID_WCHART)(wchar_t*);
+    typedef wchar_t* (__cdecl *FN_WCHART_VOID)();
+    typedef void(__cdecl *FN_VOID_INT)(int value);
+    typedef bool(__cdecl *FN_BOOL_INT)(int value);
+    typedef void(__cdecl *FN_VOID_VOID)();
+    typedef void(__cdecl *FN_VOID_WCHART)(wchar_t*);
 
-    typedef void(__cdecl *FNProgressCallBackHandler)(void* ptr, int position, int totalCount);
-    typedef void(*FNProgressCallBack)(FNProgressCallBackHandler callback);
+    typedef void(__cdecl *FNProgressCallBackHandler)(int position, int totalCount);
+    typedef void(__cdecl *FNProgressCallBack)(FNProgressCallBackHandler callback);
 
-    typedef void(__cdecl *FNSysMessageCallBackHandler)(void* ptr, int sysMsgIndex, int sysMsgCode, wchar_t* sysEventData);
-    typedef void(*FNSysMessageCallBack)(FNSysMessageCallBackHandler callback);
+    typedef void(__cdecl *FNSysMessageCallBackHandler)(int sysMsgIndex, int sysMsgCode, wchar_t* sysEventData);
+    typedef void(__cdecl *FNSysMessageCallBack)(FNSysMessageCallBackHandler callback);
 
-    typedef void(__cdecl *FNProcDataProgressCallBackHandler)(void* ptr, int position, int totalCount);
+    typedef void(__cdecl *FNProcDataProgressCallBackHandler)(int position, int totalCount);
 
-    typedef int(__stdcall *FN_INT_INT)(int);
-    typedef int(__stdcall *FN_INT_INT_INT)(int, int);
-    typedef int(*FN_INT_VOID)();
+    typedef int(__cdecl *FN_INT_INT)(int);
+    typedef int(__cdecl *FN_INT_INT_INT)(int, int);
+    typedef int(__cdecl *FN_INT_VOID)();
 
-    typedef int(__stdcall *FN_INT_WCHART_WCHART)(wchar_t* address, wchar_t* data);
-    typedef int(__stdcall *FN_INT_WCHART)(wchar_t* address);
+    typedef int(__cdecl *FN_INT_WCHART_WCHART)(wchar_t* address, wchar_t* data);
+    typedef int(__cdecl *FN_INT_WCHART)(wchar_t* address);
 
-    typedef void(__stdcall *FN_VOID_DOUBLE)(double speed);
-    typedef void(__stdcall *FNLPenQuickMoveTo)(
+    typedef void(__cdecl *FN_VOID_DOUBLE)(double speed);
+    typedef void(__cdecl *FNLPenQuickMoveTo)(
         bool xMoveEnable,
         bool xMoveStyle,
         int xPos,
@@ -52,7 +52,7 @@ private:
         bool uMoveStyle,
         int uPos
         );
-    typedef void(__stdcall *FNCheckMoveLaserMotors)(
+    typedef void(__cdecl *FNCheckMoveLaserMotors)(
         quint16 delay,
         bool xMoveEnable,
         bool xMoveStyle,
@@ -68,44 +68,44 @@ private:
         int uPos
         );
 
-    typedef void(__stdcall *FN_VOID_BOOL)(bool);
-    typedef bool(__stdcall *FN_BOOL_BOOL)(bool);
-    typedef int(__stdcall *FN_INT_BOOL)(bool);
+    typedef void(__cdecl *FN_VOID_BOOL)(bool);
+    typedef bool(__cdecl *FN_BOOL_BOOL)(bool);
+    typedef int(__cdecl *FN_INT_BOOL)(bool);
 
-    typedef int(__stdcall *FN_INT_DOUBLE_BOOL)(double, bool);
+    typedef int(__cdecl *FN_INT_DOUBLE_BOOL)(double, bool);
 
-    typedef wchar_t* (__stdcall *FNActivationMainCard)(
+    typedef wchar_t* (__cdecl *FNActivationMainCard)(
         wchar_t*, wchar_t*, wchar_t*, wchar_t*,
         wchar_t*, wchar_t*, wchar_t*, wchar_t*, 
         wchar_t*, wchar_t*, wchar_t*, wchar_t*);
 
-    typedef wchar_t* (__stdcall* FN_WCHART_BOOL)(bool);
+    typedef wchar_t* (__cdecl *FN_WCHART_BOOL)(bool);
 
-    typedef bool(__stdcall* FN_BOOL_WCHART)(wchar_t*);
+    typedef bool(__cdecl *FN_BOOL_WCHART)(wchar_t*);
 
-    typedef void(__stdcall* FN_BOOL_WCHART_INT_WCHART)(bool, wchar_t*, int, wchar_t*);
-    typedef int(__stdcall* FN_INT_INT_BOOL)(int, bool);
+    typedef void(__cdecl *FN_BOOL_WCHART_INT_WCHART)(bool, wchar_t*, int, wchar_t*);
+    typedef int(__cdecl *FN_INT_INT_BOOL)(int, bool);
 
-    typedef wchar_t* (__stdcall* FN_WCHART_WCHART)(wchar_t*);
-    typedef wchar_t* (__stdcall* FN_WCHART_WCHART_WCHART)(wchar_t*, wchar_t*);
-    typedef int(__stdcall* FN_INT_WCHART_WCHART_INT)(wchar_t*, wchar_t*, int);
+    typedef wchar_t* (__cdecl *FN_WCHART_WCHART)(wchar_t*);
+    typedef wchar_t* (__cdecl *FN_WCHART_WCHART_WCHART)(wchar_t*, wchar_t*);
+    typedef int(__cdecl *FN_INT_WCHART_WCHART_INT)(wchar_t*, wchar_t*, int);
 
-    typedef int(__stdcall* FN_INT_BYTEPTR_INT)(char*, int);
-    typedef bool(__stdcall* FN_BOOL_WCHART_INTREF)(wchar_t*, int* errorCount);
+    typedef int(__cdecl *FN_INT_BYTEPTR_INT)(char*, int);
+    typedef bool(__cdecl *FN_BOOL_WCHART_INTREF)(wchar_t*, int* errorCount);
 
-    typedef void(__stdcall* FN_VOID_LONG)(unsigned long);
+    typedef void(__cdecl *FN_VOID_LONG)(unsigned long);
 
-    typedef int(__stdcall* FN_INT_INT16)(qint16);
+    typedef int(__cdecl *FN_INT_INT16)(qint16);
 
-    typedef void(__stdcall* FNStartVersionUpdate)(bool, wchar_t*, wchar_t*, int, int, wchar_t*, wchar_t*);
+    typedef void(__cdecl *FNStartVersionUpdate)(bool, wchar_t*, wchar_t*, int, int, wchar_t*, wchar_t*);
 
 public:
     explicit LaserDriver(QObject* parent = nullptr);
     ~LaserDriver();
 
-    static void ProgressCallBackHandler(void* ptr, int position, int totalCount);
-    static void SysMessageCallBackHandler(void* ptr, int sysMsgIndex, int sysMsgCode, wchar_t* sysEventData);
-    static void ProcDataProgressCallBackHandler(void* ptr, int position, int totalCount);
+    static void __cdecl ProgressCallBackHandler(int position, int totalCount);
+    static void __cdecl SysMessageCallBackHandler(int sysMsgIndex, int sysMsgCode, wchar_t* sysEventData);
+    static void __cdecl ProcDataProgressCallBackHandler(int position, int totalCount);
 
     bool load();
     void unload();
@@ -218,6 +218,9 @@ public:
     void lPenMoveToOriginalPointZ(int moveTo);
 
     QString registerMainCard(const QString& registeCode, const QString& password);
+
+    void openDetailedLog(bool isOut);
+    void debugLogger(bool enabled);
 
     bool isLoaded() const { return m_isLoaded; }
     bool isConnected() const { return m_isConnected; }

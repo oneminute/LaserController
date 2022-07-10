@@ -41,6 +41,9 @@ public:
     static void cleanLogFiles();
     static void cleanCachedFiles();
 
+    static void showSplashScreen(const QString& msg, int progress, QWidget* parentWnd = nullptr);
+    static void hideSplashScreen(int ms);
+
 protected:
     void initLog();
     void cleanCrash();
