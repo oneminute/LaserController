@@ -35,7 +35,7 @@ CameraAlignmentDialog::CameraAlignmentDialog(CameraController* cameraController,
     , m_waitingForImage(false)
 {
     installEventFilter(this);
-    Config::Device::startFromItem()->push();
+    //Config::Device::startFromItem()->push();
     Config::Export::imageQualityItem()->push();
 
     Config::Export::imageQualityItem()->setValue(IQ_Normal, SS_DIRECTLY, this);
@@ -253,7 +253,6 @@ CameraAlignmentDialog::CameraAlignmentDialog(CameraController* cameraController,
     resize(1280, 800);
 
     page2RadioButton1->setChecked(true);
-    connect(LaserApplication::device, &LaserDevice::workStateUpdated, this, &CameraAlignmentDialog::onDeviceStateChanged);
     onCameraConnected();
 }
 
@@ -328,7 +327,7 @@ void CameraAlignmentDialog::closeEvent(QCloseEvent* e)
 {
     if (m_doc)
         LaserApplication::mainWindow->closeDocument();
-    Config::Device::startFromItem()->pop();
+    //Config::Device::startFromItem()->pop();
     Config::Export::imageQualityItem()->pop();
 }
 
@@ -400,7 +399,6 @@ void CameraAlignmentDialog::generate()
     LaserScene* scene = LaserApplication::mainWindow->scene();
     m_doc = scene->document();
     m_doc->setFinishRun(FT_BackToOrigin);
-    //m_doc->setFinishRun(FT_CurrentPos);
     
     int hMargin = m_page1SpinBoxHMargin->value() * 1000;
     int vMargin = m_page1SpinBoxVMargin->value() * 1000;
@@ -452,7 +450,7 @@ void CameraAlignmentDialog::generate()
 
 void CameraAlignmentDialog::start()
 {
-    Config::Device::startFromItem()->setValue(SFT_AbsoluteCoords, SS_DIRECTLY, this);
+    //Config::Device::startFromItem()->setValue(SFT_AbsoluteCoords, SS_DIRECTLY, this);
     LaserApplication::mainWindow->startMachining();
 }
 
@@ -564,12 +562,3 @@ void CameraAlignmentDialog::onMarkIndexChanged(bool checked)
     m_currentMarkIndex = index;
 }
 
-void CameraAlignmentDialog::onDeviceStateChanged(DeviceState state)
-{
-    if (state.workingMode == LaserWorkMode::LWM_STOP)
-    {
-        QVector4D userOrigin = LaserApplication::device->userOrigin();
-        qLogD << "user origin: " << userOrigin;
-        LaserApplication::device->moveTo(userOrigin);
-    }
-}

@@ -320,6 +320,7 @@ public:
         CONFIG_ITEM(device, rollerRotaryStepLength, int, toInt)
         CONFIG_ITEM_T(device, finishRun, FinishRunType)
         CONFIG_ITEM(device, switchToU, bool, toBool)
+        CONFIG_ITEM(device, enableDetailedLog, bool, toBool)
 
     private:
         friend class Config;

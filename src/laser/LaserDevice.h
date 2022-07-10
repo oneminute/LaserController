@@ -122,6 +122,8 @@ public:
     void showFirmwareUpdateWizard();
     void updateDriverLanguage();
 
+    void enableDetailedLog(bool enabled);
+
     bool checkLayoutForMoving(const QPoint& dest);
     bool checkLayoutForMachining(const QRect& docBounding, const QRect& engravingBounding);
 

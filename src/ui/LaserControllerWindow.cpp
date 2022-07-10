@@ -136,6 +136,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     , m_prepareDownloading(false)
 {
     m_ui->setupUi(this);
+    LaserApplication::showSplashScreen(tr("Loading main window..."), 40, this);
+
     loadRecentFilesMenu();
     installEventFilter(this);
     //setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
@@ -900,6 +902,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionCameraDefault, &QAction::triggered, this, &LaserControllerWindow::onActionCameraDefault);
 
     connect(m_ui->actionSaveUStep, &QAction::triggered, this, &LaserControllerWindow::onActionSaveUStep);
+    connect(m_ui->actionEnableDetailedLog, &QAction::triggered, this, &LaserControllerWindow::onActionEnableDetailedLog);
 
     connect(m_viewer, &LaserViewer::selectedSizeChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
     
@@ -1473,11 +1476,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     onLayoutChanged(LaserApplication::device->layoutSize());
 
 #ifdef _DEBUG
-    m_tablePrintAndCutPoints->setLaserPoint(QPoint(-164000, 39000));
-    m_tablePrintAndCutPoints->setCanvasPoint(QPoint(-180000, 30000));
+    //m_tablePrintAndCutPoints->setLaserPoint(QPoint(-164000, 39000));
+    //m_tablePrintAndCutPoints->setCanvasPoint(QPoint(-180000, 30000));
     //m_tablePrintAndCutPoints->addNewLine();
-    m_tablePrintAndCutPoints->setLaserPoint(QPoint(-131000, 76000));
-    m_tablePrintAndCutPoints->setCanvasPoint(QPoint(-140000, 60000));
+    //m_tablePrintAndCutPoints->setLaserPoint(QPoint(-131000, 76000));
+    //m_tablePrintAndCutPoints->setCanvasPoint(QPoint(-140000, 60000));
 
     /*m_tablePrintAndCutPoints->setLaserPoint(QPoint(90306, 74802));
     m_tablePrintAndCutPoints->setCanvasPoint(QPoint(90304, 74802));
@@ -6656,6 +6659,11 @@ void LaserControllerWindow::onActionSaveUStep()
     Config::SystemRegister::group->save(true, false);
 }
 
+void LaserControllerWindow::onActionEnableDetailedLog(bool checked)
+{
+    LaserApplication::device->enableDetailedLog(checked);
+}
+
 void LaserControllerWindow::onDeviceComPortsFetched(const QStringList & ports)
 {
     for (int i = 0; i < ports.size(); i++)
@@ -7582,15 +7590,17 @@ void LaserControllerWindow::showEvent(QShowEvent * event)
     if (!m_created)
     {
         //LaserApplication::device->updateDriverLanguage();
-        LaserApplication::splashScreen->setMessage(tr("Loading main window..."));
+        LaserApplication::showSplashScreen(tr("Loading main window..."), 90, this);
         m_created = true;
         QTimer::singleShot(1000, this, [=]() {
             //LaserApplication::device->updateDriverLanguage();
             emit windowCreated();
             qLogD << "orientation: " << m_splitterLayers->orientation();
             m_splitterLayers->setSizes({400, 450});
-            LaserApplication::splashScreen->setProgress(100);
-            LaserApplication::splashScreen->delayedHide(1000);
+            LaserApplication::showSplashScreen(tr("Loading completed."), 100, this);
+            LaserApplication::hideSplashScreen(1000);
+            //LaserApplication::splashScreen->setProgress(100);
+            //LaserApplication::splashScreen->delayedHide(1000);
         });
     }
 }

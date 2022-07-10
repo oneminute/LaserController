@@ -300,6 +300,7 @@ protected slots:
     void onActionCameraDefault();
 
     void onActionSaveUStep();
+    void onActionEnableDetailedLog(bool checked = false);
 
     void onDeviceComPortsFetched(const QStringList& ports);
     void onDeviceConnected();

@@ -87,10 +87,6 @@ bool LaserApplication::initialize()
     qLogD << "Display languages: " << displayLocale << ", code: " << displayLocale.language();
 
     loadLanguages();
-    splashScreen = new SplashScreen();
-    splashScreen->setMessage(tr("Loading settings..."));
-    splashScreen->setProgress(0);
-    splashScreen->show();
 
     checkEnvironment();
     checkCrash();
@@ -110,21 +106,21 @@ bool LaserApplication::initialize()
         //QTextStream stream(&file);
         //setStyleSheet(stream.readAll());
     }
-    splashScreen->setProgress(10);
+    //splashScreen->setProgress(10);
 
-    splashScreen->setMessage(tr("Loading laser library..."));
+    //splashScreen->setMessage(tr("Loading laser library..."));
     driver = new LaserDriver;
     device = new LaserDevice(driver);
 
     connect(StateController::instance().deviceUnconnectedState(), &QState::entered, this, &LaserApplication::onEnterDeviceUnconnectedState);
     connect(Config::General::languageItem(), &ConfigItem::valueChanged, this, &LaserApplication::onLanguageChanged);
-    splashScreen->setProgress(40);
+    //splashScreen->setProgress(40);
 
-    splashScreen->setMessage(tr("Loading state machine..."));
+    //splashScreen->setMessage(tr("Loading state machine..."));
     StateController::start();
-    splashScreen->setProgress(50);
+    //splashScreen->setProgress(50);
 
-    splashScreen->setMessage(tr("Loading main window..."));
+    //splashScreen->setMessage(tr("Loading main window..."));
     //progressModel = new ProgressModel;
     globalProgress = new ProgressItem(tr("Total Progress"), ProgressItem::PT_Complex);
     mainWindow = new LaserControllerWindow;
@@ -517,6 +513,25 @@ void LaserApplication::cleanCachedFiles()
     {
         tmpDir.remove(entry.fileName());
     }
+}
+
+void LaserApplication::showSplashScreen(const QString& msg, int progress, QWidget* parentWnd)
+{
+    if (!splashScreen)
+    {
+        splashScreen = new SplashScreen(parentWnd);
+    }
+    if (parentWnd)
+        splashScreen->setParent(parentWnd);
+    splashScreen->setMessage(msg);
+    splashScreen->setProgress(progress);
+    splashScreen->show();
+}
+
+void LaserApplication::hideSplashScreen(int ms)
+{
+    if (splashScreen)
+        splashScreen->delayedHide(ms);
 }
 
 void LaserApplication::initLog()

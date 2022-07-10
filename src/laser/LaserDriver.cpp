@@ -921,3 +921,13 @@ QString LaserDriver::registerMainCard(const QString& registeCode, const QString&
     return returnRegisteCode;
 }
 
+void LaserDriver::openDetailedLog(bool isOut)
+{
+    m_fnOpenDetailedLog(isOut);
+}
+
+void LaserDriver::debugLogger(bool enabled)
+{
+    m_fnDebugLogger(enabled);
+}
+

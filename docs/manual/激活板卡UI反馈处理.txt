@@ -1,0 +1,44 @@
+
+一、重新激活板卡及机器窗口中，进行在线激活时：
+调用ActivationMainCardEx时发生直接返回值（同步）和回调事件（异步）如下：
+下面是该函数的直接返回值：
+0 激活成功 
+1 未激活过，需要进入邮箱认证激活流程
+-1 网络不正常
+-2 数据同步出错
+-3 激活失败原因：加密锁不属于此代理商名下
+-4 激活过程出现异常操作导致无法继续
+其它值：身份验证失败，激活取消
+
+下面是可能发生的回调事件：
+EnLockerNotExists 1006 //加密锁不存在
+InadequatePermissions 1053 //权限不足，请使用用户加密锁激活板卡
+MainCardIDError 1010 //板卡ID无效
+MainCardRegisterError 1008  //板卡未注册，激活前需要先注册板卡
+MainCardIsGenuine 2008 //板卡已经激活，不需要重复激活
+SystemFatalError 1000 //系统错误导致无法继续
+
+－－－－－－－－－－－－－－－－－－－－－－－
+二、邮箱获取激活码过程：
+A、判断邮箱直址、用户姓名长度的合法性，不合法跳到C，合法则跳到B
+B、调用SendAuthenticationEmail函数
+下面是可能发生的回调事件：
+EnLockerNotExists 1006 //加密锁不存在
+InadequatePermissions 1053 //权限不足，请使用用户加密锁激活板卡
+EnLockerIDError 1011 //加密锁ID不存在，可能是未入库、已经激活过或非法ID
+MainCardIDError 1010 //板卡ID无效
+MainCardRegisterError 1008  //板卡未注册，激活前需要先注册板卡
+MainCardIsGenuine 2008 //板卡已经激活，不需要重复激活
+MainCardIsPirate 1009 //控制板未激活
+SystemFatalError 1000 //系统错误导致无法继续
+PingServerFail  1042 //网络故障
+ConnectFrequently 1044 //登录过于频繁
+EnLockerActivaDisabled 1007 //该加密锁激活功能被禁用
+CardDongleBindOutTimes 1014  //该加密锁绑定超次
+SubmitToServerErr 1045  //提交激活请求失败
+MailboxInValid 1055 //邮箱认证失败
+VALIDATECODE_INVALID 1058 //身份验证错误
+ACTIVECODE_INVALID 1057 //激活码错误
+MailboxName_INVALID 1059 //当前邮箱不是激活板卡使用的邮箱
+
+C、提示用户

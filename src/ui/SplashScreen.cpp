@@ -21,11 +21,12 @@ SplashScreen::SplashScreen(QWidget* parent)
     , m_progressTick(0.5)
     , m_close(false)
 {
-#ifdef _DEBUG
+//#ifdef _DEBUG
+//    setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
+//#else
+//    setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+//#endif
     setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
-#else
-    setWindowFlags(windowFlags() | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
-#endif
     m_ui->setupUi(this);   
     QRect screenGeometry = LaserApplication::desktop()->screenGeometry();
     int w = screenGeometry.width()*0.5;

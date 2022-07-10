@@ -26,6 +26,7 @@ public:
         , driver(nullptr)
         , isInit(false)
         , connected(false)
+        , dongleConnected(false)
         , name("unknown")
         , portName("")
         , printerDrawUnit(1016)
@@ -48,6 +49,7 @@ public:
     LaserDriver* driver;
     bool isInit;
     bool connected;
+    bool dongleConnected;
 
     QString name;
     QString portName;
@@ -60,6 +62,7 @@ public:
     QString mainCard;
     QString mainCardRegisteredDate;
     QString mainCardActivatedDate;
+    QString mail;
     QString boundDongle;
     QString boundDongleRegisteredDate;
     QString boundDongleActivatedDate;
@@ -326,6 +329,8 @@ void LaserDevice::load()
         d->isInit = false;
         if (d->driver->init(LaserApplication::mainWindow->winId()))
         {
+            //d->driver->openDetailedLog(Config::Device::enableDetailedLog());
+            //d->driver->debugLogger(Config::Device::enableDetailedLog());
             qLogD << "LaserDevice::onLibraryInitialized";
             d->driver->setupCallbacks();
             d->isInit = true;
@@ -1032,6 +1037,13 @@ void LaserDevice::updateDriverLanguage()
     Q_D(LaserDevice);
     if (d->driver)
         d->driver->setLanguage(Config::General::language() == QLocale::Chinese ? 1 : 0);
+}
+
+void LaserDevice::enableDetailedLog(bool enabled)
+{
+    Q_D(LaserDevice);
+    if (d->driver)
+        d->driver->openDetailedLog(enabled);
 }
 
 bool LaserDevice::checkLayoutForMoving(const QPoint& dest)
@@ -1767,9 +1779,11 @@ void LaserDevice::handleMessage(int code, const QString& message)
         qLogD << "usb removed";
         break;
     case M_DongleConnected:
+        d->dongleConnected = true;
         emit dongleConnected();
         break;
     case M_DongleDisconnected:
+        d->dongleConnected = false;
         emit dongleDisconnected();
         break;
     case M_MainCardRegisterOK:
@@ -1797,17 +1811,18 @@ void LaserDevice::handleMessage(int code, const QString& message)
         d->mainCard = items[0];
         d->mainCardRegisteredDate = items[1];
         d->mainCardActivatedDate = items[2];
-        d->boundDongle = items[3];
-        d->boundDongleRegisteredDate = items[4];
-        d->boundDongleActivatedDate = items[5];
-        d->boundDongleBindingTimes = items[6];
-        d->dongle = items[7];
-        d->dongleRegisteredDate = items[8];
-        d->dongleActivatedDate = items[9];
-        d->dongleBindingTimes = items[10];
-        d->hardwareRegisteredDate = items[11];
-        d->hardwareActivatedDate = items[12];
-        d->hardwareMaintainingTimes = items[13];
+        d->mail = items[3];
+        d->boundDongle = items[4];
+        d->boundDongleRegisteredDate = items[5];
+        d->boundDongleActivatedDate = items[6];
+        d->boundDongleBindingTimes = items[7];
+        d->dongle = items[8];
+        d->dongleRegisteredDate = items[9];
+        d->dongleActivatedDate = items[10];
+        d->dongleBindingTimes = items[11];
+        d->hardwareRegisteredDate = items[12];
+        d->hardwareActivatedDate = items[13];
+        d->hardwareMaintainingTimes = items[14];
         emit mainCardInfoFetched();
         emit dongleConnected();
         break;
@@ -2131,7 +2146,7 @@ void LaserDevice::onConnected()
     Q_D(LaserDevice);
     if (d->driver)
     {
-        d->driver->setFactoryType("EFSLaserController");
+        d->driver->setFactoryType("CNELASERCONTROLLER");
         d->driver->getDeviceWorkState();
     }
 }

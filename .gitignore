@@ -107,3 +107,7 @@ export.json
 
 *.rar
 
+
+out/
+
+.vs/

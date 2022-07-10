@@ -219,6 +219,9 @@ public:
 
     QString registerMainCard(const QString& registeCode, const QString& password);
 
+    void openDetailedLog(bool isOut);
+    void debugLogger(bool enabled);
+
     bool isLoaded() const { return m_isLoaded; }
     bool isConnected() const { return m_isConnected; }
     bool isMachining() const { return m_isMachining; }

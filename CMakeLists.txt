@@ -23,6 +23,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 set(QT_WIN32_PATH "" CACHE PATH "")
 set(OPENCV_WIN32_PATH "" CACHE PATH "")
 option(CNELASER_BUILD_EXAMPLES "Build Examples and Tech tests" OFF)
+option(CNELASER_BUILD_COMPORT "Build Comport" OFF)
 list(APPEND CMAKE_PROGRAM_PATH ${QT_WIN32_PATH} ${OPENCV_WIN32_PATH})
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -128,15 +129,14 @@ LIST(FILTER DOCS EXCLUDE REGEX "[$]")
 set(OTHER_FILES
     README.md
     ReleaseNotes.md
-    cmake_install_debug.cmake
-    cmake_install_release.cmake
+    cmake_install_Debug.cmake
+    cmake_install_Release.cmake
     cmake_install_relwithdebinfo.txt
     third/cdr/include/VGCoreAuto.tlh.in
     src/res/icons.qrc
     src/res/laser.rc
     res/constraints.csv
-    cmake/Compress_debug.cmake
-    cmake/Compress_release.cmake
+    cmake/compress.cmake
     cmake/GenerateConstraints.cmake
     .gitignore
     ${TRANSLATIONS}
@@ -229,35 +229,37 @@ IF(MSVC)
     source_group("res" FILES ${RES})
 ENDIF(MSVC)
 
-add_library(CNEComPort SHARED ${COMPORT_HEADERS} ${COMPORT_SOURCES})
-target_link_libraries(CNEComPort PRIVATE
-    Qt5::SerialPort
-)
-target_compile_definitions(CNEComPort PRIVATE COMPORT_LIBRARY)
+if (${CNELASER_BUILD_COMPORT})
+    add_library(CNEComPort SHARED ${COMPORT_HEADERS} ${COMPORT_SOURCES})
+    target_link_libraries(CNEComPort PRIVATE
+        Qt5::SerialPort
+    )
+    target_compile_definitions(CNEComPort PRIVATE COMPORT_LIBRARY)
 
-add_executable(CNEComPortTesting src/testing/comport/ComPortTesting.cpp)
-add_test(NAME CNEComPortTesting COMMAND CNEComPortTesting)
-target_include_directories(CNEComPortTesting PUBLIC src/comport)
-target_link_libraries(CNEComPortTesting PRIVATE
-    Qt5::SerialPort
-    Qt5::Test
-    CNEComPort
-)
+    add_executable(CNEComPortTesting src/testing/comport/ComPortTesting.cpp)
+    add_test(NAME CNEComPortTesting COMMAND CNEComPortTesting)
+    target_include_directories(CNEComPortTesting PUBLIC src/comport)
+    target_link_libraries(CNEComPortTesting PRIVATE
+        Qt5::SerialPort
+        Qt5::Test
+        CNEComPort
+    )
 
-add_library(DllTest SHARED ${DLLTEST_HEADERS} ${DLLTEST_SOURCES})
-target_link_libraries(DllTest PRIVATE
-    Qt5::SerialPort
-)
-target_compile_definitions(DllTest PRIVATE DLLTEST_LIBRARY)
+    add_library(DllTest SHARED ${DLLTEST_HEADERS} ${DLLTEST_SOURCES})
+    target_link_libraries(DllTest PRIVATE
+        Qt5::SerialPort
+    )
+    target_compile_definitions(DllTest PRIVATE DLLTEST_LIBRARY)
 
-add_executable(DllTestTesting src/testing/dlltest/DllTest.cpp)
-add_test(NAME DllTestTesting COMMAND DllTestTesting)
-target_include_directories(DllTestTesting PUBLIC src/dlltest)
-target_link_libraries(DllTestTesting PRIVATE
-    Qt5::SerialPort
-    Qt5::Test
-    DllTest
-)
+    add_executable(DllTestTesting src/testing/dlltest/DllTest.cpp)
+    add_test(NAME DllTestTesting COMMAND DllTestTesting)
+    target_include_directories(DllTestTesting PUBLIC src/dlltest)
+    target_link_libraries(DllTestTesting PRIVATE
+        Qt5::SerialPort
+        Qt5::Test
+        DllTest
+    )
+endif()
 
 set(LINK_LIBRARIES 
     Eigen3::Eigen
@@ -331,5 +333,7 @@ add_custom_target (GenerateTranslations
     Qt5::lupdate ${CMAKE_SOURCE_DIR}/src -ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_zh_CN.ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_en_US.ts ${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_ru_RU.ts
 )
 
-include(cmake_install_Debug.cmake)
-include(cmake_install_Release.cmake)
+message(STATUS "CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
+message(STATUS "CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
+include(cmake_install_${CMAKE_BUILD_TYPE}.cmake)
+#include(cmake_install_release.cmake)
