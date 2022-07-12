@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>CNE Laser</string>
+   <string>Laser CEO</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="autoFillBackground">

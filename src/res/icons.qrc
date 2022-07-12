@@ -187,6 +187,7 @@
 		<file>images/fingerprint7.png</file>
         <file>images/start_stamp.png</file>
         <file>images/CNE_banner.png</file>
-		<file>images/stampImport.png</file>
+        <file>images/stampImport.png</file>
+        <file>images/Africa_banner.png</file>
     </qresource>
 </RCC>

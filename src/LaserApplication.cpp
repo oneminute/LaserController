@@ -67,8 +67,8 @@ bool LaserApplication::initialize()
     mainThread = QThread::currentThread();
     QDir dir(LaserApplication::applicationDirPath());
     LaserApplication::addLibraryPath(dir.absoluteFilePath("bin"));
-    LaserApplication::setApplicationName(QObject::tr("CNE Laser"));
-    LaserApplication::setApplicationDisplayName(QObject::tr("CNE Laser %1").arg(LC_VERSION_STR_WITH_TAG));
+    LaserApplication::setApplicationName(QObject::tr("Laser CEO"));
+    LaserApplication::setApplicationDisplayName(QObject::tr("Laser CEO %1").arg(LC_VERSION_STR_WITH_TAG));
     LaserApplication::setOrganizationName(tr(""));
     LaserApplication::setApplicationVersion(QString("%1").arg(LC_VERSION_STR_WITH_TAG));
     //LaserApplication::setStyle(QStyleFactory::create("Fusion"));
@@ -222,6 +222,7 @@ void LaserApplication::loadLanguages()
     qDeleteAll(translators);
     translators.clear();
     QDir translationDir("translations");
+    qLogD << "translation dir: " << translationDir.absolutePath();
     QStringList nameFilters;
     nameFilters << "*.qm";
     QFileInfoList entries = translationDir.entryInfoList(nameFilters);
@@ -243,6 +244,7 @@ void LaserApplication::changeLanguage()
     for (QString localeName : qAsConst(languages)) {
         localeName.replace(QLatin1Char('-'), QLatin1Char('_'));
         QString realName = appShortName + "_" + localeName;
+        qLogD << "language real name: " << realName;
 
         if (translators.contains(realName))
         {
