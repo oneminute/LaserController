@@ -269,6 +269,7 @@ signals:
     void dongleConnected();
     void dongleDisconnected();
     void dongleRemoved();
+    void requestFrequent();
 
 private:
     QScopedPointer<LaserDevicePrivate> m_ptr;

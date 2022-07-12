@@ -73,7 +73,7 @@
 #include "ui/PreviewWindow.h"
 #include "ui/UpdateDialog.h"
 #include "ui/ActivationDialog.h"
-#include "ui/RegisteDialog.h"
+#include "ui/RegisterDialog.h"
 #include "ui/SelectOriginDialog.h"
 #include "ui/UserInfoDialog.h"
 #include "ui/MultiDuplicationDialog.h"
@@ -448,14 +448,14 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->statusbar->addWidget(m_statusBarDeviceStatus);
 
     m_statusBarRegister = new Label;
-    m_statusBarRegister->setText(ltr("Unregistered"));
+    m_statusBarRegister->setText(ltr("Unknown"));
     m_statusBarRegister->setMinimumWidth(60);
     m_statusBarRegister->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarRegister);
     connect(m_statusBarRegister, &Label::clicked, this, &LaserControllerWindow::onStatusBarRegisterClicked);
 
     m_statusBarActivation = new Label;
-    m_statusBarActivation->setText(ltr("Inactivated"));
+    m_statusBarActivation->setText(ltr("Unknown"));
     m_statusBarActivation->setMinimumWidth(60);
     m_statusBarActivation->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarActivation);
@@ -6288,13 +6288,13 @@ void LaserControllerWindow::onActionBitmap(bool checked)
 
 void LaserControllerWindow::onActionRegiste(bool checked)
 {
-    RegisteDialog dlg;
+    RegisterDialog dlg;
     dlg.exec();
 }
 
 void LaserControllerWindow::onStatusBarRegisterClicked(bool checked)
 {
-    RegisteDialog dlg;
+    RegisterDialog dlg;
     dlg.exec();
 }
 
@@ -6685,6 +6685,8 @@ void LaserControllerWindow::onDeviceConnected()
 void LaserControllerWindow::onDeviceDisconnected()
 {
     m_statusBarDeviceStatus->setText(tr("Disconnected"));
+    m_statusBarActivation->setText(tr("Unknown"));
+    m_statusBarRegister->setText(tr("Unknown"));
 }
 
 void LaserControllerWindow::onMainCardRegistrationChanged(bool registered)

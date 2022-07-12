@@ -608,6 +608,7 @@ void LaserDriver::closeAboutWindow()
 QString LaserDriver::getLaserLibraryInfo()
 {
     wchar_t* strInfo = m_fnGetMainCardID();
+    //QString info = QString::fromWCharArray(strInfo);
     QString info = QString::fromWCharArray(strInfo);
     return info;
 }
@@ -689,6 +690,7 @@ void LaserDriver::startMoveLaserMotors()
 QString LaserDriver::firmwareVersion()
 {
     wchar_t* strId = m_fnGetMainHardVersion();
+    //QString id = QString::fromWCharArray(strId);
     QString id = QString::fromWCharArray(strId);
     return id;
 }
@@ -696,6 +698,7 @@ QString LaserDriver::firmwareVersion()
 QString LaserDriver::getMainCardID()
 {
     wchar_t* strId = m_fnGetMainCardID();
+    //QString id = QString::fromWCharArray(strId);
     QString id = QString::fromWCharArray(strId);
     return id;
 }
@@ -788,7 +791,8 @@ QString LaserDriver::getDeviceId(bool reload)
 
 QString LaserDriver::getDongleId()
 {
-    return QString::fromWCharArray(m_fnGetHardwareKeyID());
+    wchar_t* str = m_fnGetHardwareKeyID();
+    return QString::fromWCharArray(str);
 }
 
 void LaserDriver::getMainCardRegisterState()
@@ -798,12 +802,14 @@ void LaserDriver::getMainCardRegisterState()
 
 QString LaserDriver::getMainCardInfo()
 {
-    return QString::fromWCharArray(m_fnGetMainCardInfo());
+    wchar_t* str = m_fnGetMainCardInfo();
+    return QString::fromWCharArray(str);
 }
 
 QString LaserDriver::getMainHardModal()
 {
-    return QString::fromWCharArray(m_fnGetMainHardModal());
+    wchar_t* str = m_fnGetMainHardModal();
+    return QString::fromWCharArray(str);
 }
 
 bool LaserDriver::createLicenseFile(const QString& licenseCode)
@@ -914,7 +920,6 @@ QString LaserDriver::registerMainCard(const QString& registeCode, const QString&
     wchar_t* registeCodeBuf = typeUtils::qStringToWCharPtr(registeCode);
     wchar_t* passwordBuf = typeUtils::qStringToWCharPtr(password);
     wchar_t* returnBuf = m_fnRegisterMainCard(registeCodeBuf, passwordBuf);
-    qLogD << sizeof(QChar);
     QString returnRegisteCode = QString::fromWCharArray(returnBuf);
     delete[] registeCodeBuf;
     delete[] passwordBuf;

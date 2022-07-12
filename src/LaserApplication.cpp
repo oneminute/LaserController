@@ -222,6 +222,7 @@ void LaserApplication::loadLanguages()
     qDeleteAll(translators);
     translators.clear();
     QDir translationDir("translations");
+    qLogD << "translation dir: " << translationDir.absolutePath();
     QStringList nameFilters;
     nameFilters << "*.qm";
     QFileInfoList entries = translationDir.entryInfoList(nameFilters);
@@ -243,6 +244,7 @@ void LaserApplication::changeLanguage()
     for (QString localeName : qAsConst(languages)) {
         localeName.replace(QLatin1Char('-'), QLatin1Char('_'));
         QString realName = appShortName + "_" + localeName;
+        qLogD << "language real name: " << realName;
 
         if (translators.contains(realName))
         {

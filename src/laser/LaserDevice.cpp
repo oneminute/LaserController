@@ -1699,7 +1699,7 @@ void LaserDevice::handleError(int code, const QString& message)
         widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Failed to log in to server"));
         break;
     case E_ConnectFrequently:
-        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Login too frequently"));
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Login requests are too frequent. Please restart this software."));
         break;
     case E_SubmitToServerError:
         widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Warning"), tr("Failed to submit data"));
@@ -2080,6 +2080,7 @@ void LaserDevice::handleMessage(int code, const QString& message)
     case M_SoftUpdateFinished:
     {
         qLogD << "Downloading software finished: " << message;
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Update finished"), tr("Update finished!"));
         break;
     }
     case M_FoundFirmwareNewVersion:
@@ -2115,11 +2116,13 @@ void LaserDevice::handleMessage(int code, const QString& message)
     case M_UpdateFirmwareEnd:
     {
         qLogD << "End to update firmware: " << message;
+        widgetUtils::showInfoMessage(LaserApplication::mainWindow, tr("Update firmware finished"), tr("Update firmware finished."));
         break;
     }
     case M_UpdateFirmwareAbort:
     {
         qLogD << "Abort updating firmware: " << message;
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow, tr("Update firmware aborted"), tr("Update firmware aborted."));
         break;
     }
     case M_SaveParamsToServerOK:
