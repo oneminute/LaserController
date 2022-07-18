@@ -113,6 +113,34 @@ void ActivationDialog::onPushButtonActivateClicked(bool checked)
             m_ui->labelDescription->setText(tr("An error occurred. Please communicate your administartor."));
             break;
         }
+        case -1:
+        {
+            m_ui->labelIcon->setPixmap(QPixmap(":/ui/icons/images/Image-dialog-warning.ico"));
+            m_ui->labelStatus->setText(tr("Error"));
+            m_ui->labelDescription->setText(tr("There is a problem with your network connection."));
+            break;
+        }
+        case -2:
+        {
+            m_ui->labelIcon->setPixmap(QPixmap(":/ui/icons/images/Image-dialog-warning.ico"));
+            m_ui->labelStatus->setText(tr("Error"));
+            m_ui->labelDescription->setText(tr("There is a problem when synchronizing data."));
+            break;
+        }
+        case -3:
+        {
+            m_ui->labelIcon->setPixmap(QPixmap(":/ui/icons/images/Image-dialog-warning.ico"));
+            m_ui->labelStatus->setText(tr("Error"));
+            m_ui->labelDescription->setText(tr("This key is not belonged to current distributor."));
+            break;
+        }
+        case -4:
+        {
+            m_ui->labelIcon->setPixmap(QPixmap(":/ui/icons/images/Image-dialog-warning.ico"));
+            m_ui->labelStatus->setText(tr("Error"));
+            m_ui->labelDescription->setText(tr("An error occurred. Please communicate your administartor."));
+            break;
+        }
         }
     }
     else if (m_ui->stackedWidget->currentIndex() == 1)

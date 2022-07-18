@@ -63,7 +63,7 @@
 #include "ui/PreviewWindow.h"
 #include "ui/UpdateDialog.h"
 #include "ui/ActivationDialog.h"
-#include "ui/RegisteDialog.h"
+#include "ui/RegisterDialog.h"
 #include "ui/UserInfoDialog.h"
 #include "ui/MultiDuplicationDialog.h"
 #include "util/ImageUtils.h"
@@ -1730,33 +1730,6 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionZoomToSelection, "enabled", false, documentPrimitiveSplineState);
     // end m_ui->actionZoomToSelection
 
-    // begin m_ui->actionUndo
-    BIND_PROP_TO_STATE(m_ui->actionUndo, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionUndo, "enabled", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionUndo, "enabled", true, documentIdleState);
-    // end m_ui->actionUndo
-
-    // begin m_ui->actionRedo
-    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentEmptyState);
-    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", true, documentIdleState);
-    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveState);
-    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveRectState);
-    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveLineState);
-    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitivePolygonState);
-    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveTextState);
-    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveArcTextState);
-    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveVerticalTextState);
-    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveHorizontalTextState);
-    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveRingEllipseState);
-    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveRingState);
-    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveFrameState);
-    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitivePartyEmblemState);
-    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveStarState);
-    BIND_PROP_TO_STATE(m_ui->actionRedo, "enabled", false, documentPrimitiveSplineState);
-    // end m_ui->actionRedo
-
     // begin m_ui->actionMirrorHorizontal
     BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, initState);
     BIND_PROP_TO_STATE(m_ui->actionMirrorHorizontal, "enabled", false, documentEmptyState);
@@ -1767,10 +1740,10 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionMirrorVertical, "enabled", false, documentEmptyState);
     // end m_ui->actionMirrorVertical
 
-    // begin m_ui->actionWeldAllShapes
-    BIND_PROP_TO_STATE(m_ui->actionWeldAllShapes, "enabled", false, initState);
-    BIND_PROP_TO_STATE(m_ui->actionWeldAllShapes, "enabled", false, documentEmptyState);
-    // end m_ui->actionWeldAllShapes
+    // begin m_ui->actionWeldAll
+    BIND_PROP_TO_STATE(m_ui->actionWeldAll, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionWeldAll, "enabled", false, documentEmptyState);
+    // end m_ui->actionWeldAll
 
     // begin m_ui->actionUniteTwoShapes
     BIND_PROP_TO_STATE(m_ui->actionUniteTwoShapes, "enabled", false, initState);
@@ -2087,6 +2060,71 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionMoveDown, "enabled", true, documentPrintAndCutSelectingState);
     BIND_PROP_TO_STATE(m_ui->actionMoveDown, "enabled", true, documentPrintAndCutAligningState);
     // end m_ui->actionMoveDown
+
+    // begin m_ui->actionMoveForward
+    BIND_PROP_TO_STATE(m_ui->actionMoveForward, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveForward, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveForward, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveForward, "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveForward, "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveForward, "enabled", false, deviceDownloadingState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveForward, "enabled", false, devicePausedState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveForward, "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveForward, "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveForward, "enabled", true, documentPrintAndCutAligningState);
+    // end m_ui->actionMoveForward
+
+    // begin m_ui->actionMoveToUOrigin
+    BIND_PROP_TO_STATE(m_ui->actionMoveToUOrigin, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToUOrigin, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToUOrigin, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToUOrigin, "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToUOrigin, "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToUOrigin, "enabled", false, deviceDownloadingState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToUOrigin, "enabled", false, devicePausedState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToUOrigin, "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToUOrigin, "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToUOrigin, "enabled", true, documentPrintAndCutAligningState);
+    // end m_ui->actionMoveToUOrigin
+
+    // begin m_ui->actionMoveBackward
+    BIND_PROP_TO_STATE(m_ui->actionMoveBackward, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveBackward, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveBackward, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveBackward, "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveBackward, "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveBackward, "enabled", false, deviceDownloadingState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveBackward, "enabled", false, devicePausedState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveBackward, "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveBackward, "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveBackward, "enabled", true, documentPrintAndCutAligningState);
+    // end m_ui->actionMoveBackward
+
+    // begin m_ui->actionMoveToZOrigin
+    BIND_PROP_TO_STATE(m_ui->actionMoveToZOrigin, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToZOrigin, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToZOrigin, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToZOrigin, "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToZOrigin, "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToZOrigin, "enabled", false, deviceDownloadingState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToZOrigin, "enabled", false, devicePausedState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToZOrigin, "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToZOrigin, "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionMoveToZOrigin, "enabled", true, documentPrintAndCutAligningState);
+    // end m_ui->actionMoveToZOrigin
+
+    // begin m_ui->actionSaveZOrigin
+    BIND_PROP_TO_STATE(m_ui->actionSaveZOrigin, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveZOrigin, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveZOrigin, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveZOrigin, "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveZOrigin, "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveZOrigin, "enabled", false, deviceDownloadingState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveZOrigin, "enabled", false, devicePausedState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveZOrigin, "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveZOrigin, "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveZOrigin, "enabled", true, documentPrintAndCutAligningState);
+    // end m_ui->actionSaveZOrigin
 
     // begin m_ui->actionMachining
     BIND_PROP_TO_STATE(m_ui->actionMachining, "enabled", false, initState);
@@ -2485,6 +2523,58 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutEndSelect, "enabled", false, documentPrintAndCutAligningState);
     // end m_ui->actionPrintAndCutEndSelect
 
+    // begin m_comboBoxStartPosition
+    BIND_PROP_TO_STATE(m_comboBoxStartPosition, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_comboBoxStartPosition, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_comboBoxStartPosition, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_comboBoxStartPosition, "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(m_comboBoxStartPosition, "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_comboBoxStartPosition, "enabled", false, deviceDownloadingState);
+    BIND_PROP_TO_STATE(m_comboBoxStartPosition, "enabled", false, devicePausedState);
+    BIND_PROP_TO_STATE(m_comboBoxStartPosition, "enabled", false, deviceErrorState);
+    BIND_PROP_TO_STATE(m_comboBoxStartPosition, "enabled", false, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(m_comboBoxStartPosition, "enabled", false, documentPrintAndCutAligningState);
+    // end m_comboBoxStartPosition
+
+    // begin m_comboBoxFinishRun
+    BIND_PROP_TO_STATE(m_comboBoxFinishRun, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_comboBoxFinishRun, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_comboBoxFinishRun, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_comboBoxFinishRun, "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(m_comboBoxFinishRun, "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_comboBoxFinishRun, "enabled", false, deviceDownloadingState);
+    BIND_PROP_TO_STATE(m_comboBoxFinishRun, "enabled", false, devicePausedState);
+    BIND_PROP_TO_STATE(m_comboBoxFinishRun, "enabled", false, deviceErrorState);
+    BIND_PROP_TO_STATE(m_comboBoxFinishRun, "enabled", false, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(m_comboBoxFinishRun, "enabled", false, documentPrintAndCutAligningState);
+    // end m_comboBoxFinishRun
+
+    // begin m_radioButtonGroupJobOrigin
+    BIND_PROP_TO_STATE(m_radioButtonGroupJobOrigin, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_radioButtonGroupJobOrigin, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_radioButtonGroupJobOrigin, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_radioButtonGroupJobOrigin, "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(m_radioButtonGroupJobOrigin, "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_radioButtonGroupJobOrigin, "enabled", false, deviceDownloadingState);
+    BIND_PROP_TO_STATE(m_radioButtonGroupJobOrigin, "enabled", false, devicePausedState);
+    BIND_PROP_TO_STATE(m_radioButtonGroupJobOrigin, "enabled", false, deviceErrorState);
+    BIND_PROP_TO_STATE(m_radioButtonGroupJobOrigin, "enabled", false, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(m_radioButtonGroupJobOrigin, "enabled", false, documentPrintAndCutAligningState);
+    // end m_radioButtonGroupJobOrigin
+
+    // begin m_comboBoxSwitchToU
+    BIND_PROP_TO_STATE(m_comboBoxSwitchToU, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_comboBoxSwitchToU, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_comboBoxSwitchToU, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_comboBoxSwitchToU, "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(m_comboBoxSwitchToU, "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_comboBoxSwitchToU, "enabled", false, deviceDownloadingState);
+    BIND_PROP_TO_STATE(m_comboBoxSwitchToU, "enabled", false, devicePausedState);
+    BIND_PROP_TO_STATE(m_comboBoxSwitchToU, "enabled", false, deviceErrorState);
+    BIND_PROP_TO_STATE(m_comboBoxSwitchToU, "enabled", false, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(m_comboBoxSwitchToU, "enabled", false, documentPrintAndCutAligningState);
+    // end m_comboBoxSwitchToU
+
     // begin Config::UserRegister::scanLaserPowerItem()
     BIND_PROP_TO_STATE(Config::UserRegister::scanLaserPowerItem(), "enabled", false, initState);
     BIND_PROP_TO_STATE(Config::UserRegister::scanLaserPowerItem(), "enabled", false, deviceUnconnectedState);
@@ -2562,6 +2652,84 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(Config::UserRegister::spotShotPowerItem(), "enabled", true, documentPrintAndCutSelectingState);
     BIND_PROP_TO_STATE(Config::UserRegister::spotShotPowerItem(), "enabled", true, documentPrintAndCutAligningState);
     // end Config::UserRegister::spotShotPowerItem()
+
+    // begin Config::Device::uEnabledItem()
+    BIND_PROP_TO_STATE(Config::Device::uEnabledItem(), "enabled", false, initState);
+    BIND_PROP_TO_STATE(Config::Device::uEnabledItem(), "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(Config::Device::uEnabledItem(), "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(Config::Device::uEnabledItem(), "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(Config::Device::uEnabledItem(), "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(Config::Device::uEnabledItem(), "enabled", false, deviceDownloadingState);
+    BIND_PROP_TO_STATE(Config::Device::uEnabledItem(), "enabled", false, devicePausedState);
+    BIND_PROP_TO_STATE(Config::Device::uEnabledItem(), "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(Config::Device::uEnabledItem(), "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(Config::Device::uEnabledItem(), "enabled", true, documentPrintAndCutAligningState);
+    // end Config::Device::uEnabledItem()
+
+    // begin Config::Device::uFixtureTypeItem()
+    BIND_PROP_TO_STATE(Config::Device::uFixtureTypeItem(), "enabled", false, initState);
+    BIND_PROP_TO_STATE(Config::Device::uFixtureTypeItem(), "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(Config::Device::uFixtureTypeItem(), "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(Config::Device::uFixtureTypeItem(), "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(Config::Device::uFixtureTypeItem(), "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(Config::Device::uFixtureTypeItem(), "enabled", false, deviceDownloadingState);
+    BIND_PROP_TO_STATE(Config::Device::uFixtureTypeItem(), "enabled", false, devicePausedState);
+    BIND_PROP_TO_STATE(Config::Device::uFixtureTypeItem(), "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(Config::Device::uFixtureTypeItem(), "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(Config::Device::uFixtureTypeItem(), "enabled", true, documentPrintAndCutAligningState);
+    // end Config::Device::uFixtureTypeItem()
+
+    // begin Config::Device::circumferencePulseNumberItem()
+    BIND_PROP_TO_STATE(Config::Device::circumferencePulseNumberItem(), "enabled", false, initState);
+    BIND_PROP_TO_STATE(Config::Device::circumferencePulseNumberItem(), "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(Config::Device::circumferencePulseNumberItem(), "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(Config::Device::circumferencePulseNumberItem(), "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(Config::Device::circumferencePulseNumberItem(), "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(Config::Device::circumferencePulseNumberItem(), "enabled", false, deviceDownloadingState);
+    BIND_PROP_TO_STATE(Config::Device::circumferencePulseNumberItem(), "enabled", false, devicePausedState);
+    BIND_PROP_TO_STATE(Config::Device::circumferencePulseNumberItem(), "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(Config::Device::circumferencePulseNumberItem(), "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(Config::Device::circumferencePulseNumberItem(), "enabled", true, documentPrintAndCutAligningState);
+    // end Config::Device::circumferencePulseNumberItem()
+
+    // begin Config::Device::workpieceDiameterItem()
+    BIND_PROP_TO_STATE(Config::Device::workpieceDiameterItem(), "enabled", false, initState);
+    BIND_PROP_TO_STATE(Config::Device::workpieceDiameterItem(), "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(Config::Device::workpieceDiameterItem(), "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(Config::Device::workpieceDiameterItem(), "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(Config::Device::workpieceDiameterItem(), "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(Config::Device::workpieceDiameterItem(), "enabled", false, deviceDownloadingState);
+    BIND_PROP_TO_STATE(Config::Device::workpieceDiameterItem(), "enabled", false, devicePausedState);
+    BIND_PROP_TO_STATE(Config::Device::workpieceDiameterItem(), "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(Config::Device::workpieceDiameterItem(), "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(Config::Device::workpieceDiameterItem(), "enabled", true, documentPrintAndCutAligningState);
+    // end Config::Device::workpieceDiameterItem()
+
+    // begin Config::Device::rollerRotaryStepLengthItem()
+    BIND_PROP_TO_STATE(Config::Device::rollerRotaryStepLengthItem(), "enabled", false, initState);
+    BIND_PROP_TO_STATE(Config::Device::rollerRotaryStepLengthItem(), "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(Config::Device::rollerRotaryStepLengthItem(), "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(Config::Device::rollerRotaryStepLengthItem(), "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(Config::Device::rollerRotaryStepLengthItem(), "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(Config::Device::rollerRotaryStepLengthItem(), "enabled", false, deviceDownloadingState);
+    BIND_PROP_TO_STATE(Config::Device::rollerRotaryStepLengthItem(), "enabled", false, devicePausedState);
+    BIND_PROP_TO_STATE(Config::Device::rollerRotaryStepLengthItem(), "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(Config::Device::rollerRotaryStepLengthItem(), "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(Config::Device::rollerRotaryStepLengthItem(), "enabled", true, documentPrintAndCutAligningState);
+    // end Config::Device::rollerRotaryStepLengthItem()
+
+    // begin m_ui->actionSaveUStep
+    BIND_PROP_TO_STATE(m_ui->actionSaveUStep, "enabled", false, initState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveUStep, "enabled", false, deviceUnconnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveUStep, "enabled", true, deviceConnectedState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveUStep, "enabled", true, deviceIdleState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveUStep, "enabled", false, deviceMachiningState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveUStep, "enabled", false, deviceDownloadingState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveUStep, "enabled", false, devicePausedState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveUStep, "enabled", true, deviceErrorState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveUStep, "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionSaveUStep, "enabled", true, documentPrintAndCutAligningState);
+    // end m_ui->actionSaveUStep
 
 
 }

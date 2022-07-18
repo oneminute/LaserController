@@ -122,6 +122,8 @@ public:
     void showFirmwareUpdateWizard();
     void updateDriverLanguage();
 
+    void enableDetailedLog(bool enabled);
+
     bool checkLayoutForMoving(const QPoint& dest);
     bool checkLayoutForMachining(const QRect& docBounding, const QRect& engravingBounding);
 
@@ -267,6 +269,7 @@ signals:
     void dongleConnected();
     void dongleDisconnected();
     void dongleRemoved();
+    void requestFrequent();
 
 private:
     QScopedPointer<LaserDevicePrivate> m_ptr;

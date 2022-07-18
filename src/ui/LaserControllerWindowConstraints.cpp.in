@@ -63,7 +63,7 @@
 #include "ui/PreviewWindow.h"
 #include "ui/UpdateDialog.h"
 #include "ui/ActivationDialog.h"
-#include "ui/RegisteDialog.h"
+#include "ui/RegisterDialog.h"
 #include "ui/UserInfoDialog.h"
 #include "ui/MultiDuplicationDialog.h"
 #include "util/ImageUtils.h"

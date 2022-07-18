@@ -1758,7 +1758,10 @@ WeldShapesUndoCommand::~WeldShapesUndoCommand()
 
 void WeldShapesUndoCommand::initeTranversedMap()
 {
-    QList<QGraphicsItem*>groupList = m_viewer->group()->childItems();
+    LaserPrimitiveGroup* group = m_viewer->group();
+    if (!group)
+        return;
+    QList<QGraphicsItem*>groupList = group->childItems();
     int minLayerIndex;
     
     int index = 0;

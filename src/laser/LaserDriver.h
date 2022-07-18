@@ -17,6 +17,7 @@ class LaserDriver : public QObject
 public:
 private:
     typedef wchar_t* (__cdecl *FN_WCHART_VOID)();
+    typedef char* (__cdecl *FN_CHAR_VOID)();
     typedef void(__cdecl *FN_VOID_INT)(int value);
     typedef bool(__cdecl *FN_BOOL_INT)(int value);
     typedef void(__cdecl *FN_VOID_VOID)();
@@ -218,6 +219,9 @@ public:
     void lPenMoveToOriginalPointZ(int moveTo);
 
     QString registerMainCard(const QString& registeCode, const QString& password);
+
+    void openDetailedLog(bool isOut);
+    void debugLogger(bool enabled);
 
     bool isLoaded() const { return m_isLoaded; }
     bool isConnected() const { return m_isConnected; }

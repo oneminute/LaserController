@@ -152,7 +152,12 @@ void setSelectedInGroup(bool selected) {
 void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 {
     Q_D(LaserPrimitive);
-    QString className = this->scene()->metaObject()->className();
+    QGraphicsScene* scene = this->scene();
+    if (!scene)
+    {
+        return;
+    }
+    QString className = scene->metaObject()->className();
     if (className == "LaserScene") {
         if (!visible())
             return;

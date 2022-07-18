@@ -6,19 +6,19 @@ INSTALL(FILES
             "${CMAKE_SOURCE_DIR}/third/bin/LaserLib${CNELaser_ARCH}.dll"
             "${CMAKE_SOURCE_DIR}/third/others/AccBuf.txt"
             "${CMAKE_SOURCE_DIR}/ReleaseNotes.md"
-        DESTINATION ${CMAKE_INSTALL_PREFIX}_Debug
+        DESTINATION ${CMAKE_INSTALL_PREFIX}
 		CONFIGURATIONS Debug)
 
 INSTALL(FILES 
 	"${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_zh_CN.qm"
-	DESTINATION ${CMAKE_INSTALL_PREFIX}_Debug/translations
+	DESTINATION ${CMAKE_INSTALL_PREFIX}/translations
 	CONFIGURATIONS Debug)
 
 foreach(_lib IN LISTS OpenCV_LIBS)
 	get_target_property(${_lib}_location_Debug ${_lib} IMPORTED_LOCATION_DEBUG)
 	INSTALL(FILES 
 		${${_lib}_location_Debug}
-		DESTINATION ${CMAKE_INSTALL_PREFIX}_Debug
+		DESTINATION ${CMAKE_INSTALL_PREFIX}
 		CONFIGURATIONS Debug)
 endforeach()
 
@@ -49,7 +49,7 @@ set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
 include(InstallRequiredSystemLibraries)
 install(
     PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
-    DESTINATION ${CMAKE_INSTALL_PREFIX}_Debug
+    DESTINATION ${CMAKE_INSTALL_PREFIX}
 	CONFIGURATIONS Debug)
 
 get_target_property(QMAKE_EXECUTABLE Qt5::qmake IMPORTED_LOCATION)
@@ -57,13 +57,13 @@ get_filename_component(QT_BIN_DIR "${QMAKE_EXECUTABLE}" DIRECTORY)
 INSTALL(CODE "
 	execute_process(
 		COMMAND \"${QT_BIN_DIR}/windeployqt.exe\"
-			--dir ${CMAKE_INSTALL_PREFIX}_Debug
+			--dir ${CMAKE_INSTALL_PREFIX}
 			--verbose 1
 			--debug
 			--pdb
 			--no-translations
-			${CMAKE_INSTALL_PREFIX}_Debug/${PROJECT_NAME}.exe)"
+			${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.exe)"
 	CONFIGURATIONS Debug)
 
-INSTALL(SCRIPT "cmake/Compress_debug.cmake"
+INSTALL(SCRIPT "cmake/compress.cmake"
     CONFIGURATIONS Debug)

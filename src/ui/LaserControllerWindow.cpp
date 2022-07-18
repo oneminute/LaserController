@@ -73,7 +73,7 @@
 #include "ui/PreviewWindow.h"
 #include "ui/UpdateDialog.h"
 #include "ui/ActivationDialog.h"
-#include "ui/RegisteDialog.h"
+#include "ui/RegisterDialog.h"
 #include "ui/SelectOriginDialog.h"
 #include "ui/UserInfoDialog.h"
 #include "ui/MultiDuplicationDialog.h"
@@ -82,6 +82,7 @@
 #include "util/ImageUtils.h"
 #include "util/Utils.h"
 #include "util/MachiningUtils.h"
+#include "util/WidgetUtils.h"
 #include "widget/FloatEditDualSlider.h"
 #include "widget/FloatEditSlider.h"
 #include "widget/ImageViewer.h"
@@ -136,6 +137,8 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     , m_prepareDownloading(false)
 {
     m_ui->setupUi(this);
+    LaserApplication::showSplashScreen(tr("Loading main window..."), 40, this);
+
     loadRecentFilesMenu();
     installEventFilter(this);
     //setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
@@ -446,14 +449,14 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     m_ui->statusbar->addWidget(m_statusBarDeviceStatus);
 
     m_statusBarRegister = new Label;
-    m_statusBarRegister->setText(ltr("Unregistered"));
+    m_statusBarRegister->setText(ltr("Unknown"));
     m_statusBarRegister->setMinimumWidth(60);
     m_statusBarRegister->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarRegister);
     connect(m_statusBarRegister, &Label::clicked, this, &LaserControllerWindow::onStatusBarRegisterClicked);
 
     m_statusBarActivation = new Label;
-    m_statusBarActivation->setText(ltr("Inactivated"));
+    m_statusBarActivation->setText(ltr("Unknown"));
     m_statusBarActivation->setMinimumWidth(60);
     m_statusBarActivation->setAlignment(Qt::AlignHCenter);
     m_ui->statusbar->addWidget(m_statusBarActivation);
@@ -900,6 +903,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     connect(m_ui->actionCameraDefault, &QAction::triggered, this, &LaserControllerWindow::onActionCameraDefault);
 
     connect(m_ui->actionSaveUStep, &QAction::triggered, this, &LaserControllerWindow::onActionSaveUStep);
+    connect(m_ui->actionEnableDetailedLog, &QAction::triggered, this, &LaserControllerWindow::onActionEnableDetailedLog);
 
     connect(m_viewer, &LaserViewer::selectedSizeChanged, this, &LaserControllerWindow::onLaserSceneSelectedChanged);
     
@@ -1126,7 +1130,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     //shapes weld/ two shapes unite
     connect(m_ui->actionUniteTwoShapes, &QAction::triggered, this, &LaserControllerWindow::onActionTwoShapesUnite);
     connect(m_ui->actionWeldAll, &QAction::triggered, this, &LaserControllerWindow::onActionWeldAll);
-    
+
     connect(m_ui->actionParseJson, &QAction::triggered, this, &LaserControllerWindow::onActionParseJson);
     connect(m_ui->actionCleanCacheFiles, &QAction::triggered, this, &LaserControllerWindow::onActionCleanCacheFiles);
     connect(m_ui->actionBresenham, &QAction::triggered, this, &LaserControllerWindow::onActionBresenham);
@@ -1473,11 +1477,11 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     onLayoutChanged(LaserApplication::device->layoutSize());
 
 #ifdef _DEBUG
-    m_tablePrintAndCutPoints->setLaserPoint(QPoint(-164000, 39000));
-    m_tablePrintAndCutPoints->setCanvasPoint(QPoint(-180000, 30000));
+    //m_tablePrintAndCutPoints->setLaserPoint(QPoint(-164000, 39000));
+    //m_tablePrintAndCutPoints->setCanvasPoint(QPoint(-180000, 30000));
     //m_tablePrintAndCutPoints->addNewLine();
-    m_tablePrintAndCutPoints->setLaserPoint(QPoint(-131000, 76000));
-    m_tablePrintAndCutPoints->setCanvasPoint(QPoint(-140000, 60000));
+    //m_tablePrintAndCutPoints->setLaserPoint(QPoint(-131000, 76000));
+    //m_tablePrintAndCutPoints->setCanvasPoint(QPoint(-140000, 60000));
 
     /*m_tablePrintAndCutPoints->setLaserPoint(QPoint(90306, 74802));
     m_tablePrintAndCutPoints->setCanvasPoint(QPoint(90304, 74802));
@@ -2621,8 +2625,8 @@ void LaserControllerWindow::createOperationsDockPanel()
     }
     Config::Device::jobOriginItem()->bindWidget(m_radioButtonGroupJobOrigin, SS_DIRECTLY);
 
-    QCheckBox* comboBoxSwitchToU = InputWidgetWrapper::createWidget<QCheckBox*>(Config::Device::switchToUItem());
-    Config::Device::switchToUItem()->bindWidget(comboBoxSwitchToU, SS_DIRECTLY);
+    m_comboBoxSwitchToU = InputWidgetWrapper::createWidget<QCheckBox*>(Config::Device::switchToUItem());
+    Config::Device::switchToUItem()->bindWidget(m_comboBoxSwitchToU, SS_DIRECTLY);
 
     QLabel* labelDevices = new QLabel(tr("Devices"));
     m_comboBoxDevices = new QComboBox;
@@ -2648,8 +2652,8 @@ void LaserControllerWindow::createOperationsDockPanel()
     secondRow->addWidget(m_buttonOperationOrigin);
     secondRow->addWidget(m_buttonOperationDownload);
 
-    QComboBox* comboBoxFinishRun = InputWidgetWrapper::createWidget<QComboBox*>(Config::Device::finishRunItem());
-    Config::Device::finishRunItem()->bindWidget(comboBoxFinishRun, SS_DIRECTLY);
+    m_comboBoxFinishRun = InputWidgetWrapper::createWidget<QComboBox*>(Config::Device::finishRunItem());
+    Config::Device::finishRunItem()->bindWidget(m_comboBoxFinishRun, SS_DIRECTLY);
     QToolButton* buttonApplyToDoc = new QToolButton;
     buttonApplyToDoc->setDefaultAction(m_ui->actionApplyJobOriginToDocument);
 
@@ -2658,8 +2662,8 @@ void LaserControllerWindow::createOperationsDockPanel()
     fifthRow->addRow(Config::Device::startFromItem()->title(), m_comboBoxStartPosition);
     fifthRow->addRow(Config::Device::jobOriginItem()->title(), m_radioButtonGroupJobOrigin);
     fifthRow->addRow("", buttonApplyToDoc);
-    fifthRow->addRow(Config::Device::finishRunItem()->title(), comboBoxFinishRun);
-    fifthRow->addRow(Config::Device::switchToUItem()->title(), comboBoxSwitchToU);
+    fifthRow->addRow(Config::Device::finishRunItem()->title(), m_comboBoxFinishRun);
+    fifthRow->addRow(Config::Device::switchToUItem()->title(), m_comboBoxSwitchToU);
 
     QHBoxLayout* sixthRow = new QHBoxLayout;
     sixthRow->setMargin(0);
@@ -3738,7 +3742,7 @@ void LaserControllerWindow::createShapePropertyDockPanel()
     
     
     m_propertyPanelWidget = new QWidget();
-    m_propertyDockWidget = new CDockWidget(tr("Movement"));
+    m_propertyDockWidget = new CDockWidget(tr("Shape Properties"));
     
     m_ui->menuWindow->addAction(m_propertyDockWidget->toggleViewAction());
 
@@ -6234,7 +6238,8 @@ void LaserControllerWindow::onActionMoveToUserOrigin(bool checked)
 void LaserControllerWindow::onActionBitmap(bool checked)
 {
 	QString name = QFileDialog::getOpenFileName(nullptr, "open image", ".", "Images (*.jpg *.jpeg *.tif *.bmp *.png *.svg *.ico)");
-	qDebug() <<"name: "<< name;
+    if (name.isEmpty())
+        return;
     QFile file(name);
     file.open(QFile::ReadOnly);
     QByteArray data = file.readAll();
@@ -6285,26 +6290,46 @@ void LaserControllerWindow::onActionBitmap(bool checked)
 
 void LaserControllerWindow::onActionRegiste(bool checked)
 {
-    RegisteDialog dlg;
+    RegisterDialog dlg;
     dlg.exec();
 }
 
 void LaserControllerWindow::onStatusBarRegisterClicked(bool checked)
 {
-    RegisteDialog dlg;
+    RegisterDialog dlg;
     dlg.exec();
 }
 
 void LaserControllerWindow::onActionActivate(bool checked)
 {
-    ActivationDialog dlg;
-    dlg.exec();
+    showActivationDialog();
 }
 
 void LaserControllerWindow::onStatusBarActivationClicked(bool checked)
 {
-    ActivationDialog dlg;
-    dlg.exec();
+    showActivationDialog();
+}
+
+void LaserControllerWindow::showActivationDialog()
+{
+    int keyType = LaserApplication::device->getHardwareKeyType();
+    bool connected = LaserApplication::device->isDongleConnected();
+    if (connected)
+    {
+        if (keyType < 4)
+        {
+            widgetUtils::showInfoMessage(this, tr("Info"), tr("You don't need to active."));
+        }
+        else
+        {
+            ActivationDialog dlg;
+            dlg.exec();
+        }
+    }
+    else
+    {
+        widgetUtils::showWarningMessage(this, tr("Warning"), tr("No available key founded."));
+    }
 }
 
 void LaserControllerWindow::onActionUpdateSoftware(bool checked)
@@ -6656,6 +6681,11 @@ void LaserControllerWindow::onActionSaveUStep()
     Config::SystemRegister::group->save(true, false);
 }
 
+void LaserControllerWindow::onActionEnableDetailedLog(bool checked)
+{
+    LaserApplication::device->enableDetailedLog(checked);
+}
+
 void LaserControllerWindow::onDeviceComPortsFetched(const QStringList & ports)
 {
     for (int i = 0; i < ports.size(); i++)
@@ -6677,6 +6707,8 @@ void LaserControllerWindow::onDeviceConnected()
 void LaserControllerWindow::onDeviceDisconnected()
 {
     m_statusBarDeviceStatus->setText(tr("Disconnected"));
+    m_statusBarActivation->setText(tr("Unknown"));
+    m_statusBarRegister->setText(tr("Unknown"));
 }
 
 void LaserControllerWindow::onMainCardRegistrationChanged(bool registered)
@@ -6729,19 +6761,15 @@ void LaserControllerWindow::onWindowCreated()
 
 void LaserControllerWindow::closeEvent(QCloseEvent* event)
 {
-    /*if (scene()->document() != nullptr) {
-        onActionCloseDocument();
-    }
-
-    QMainWindow::closeEvent(event);*/
-    QMessageBox msgBox(QMessageBox::NoIcon,
-        tr("Close softeware?"), tr("Do you want to save current document,before close softeware?"),
-        QMessageBox::Save | QMessageBox::Close | QMessageBox::Cancel, NULL);
-    msgBox.setButtonText(QMessageBox::Save, tr("Save"));
-    msgBox.setButtonText(QMessageBox::Close, tr("Close"));
-    msgBox.setButtonText(QMessageBox::Cancel, tr("Cancel"));
-    int result = msgBox.exec();
-    switch (result) {
+    if (scene()->document() != nullptr) {
+        QMessageBox msgBox(QMessageBox::NoIcon,
+            tr("Close softeware?"), tr("Do you want to save current document,before close softeware?"),
+            QMessageBox::Save | QMessageBox::Close | QMessageBox::Cancel, NULL);
+        msgBox.setButtonText(QMessageBox::Save, tr("Save"));
+        msgBox.setButtonText(QMessageBox::Close, tr("Close"));
+        msgBox.setButtonText(QMessageBox::Cancel, tr("Cancel"));
+        int result = msgBox.exec();
+        switch (result) {
         case QMessageBox::StandardButton::Save: {
             onActionSave();
             event->accept();
@@ -6756,8 +6784,10 @@ void LaserControllerWindow::closeEvent(QCloseEvent* event)
         default: {
             event->ignore();
         }
+        }
+
     }
-   
+    QMainWindow::closeEvent(event);
 }
 
 void LaserControllerWindow::onEnterDeviceUnconnectedState()
@@ -7582,15 +7612,17 @@ void LaserControllerWindow::showEvent(QShowEvent * event)
     if (!m_created)
     {
         //LaserApplication::device->updateDriverLanguage();
-        LaserApplication::splashScreen->setMessage(tr("Loading main window..."));
+        LaserApplication::showSplashScreen(tr("Loading main window..."), 90, this);
         m_created = true;
         QTimer::singleShot(1000, this, [=]() {
             //LaserApplication::device->updateDriverLanguage();
             emit windowCreated();
             qLogD << "orientation: " << m_splitterLayers->orientation();
             m_splitterLayers->setSizes({400, 450});
-            LaserApplication::splashScreen->setProgress(100);
-            LaserApplication::splashScreen->delayedHide(1000);
+            LaserApplication::showSplashScreen(tr("Loading completed."), 100, this);
+            LaserApplication::hideSplashScreen(1000);
+            //LaserApplication::splashScreen->setProgress(100);
+            //LaserApplication::splashScreen->delayedHide(1000);
         });
     }
 }

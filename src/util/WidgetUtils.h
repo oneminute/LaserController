@@ -12,6 +12,8 @@ namespace widgetUtils
     QString findComboBoxStringByValue(QComboBox* widget, const QVariant& value);
 
     void showWarningMessage(QWidget* parentWnd, const QString& title, const QString& msg);
+
+    void showInfoMessage(QWidget* parentWnd, const QString& title, const QString& msg);
 }
 
 #endif // WIDGETUTILS_H

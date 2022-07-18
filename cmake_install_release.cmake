@@ -1,24 +1,24 @@
 INSTALL(TARGETS ${PROJECT_NAME}
-    DESTINATION "${CMAKE_INSTALL_PREFIX}_Release" COMPONENT runtime
+    DESTINATION "${CMAKE_INSTALL_PREFIX}" COMPONENT runtime
 	CONFIGURATIONS Release)
 
 INSTALL(FILES 
             "${CMAKE_SOURCE_DIR}/third/bin/LaserLib${CNELaser_ARCH}.dll"
             "${CMAKE_SOURCE_DIR}/third/others/AccBuf.txt"
             "${CMAKE_SOURCE_DIR}/ReleaseNotes.md"
-        DESTINATION ${CMAKE_INSTALL_PREFIX}_Release
+        DESTINATION ${CMAKE_INSTALL_PREFIX}
 		CONFIGURATIONS Release)
 
 INSTALL(FILES 
 	"${CMAKE_SOURCE_DIR}/translations/${PROJECT_NAME}_zh_CN.qm"
-	DESTINATION ${CMAKE_INSTALL_PREFIX}_Release/translations
+	DESTINATION ${CMAKE_INSTALL_PREFIX}/translations
 	CONFIGURATIONS Release)
 
 foreach(_lib IN LISTS OpenCV_LIBS)
 	get_target_property(${_lib}_location_Release ${_lib} IMPORTED_LOCATION_RELEASE)
 	INSTALL(FILES 
 		${${_lib}_location_Release}
-		DESTINATION ${CMAKE_INSTALL_PREFIX}_Release
+		DESTINATION ${CMAKE_INSTALL_PREFIX}
 		CONFIGURATIONS Release)
 endforeach()
 
@@ -47,7 +47,7 @@ set(CMAKE_INSTALL_UCRT_LIBRARIES TRUE)
 include(InstallRequiredSystemLibraries)
 install(
     PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS}
-    DESTINATION ${CMAKE_INSTALL_PREFIX}_Release
+    DESTINATION ${CMAKE_INSTALL_PREFIX}
 	CONFIGURATIONS Release)
 
 get_target_property(QMAKE_EXECUTABLE Qt5::qmake IMPORTED_LOCATION)
@@ -55,14 +55,14 @@ get_filename_component(QT_BIN_DIR "${QMAKE_EXECUTABLE}" DIRECTORY)
 INSTALL(CODE "
 	execute_process(
 		COMMAND \"${QT_BIN_DIR}/windeployqt.exe\"
-			--dir ${CMAKE_INSTALL_PREFIX}_Release
+			--dir ${CMAKE_INSTALL_PREFIX}
 			--verbose 1
 			--release
 			--no-translations
-			${CMAKE_INSTALL_PREFIX}_Release/${PROJECT_NAME}.exe)"
+			${CMAKE_INSTALL_PREFIX}/${PROJECT_NAME}.exe)"
 	CONFIGURATIONS Release)
 
-set(BASE_CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}_Release")
+set(BASE_CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
-INSTALL(SCRIPT "cmake/Compress_release.cmake"
+INSTALL(SCRIPT "cmake/compress.cmake"
     CONFIGURATIONS Release)
