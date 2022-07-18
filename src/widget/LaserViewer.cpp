@@ -2688,22 +2688,30 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 				
 			}
 		}
-		else if (event->button() == Qt::RightButton) {
-			if ( m_creatingPolygonPoints.size() > 0) {
-				LaserPolyline* polyLine = new LaserPolyline(QPolygonF(m_creatingPolygonPoints).toPolygon(), m_scene->document(), 
-					QTransform(), m_curLayerIndex);
-				//m_scene->addLaserPrimitive(polyLine);
-				//onReplaceGroup(polyLine);
-				//undo
-				PolygonUndoCommand* polyCmd = new PolygonUndoCommand(m_scene.data(), m_lastPolygon, polyLine);
-				m_lastPolygon = polyLine;
-				//m_undoStack->push(polyCmd);
-			}
-			m_creatingPolygonPoints.clear();
-			setCursor(Qt::ArrowCursor);
-			emit readyPolygon();
-
-		}
+        else if (event->button() == Qt::RightButton) {
+            if (m_creatingPolygonPoints.size() > 0) {
+                LaserPolyline* polyLine = new LaserPolyline(QPolygonF(m_creatingPolygonPoints).toPolygon(), m_scene->document(),
+                    QTransform(), m_curLayerIndex);
+                //m_scene->addLaserPrimitive(polyLine);
+                //onReplaceGroup(polyLine);
+                //undo
+                //判断是否在4叉树的有效区域内
+                if (m_scene->maxRegion().contains(m_creatingPolygonEndPoint.toPoint())) {
+                    //undo
+                    PolygonUndoCommand* polyCmd = new PolygonUndoCommand(m_scene.data(), m_lastPolygon, polyLine);
+                    m_undoStack->push(polyCmd);
+                    m_lastPolygon = polyLine;
+                }
+                else {
+                    QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+                    m_creatingPolygonPoints.removeLast();
+                }
+                //m_undoStack->push(polyCmd);
+            }
+            m_creatingPolygonPoints.clear();
+            setCursor(Qt::ArrowCursor);
+            emit readyPolygon();
+        }
     }
     //text
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextReadyState())) {

@@ -258,6 +258,7 @@ protected slots:
     void onStatusBarRegisterClicked(bool checked = false);
     void onActionActivate(bool checked = false);
     void onStatusBarActivationClicked(bool checked = false);
+    void showActivationDialog();
     void onActionUpdateSoftware(bool checked = false);
     void onActionUpdateFirmware(bool checked = false);
     void onActionShowLaserPosition(bool checked = false);
@@ -509,6 +510,8 @@ private:
     QToolButton* m_buttonOperationReset;
     QToolButton* m_buttonOperationOrigin;
     QComboBox* m_comboBoxStartPosition;
+    QComboBox* m_comboBoxFinishRun;
+    QCheckBox* m_comboBoxSwitchToU;
     RadioButtonGroup* m_radioButtonGroupJobOrigin;
     QComboBox* m_comboBoxDevices;
     QToolButton* m_buttonConnect;

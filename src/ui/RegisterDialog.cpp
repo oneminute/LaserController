@@ -12,6 +12,7 @@
 RegisterDialog::RegisterDialog(QWidget* parent) 
     : QDialog(parent) 
     , m_ui(new Ui::RegisterDialog)
+    , m_reCode("^[0-9a-zA-Z]{24}$")
 { 
     m_ui->setupUi(this);
 
@@ -56,14 +57,15 @@ void RegisterDialog::onButtonCopyRegisteIdClicked(bool checked)
 void RegisterDialog::onButtonRegiste(bool checked)
 {
     QString code = m_ui->lineEditRegisterCode->text().trimmed();
-    if (code.length() != 24)
+    QRegularExpressionMatch match = m_reCode.match(code);
+    if (!match.hasMatch())
     {
         QMessageBox::warning(this, tr("Invalide registe code"), tr("The registration code contains at least 24 valid characters. Please check your input."));
         return;
     }
 
     LaserApplication::device->registerMainCard(code, this);
-    LaserApplication::device->requestMainCardRegInfo();
+    //LaserApplication::device->requestMainCardRegInfo();
 }
 
 void RegisterDialog::onButtonStatusClicked(bool checked)

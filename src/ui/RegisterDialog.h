@@ -2,6 +2,7 @@
 #define REGISTERDIALOG_H 
 
 #include <QDialog> 
+#include <QRegularExpression>
 
 namespace Ui
 {
@@ -23,6 +24,8 @@ protected slots:
     void onRegistrationChanged(bool registered);
 
 private:
+    QRegularExpression m_reCode;
+
     QScopedPointer<Ui::RegisterDialog> m_ui;
 }; 
 #endif
