@@ -5790,7 +5790,7 @@ If you click &apos;Cancel&apos;, do nothing.</source>
     <message>
         <location line="+12"/>
         <source>Text Tool</source>
-        <translation>文件工具</translation>
+        <translation>文本工具</translation>
     </message>
     <message>
         <location line="+12"/>
