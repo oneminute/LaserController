@@ -136,7 +136,7 @@ cv::Mat imageUtils::halftone6(ProgressItem* parentProgress, cv::Mat src, float d
     //qLogD << topLeftMat.ptr<quint8>(0)[1];
     //outMat = 255 - outMat;
     cv::imwrite("tmp/h6_outMat.tiff", outMat);
-    cv::imwrite("tmp/h6_topleft.tiff", topLeftMat);
+    //cv::imwrite("tmp/h6_topleft.tiff", topLeftMat);
 
 #ifdef _DEBUG
     //cv::imshow("halftone6_processed", outMat);

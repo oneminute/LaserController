@@ -20,6 +20,8 @@ int main(int argc, char *argv[])
 {
     google::InitGoogleLogging(argv[0]);
     LaserApplication *app = new LaserApplication(argc, argv);
+    app->arg0 = QString::fromLatin1(argv[0]);
+    qLogD << "arg0 = " << app->arg0;
 
     qRegisterMetaType<QPainterPath>("QPainterPath");
     qRegisterMetaType<QList<QPointF>>("QList<QPointF>");

@@ -30,6 +30,8 @@
 #include <iostream>
 
 LaserApplication* LaserApplication::app(nullptr);
+QStringList LaserApplication::args;
+QString LaserApplication::arg0;
 LaserControllerWindow* LaserApplication::mainWindow(nullptr);
 SplashScreen* LaserApplication::splashScreen(nullptr);
 ProgressItem* LaserApplication::globalProgress(nullptr);
@@ -64,6 +66,8 @@ LaserApplication::~LaserApplication()
 
 bool LaserApplication::initialize()
 {
+    args = LaserApplication::instance()->arguments();
+
     mainThread = QThread::currentThread();
     QDir dir(LaserApplication::applicationDirPath());
     LaserApplication::addLibraryPath(dir.absoluteFilePath("bin"));
@@ -160,6 +164,7 @@ void LaserApplication::destroy()
     Config::destroy();
 
     qDeleteAll(translators);
+    qInstallMessageHandler(nullptr);
 }
 
 bool LaserApplication::checkEnvironment()
@@ -433,9 +438,14 @@ int LaserApplication::exec()
 
 void LaserApplication::restart()
 {
-    mainWindow->close();
-    LaserApplication::quit();
-    QProcess::startDetached(LaserApplication::instance()->arguments()[0], LaserApplication::instance()->arguments());
+    QTimer::singleShot(200, [=]()
+        {
+            mainWindow->close();
+            app->destroy();
+            LaserApplication::quit();
+            QProcess::startDetached(arg0, args);
+        }
+    );
 }
 
 bool LaserApplication::antiDebugger()

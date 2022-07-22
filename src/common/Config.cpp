@@ -2269,6 +2269,7 @@ void Config::loadSystemRegisters()
         DT_INT
     );
     sysRunTime->setInputWidgetType(IWT_LineEdit);
+    sysRunTime->setExportable(false);
 
     ConfigItem* laserRunTime = group->addConfigItem(
         "laserRunTime",

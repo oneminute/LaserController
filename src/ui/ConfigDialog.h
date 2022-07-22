@@ -111,6 +111,8 @@ private:
     bool m_needSystemRegisterConfirm;
     int m_errorCount;
     bool m_changingPassword;
+    QDateTime m_lastUserInformTime;
+    QDateTime m_lastSysInformTime;
 
     QTimer m_passwordTimer;
 };

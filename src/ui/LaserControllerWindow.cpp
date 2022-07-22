@@ -153,7 +153,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     createLayersDockPanel();
     createCameraDockPanel();
     createOperationsDockPanel();
-    createOutlineDockPanel();
+    //createOutlineDockPanel();
     createMovementDockPanel();
     createUAxisDockPanel();
     createShapePropertyDockPanel();
@@ -171,7 +171,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
     internal::findParent<QSplitter*>(m_dockAreaLayers)->setHandleWidth(Config::Ui::splitterHandleWidth());
     internal::findParent<QSplitter*>(m_dockAreaCameras)->setHandleWidth(Config::Ui::splitterHandleWidth());
     internal::findParent<QSplitter*>(m_dockAreaOperations)->setHandleWidth(Config::Ui::splitterHandleWidth());
-    internal::findParent<QSplitter*>(m_dockAreaOutline)->setHandleWidth(Config::Ui::splitterHandleWidth());
+    //internal::findParent<QSplitter*>(m_dockAreaOutline)->setHandleWidth(Config::Ui::splitterHandleWidth());
     internal::findParent<QSplitter*>(m_dockAreaMovement)->setHandleWidth(Config::Ui::splitterHandleWidth());
     internal::findParent<QSplitter*>(m_dockAreaProperty)->setHandleWidth(Config::Ui::splitterHandleWidth());
     for (CDockContainerWidget* container : m_dockManager->dockContainers())
@@ -2748,6 +2748,7 @@ void LaserControllerWindow::createMovementDockPanel()
 
     FloatEditSlider* stepLength = InputWidgetWrapper::createWidget<FloatEditSlider*>(
         Config::UserRegister::movementStepLengthItem());
+    stepLength->setTracking(false);
     Config::UserRegister::movementStepLengthItem()->bindWidget(stepLength, SS_REGISTER);
 
     QGridLayout* firstRow = new QGridLayout;
@@ -3059,21 +3060,27 @@ void LaserControllerWindow::createUAxisDockPanel()
 void LaserControllerWindow::createLaserPowerDockPanel()
 {
     m_floatEditSliderScanLaserPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::scanLaserPowerItem());
+    m_floatEditSliderScanLaserPower->setTracking(false);
     Config::UserRegister::scanLaserPowerItem()->bindWidget(m_floatEditSliderScanLaserPower, SS_REGISTER);
 
     m_editSliderScanMaxGray = InputWidgetWrapper::createWidget<EditSlider*>(Config::UserRegister::maxScanGrayRatioItem());
+    m_editSliderScanMaxGray->setTracking(false);
     Config::UserRegister::maxScanGrayRatioItem()->bindWidget(m_editSliderScanMaxGray, SS_REGISTER);
 
     m_editSliderScanMinGray = InputWidgetWrapper::createWidget<EditSlider*>(Config::UserRegister::minScanGrayRatioItem());
+    m_editSliderScanMinGray->setTracking(false);
     Config::UserRegister::minScanGrayRatioItem()->bindWidget(m_editSliderScanMinGray, SS_REGISTER);
 
     m_floatEditSliderCuttingMaxPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::defaultMaxCuttingPowerItem());
+    m_floatEditSliderCuttingMaxPower->setTracking(false);
     Config::UserRegister::defaultMaxCuttingPowerItem()->bindWidget(m_floatEditSliderCuttingMaxPower, SS_REGISTER);
 
     m_floatEditSliderCuttingMinPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::defaultMinCuttingPowerItem());
+    m_floatEditSliderCuttingMinPower->setTracking(false);
     Config::UserRegister::defaultMinCuttingPowerItem()->bindWidget(m_floatEditSliderCuttingMinPower, SS_REGISTER);
 
     m_floatEditSliderSpotShotPower = InputWidgetWrapper::createWidget<FloatEditSlider*>(Config::UserRegister::spotShotPowerItem());
+    m_floatEditSliderSpotShotPower->setTracking(false);
     Config::UserRegister::spotShotPowerItem()->bindWidget(m_floatEditSliderSpotShotPower, SS_REGISTER);
     QFormLayout* layout = new QFormLayout;
     layout->setMargin(3);
@@ -6050,7 +6057,19 @@ bool LaserControllerWindow::onActionCloseDocument(bool checked)
 
 void LaserControllerWindow::onActionSettings(bool checked)
 {
+    m_floatEditSliderScanLaserPower->blockSignals(true);
+    m_editSliderScanMaxGray->blockSignals(true);
+    m_editSliderScanMinGray->blockSignals(true);
+    m_floatEditSliderCuttingMaxPower->blockSignals(true);
+    m_floatEditSliderCuttingMinPower->blockSignals(true);
+    m_floatEditSliderSpotShotPower->blockSignals(true);
     showConfigDialog();
+    m_floatEditSliderScanLaserPower->blockSignals(false);
+    m_editSliderScanMaxGray->blockSignals(false);
+    m_editSliderScanMinGray->blockSignals(false);
+    m_floatEditSliderCuttingMaxPower->blockSignals(false);
+    m_floatEditSliderCuttingMinPower->blockSignals(false);
+    m_floatEditSliderSpotShotPower->blockSignals(false);
 }
 
 void LaserControllerWindow::onActionSelectionTool(bool checked)
@@ -7380,7 +7399,7 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
 {
     if (!doc)
         return;
-    connect(doc, &LaserDocument::outlineUpdated, this, &LaserControllerWindow::updateOutlineTree);
+    //connect(doc, &LaserDocument::outlineUpdated, this, &LaserControllerWindow::updateOutlineTree);
     connect(doc, &LaserDocument::exportFinished, this, &LaserControllerWindow::onDocumentExportFinished);
 
     doc->bindLayerButtons(m_layerButtons);
@@ -7440,6 +7459,10 @@ void LaserControllerWindow::showConfigDialog(const QString& title)
             //updata region
             m_scene->updateValidMaxRegionRect();
         }
+    }
+    else if (result == 1000)
+    {
+        LaserApplication::restart();
     }
 	
 }

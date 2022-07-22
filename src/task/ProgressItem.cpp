@@ -36,7 +36,7 @@ ProgressItem::~ProgressItem()
 
 void ProgressItem::setMaximum(qreal value) 
 {
-    QMutexLocker locker(&m_childMutex);
+    //QMutexLocker locker(&m_childMutex);
     m_maximum = value; 
     if (m_type == PT_Complex)
         updateWeights();
@@ -44,7 +44,7 @@ void ProgressItem::setMaximum(qreal value)
 
 int ProgressItem::indexOfParent()
 {
-    QMutexLocker locker(&m_childMutex);
+    //QMutexLocker locker(&m_childMutex);
     if (parent())
         return parent()->childItems().indexOf(this);
     return -1;
@@ -94,7 +94,7 @@ qreal ProgressItem::progress() const
 
 void ProgressItem::setProgress(qreal progress)
 {
-    QMutexLocker locker(&m_childMutex);
+    //QMutexLocker locker(&m_childMutex);
     if (m_type == PT_Simple)
         m_progress = qBound(m_minimum, progress, m_maximum); 
     notify();
@@ -102,7 +102,7 @@ void ProgressItem::setProgress(qreal progress)
 
 void ProgressItem::increaseProgress(qreal delta)
 {
-    QMutexLocker locker(&m_childMutex);
+    //QMutexLocker locker(&m_childMutex);
     if (m_type == PT_Simple)
         m_progress = qBound(m_minimum, m_progress + delta, m_maximum); 
     notify();
@@ -110,7 +110,7 @@ void ProgressItem::increaseProgress(qreal delta)
 
 void ProgressItem::finish()
 {
-    QMutexLocker locker(&m_childMutex);
+    //QMutexLocker locker(&m_childMutex);
     if (m_type == PT_Simple)
         m_progress = m_maximum;
     else if (m_type == PT_Complex)
@@ -128,19 +128,19 @@ void ProgressItem::finish()
 
 bool ProgressItem::isFinished() const
 {
-    QMutexLocker locker(const_cast<QMutex*>(&m_childMutex));
+    //QMutexLocker locker(const_cast<QMutex*>(&m_childMutex));
     return progress() >= 1.0;
 }
 
 qreal ProgressItem::durationSecs() const
 {
-    QMutexLocker locker(const_cast<QMutex*>(&m_childMutex));
+    //QMutexLocker locker(const_cast<QMutex*>(&m_childMutex));
     return durationNSecs() * 0.000001;
 }
 
 qreal ProgressItem::durationMSecs() const
 {
-    QMutexLocker locker(const_cast<QMutex*>(&m_childMutex));
+    //QMutexLocker locker(const_cast<QMutex*>(&m_childMutex));
     return durationNSecs() * 0.000001;
 }
 

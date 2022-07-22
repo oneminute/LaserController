@@ -5310,7 +5310,7 @@ Would you like to overwrite it?</source>
     <message>
         <location line="+11"/>
         <source>Text Weight</source>
-        <translation></translation>
+        <translation>文字权重</translation>
     </message>
     <message>
         <location line="+2"/>

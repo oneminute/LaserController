@@ -864,6 +864,8 @@ void ConfigItem::restoreToSystemDefault(StoreStrategy strategy, void* senderPtr)
 void ConfigItem::apply()
 {
     Q_D(ConfigItem);
+    if (!d->exportable)
+        return;
     bool changed = d->value != d->dirtyValue;
     d->value = d->dirtyValue;
     if (changed)

@@ -3661,7 +3661,7 @@ void LaserViewer::keyPressEvent(QKeyEvent* event)
             break;
         }
     }
-    qDebug() << "VVV";
+    //qDebug() << "VVV";
 }
 
 void LaserViewer::keyReleaseEvent(QKeyEvent* event)
@@ -3744,12 +3744,11 @@ void LaserViewer::keyReleaseEvent(QKeyEvent* event)
 
 void LaserViewer::inputMethodEvent(QInputMethodEvent * event)
 {
-    QWidget::inputMethodEvent(event);
     if (!event->commitString().isEmpty()) {
         addTextByKeyInput(event->commitString());
         
     }
-    
+    QWidget::inputMethodEvent(event);
 }
 
 void LaserViewer::scrollContentsBy(int dx, int dy)
