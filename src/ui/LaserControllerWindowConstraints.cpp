@@ -110,7 +110,7 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionSettings, "enabled", true, deviceIdleState);
     BIND_PROP_TO_STATE(m_ui->actionSettings, "enabled", false, deviceMachiningState);
     BIND_PROP_TO_STATE(m_ui->actionSettings, "enabled", false, deviceDownloadingState);
-    BIND_PROP_TO_STATE(m_ui->actionSettings, "enabled", true, devicePausedState);
+    BIND_PROP_TO_STATE(m_ui->actionSettings, "enabled", false, devicePausedState);
     // end m_ui->actionSettings
 
     // begin m_ui->actionAbout
@@ -2519,7 +2519,7 @@ void LaserControllerWindow::bindWidgetsProperties()
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutEndSelect, "enabled", false, deviceDownloadingState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutEndSelect, "enabled", false, devicePausedState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutEndSelect, "enabled", false, deviceErrorState);
-    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutEndSelect, "enabled", true, documentPrintAndCutSelectingState);
+    BIND_PROP_TO_STATE(m_ui->actionPrintAndCutEndSelect, "enabled", false, documentPrintAndCutSelectingState);
     BIND_PROP_TO_STATE(m_ui->actionPrintAndCutEndSelect, "enabled", false, documentPrintAndCutAligningState);
     // end m_ui->actionPrintAndCutEndSelect
 

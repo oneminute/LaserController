@@ -30,10 +30,14 @@ cv::Mat imageUtils::halftone6(ProgressItem* parentProgress, cv::Mat src, float d
     rot.at<double>(0, 2) += rotatedWidth / 2.0 - src.cols / 2.0;
     rot.at<double>(1, 2) += rotatedHeight / 2.0 - src.rows / 2.0;
 
+#ifdef _DEBUG
     cv::imwrite("tmp/h6_src.bmp", src);
+#endif
     cv::Mat rotated;
     cv::warpAffine(src, rotated, rot, cv::Size(rotatedWidth, rotatedHeight), cv::INTER_NEAREST, 0, cv::Scalar(255));
+#ifdef _DEBUG
     cv::imwrite("tmp/h6_rotated.bmp", rotated);
+#endif
 
     cv::Mat dst(rotated.rows, rotated.cols, CV_8UC1, cv::Scalar(255));
     int gridCols = qCeil(dst.cols * 1.0 / gridSize);
@@ -105,7 +109,9 @@ cv::Mat imageUtils::halftone6(ProgressItem* parentProgress, cv::Mat src, float d
     }
 
     std::vector<int>param; 
+#ifdef _DEBUG
     cv::imwrite("tmp/h6_dst.bmp", dst);
+#endif
 
     //cv::Mat outMat(dst.rows, dst.cols, CV_8UC1, cv::Scalar(255));
     center = cv::Point2f((dst.cols - 1) / 2, (dst.rows - 1) / 2);
@@ -114,7 +120,9 @@ cv::Mat imageUtils::halftone6(ProgressItem* parentProgress, cv::Mat src, float d
     cv::Mat antiRotated;
     cv::warpAffine(dst, antiRotated, rot, bbox.size(), cv::INTER_NEAREST, 0, cv::Scalar(255));
     cv::threshold(antiRotated, antiRotated, 127.5, 255, cv::THRESH_BINARY);
+#ifdef _DEBUG
     cv::imwrite("tmp/h6_antiRotated.bmp", dst);
+#endif
 
 	int roix = (antiRotated.cols - src.cols - 1) / 2;
 	int roiy = (antiRotated.rows - src.rows - 1) / 2;
@@ -135,11 +143,11 @@ cv::Mat imageUtils::halftone6(ProgressItem* parentProgress, cv::Mat src, float d
     //qLogD << outMat.ptr<quint8>(0)[0];
     //qLogD << topLeftMat.ptr<quint8>(0)[1];
     //outMat = 255 - outMat;
-    cv::imwrite("tmp/h6_outMat.tiff", outMat);
-    //cv::imwrite("tmp/h6_topleft.tiff", topLeftMat);
 
 #ifdef _DEBUG
-    //cv::imshow("halftone6_processed", outMat);
+    cv::imwrite("tmp/h6_outMat.tiff", outMat);
+    cv::imwrite("tmp/h6_topleft.tiff", topLeftMat);
+    cv::imshow("halftone6_processed", outMat);
 #endif
 
     progress->finish();

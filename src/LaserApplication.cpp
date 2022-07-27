@@ -132,7 +132,7 @@ bool LaserApplication::initialize()
     mainWindow->showMaximized();
     splashScreen->setProgress(85);
 
-    g_deviceThread.start();
+    //g_deviceThread.start();
 
     return true;
 }
@@ -146,19 +146,21 @@ void LaserApplication::destroy()
     {
         driver->unload();
         delete driver;
+        driver = nullptr;
     }
     
     if (device)
     {
         device->unload();
         delete device;
+        device = nullptr;
     }
     
     //SAFE_DELETE(progressModel)
     SAFE_DELETE(globalProgress)
 
-    g_deviceThread.exit();
-    g_deviceThread.wait();
+    //g_deviceThread.exit();
+    //g_deviceThread.wait();
 
     cleanCrash();
     Config::destroy();

@@ -2195,7 +2195,7 @@ void Config::loadSystemRegisters()
     );
     password->setInputWidgetType(IWT_LineEdit);
     password->setVisible(false);
-    password->setExportable(false);
+    //password->setExportable(false);
 
     ConfigItem* storedPassword = group->addConfigItem(
         "storedPassword",

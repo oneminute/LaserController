@@ -5634,7 +5634,7 @@ void LaserControllerWindow::updateLayers()
 void LaserControllerWindow::onActionPauseMechining(bool checked)
 {
     //LaserDriver::instance().pauseContinueMachining(!checked);
-    int result = LaserApplication::driver->pauseContinueMachining(checked);
+    int result = LaserApplication::driver->pauseContinueMachining(!checked);
     qDebug() << "pause result:" << result << ", checked state:" << checked;
     /*m_ui->actionPause->blockSignals(true);
     if (result == 1)
@@ -7684,7 +7684,7 @@ void LaserControllerWindow::closeDocument()
 		button->setChecked(false);
 	}
     
-    updateOutlineTree();
+    //updateOutlineTree();
 }
 
 void LaserControllerWindow::deviceOriginChanged(const QVariant& value, void* senderPtr)

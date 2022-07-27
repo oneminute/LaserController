@@ -51,6 +51,9 @@ void LaserDriver::ProgressCallBackHandler(int position, int totalCount)
 
 void LaserDriver::SysMessageCallBackHandler(int sysMsgIndex, int sysMsgCode, wchar_t* sysEventData)
 {
+    if (!LaserApplication::driver)
+        return;
+
     if (LaserApplication::driver->m_isClosed)
         return;
 
