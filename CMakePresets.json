@@ -2,36 +2,6 @@
     "version": 3,
     "configurePresets": [
         {
-            "name": "linux-debug",
-            "displayName": "Linux Debug",
-            "description": "Target the Windows Subsystem for Linux (WSL) or a remote Linux system.",
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "installDir": "${sourceDir}/out/install/${presetName}",
-            "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" },
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Linux"
-            },
-            "vendor": { "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": { "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}" } }
-        },
-        {
-            "name": "macos-debug",
-            "displayName": "macOS Debug",
-            "description": "Target a remote macOS system.",
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "installDir": "${sourceDir}/out/install/${presetName}",
-            "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" },
-            "condition": {
-                "type": "equals",
-                "lhs": "${hostSystemName}",
-                "rhs": "Darwin"
-            },
-            "vendor": { "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": { "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}" } }
-        },
-        {
             "name": "windows-base",
             "description": "Target Windows with the Visual Studio development environment.",
             "hidden": true,
@@ -40,7 +10,18 @@
             "installDir": "${sourceDir}/out/install/${presetName}",
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "cl.exe",
-                "CMAKE_CXX_COMPILER": "cl.exe"
+                "CMAKE_CXX_COMPILER": "cl.exe",
+                "QT_DIR": "d:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5",
+                "Qt5_DIR": "d:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5",
+                "OpenCV_DIR": "d:/build/opencv/vs2019_x64/x64/vc16/lib",
+                "glog_DIR": "D:/build/glog/vs2019_x64/lib/cmake/glog",
+                "gflags_DIR": "D:/build/gflags/vs2019_x64/lib/cmake/gflags",
+                "LZ4_DIR": "D:/build/LZ4/vs2019_x64/lib/cmake/lz4",
+                "Eigen3_DIR": "D:/dev/eigen/build",
+                "flann_DIR": "D:/build/flann/vs2019_x64/lib/cmake/flann",
+                "LRWIDGETS_BUILD_EXAMPLES": "FALSE",
+                "BUILD_EXAMPLES": "OFF",
+                "BUILD_STATIC": "TRUE"
             },
             "condition": {
                 "type": "equals",
@@ -59,18 +40,7 @@
             },
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_CXX_FLAGS": "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /bigobj",
-                "QT_DIR": "d:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5",
-                "Qt5_DIR": "d:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5",
-                "OpenCV_DIR": "d:/build/opencv/vs2019_x64/x64/vc16/lib",
-                "glog_DIR": "D:/build/glog/vs2019_x64/lib/cmake/glog",
-                "gflags_DIR": "D:/build/gflags/vs2019_x64/lib/cmake/gflags",
-                "LZ4_DIR": "D:/build/LZ4/vs2019_x64/lib/cmake/lz4",
-                "Eigen3_DIR": "D:/dev/eigen/build",
-                "flann_DIR": "D:/build/flann/vs2019_x64/lib/cmake/flann",
-                "LRWIDGETS_BUILD_EXAMPLES": "FALSE",
-                "BUILD_EXAMPLES": "OFF",
-                "BUILD_STATIC":  "TRUE"
+                "CMAKE_CXX_FLAGS": "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /bigobj"
             }
         },
         {
@@ -80,18 +50,7 @@
             "inherits": "x64-debug",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_CXX_FLAGS": "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /bigobj",
-                "QT_DIR": "d:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5",
-                "Qt5_DIR": "d:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5",
-                "OpenCV_DIR": "d:/build/opencv/vs2019_x64/x64/vc16/lib",
-                "glog_DIR": "D:/build/glog/vs2019_x64/lib/cmake/glog",
-                "gflags_DIR": "D:/build/gflags/vs2019_x64/lib/cmake/gflags",
-                "LZ4_DIR": "D:/build/LZ4/vs2019_x64/lib/cmake/lz4",
-                "Eigen3_DIR": "D:/dev/eigen/build",
-                "flann_DIR": "D:/build/flann/vs2019_x64/lib/cmake/flann",
-                "LRWIDGETS_BUILD_EXAMPLES": "FALSE",
-                "BUILD_EXAMPLES": "OFF",
-                "BUILD_STATIC": "TRUE"
+                "CMAKE_CXX_FLAGS": "/DWIN32 /D_WINDOWS /W3 /GR /EHsc /bigobj"
             }
         },
         {
