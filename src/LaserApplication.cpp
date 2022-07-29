@@ -30,6 +30,8 @@
 #include <iostream>
 
 LaserApplication* LaserApplication::app(nullptr);
+QStringList LaserApplication::args;
+QString LaserApplication::arg0;
 LaserControllerWindow* LaserApplication::mainWindow(nullptr);
 SplashScreen* LaserApplication::splashScreen(nullptr);
 ProgressItem* LaserApplication::globalProgress(nullptr);
@@ -64,6 +66,8 @@ LaserApplication::~LaserApplication()
 
 bool LaserApplication::initialize()
 {
+    args = LaserApplication::instance()->arguments();
+
     mainThread = QThread::currentThread();
     QDir dir(LaserApplication::applicationDirPath());
     LaserApplication::addLibraryPath(dir.absoluteFilePath("bin"));
@@ -128,7 +132,7 @@ bool LaserApplication::initialize()
     mainWindow->showMaximized();
     splashScreen->setProgress(85);
 
-    g_deviceThread.start();
+    //g_deviceThread.start();
 
     return true;
 }
@@ -142,24 +146,27 @@ void LaserApplication::destroy()
     {
         driver->unload();
         delete driver;
+        driver = nullptr;
     }
     
     if (device)
     {
         device->unload();
         delete device;
+        device = nullptr;
     }
     
     //SAFE_DELETE(progressModel)
     SAFE_DELETE(globalProgress)
 
-    g_deviceThread.exit();
-    g_deviceThread.wait();
+    //g_deviceThread.exit();
+    //g_deviceThread.wait();
 
     cleanCrash();
     Config::destroy();
 
     qDeleteAll(translators);
+    qInstallMessageHandler(nullptr);
 }
 
 bool LaserApplication::checkEnvironment()
@@ -433,9 +440,14 @@ int LaserApplication::exec()
 
 void LaserApplication::restart()
 {
-    mainWindow->close();
-    LaserApplication::quit();
-    QProcess::startDetached(LaserApplication::instance()->arguments()[0], LaserApplication::instance()->arguments());
+    QTimer::singleShot(200, [=]()
+        {
+            mainWindow->close();
+            app->destroy();
+            LaserApplication::quit();
+            QProcess::startDetached(arg0, args);
+        }
+    );
 }
 
 bool LaserApplication::antiDebugger()

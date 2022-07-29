@@ -541,7 +541,17 @@ QString LaserPrimitive::typeLatinName() const
 bool LaserPrimitive::isShape() const 
 {
     Q_D(const LaserPrimitive);
-    return (int)d->primitiveType <= (int)LPT_SHAPE; 
+    return d->primitiveType == LPT_LINE ||
+        d->primitiveType == LPT_CIRCLE ||
+        d->primitiveType == LPT_ELLIPSE ||
+        d->primitiveType == LPT_RECT ||
+        d->primitiveType == LPT_POLYLINE ||
+        d->primitiveType == LPT_POLYGON ||
+        d->primitiveType == LPT_PATH ||
+        d->primitiveType == LPT_STAR ||
+        d->primitiveType == LPT_PARTYEMBLEM ||
+        d->primitiveType == LPT_FRAME ||
+        d->primitiveType == LPT_RING;
 }
 
 bool LaserPrimitive::isBitmap() const 
@@ -553,7 +563,10 @@ bool LaserPrimitive::isBitmap() const
 bool LaserPrimitive::isText() const
 {
     Q_D(const LaserPrimitive);
-    return d->primitiveType == LPT_TEXT;
+    return d->primitiveType == LPT_TEXT ||
+        d->primitiveType == LPT_CIRCLETEXT ||
+        d->primitiveType == LPT_HORIZONTALTEXT ||
+        d->primitiveType == LPT_VERTICALTEXT;
 }
 
 bool LaserPrimitive::exportable() const

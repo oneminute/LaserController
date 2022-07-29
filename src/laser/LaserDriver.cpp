@@ -5,6 +5,7 @@
 #include <QErrorMessage>
 #include <QFile>
 #include <QMessageBox>
+#include <QTextCodec>
 
 #include "LaserDevice.h"
 #include "LaserRegister.h"
@@ -51,11 +52,21 @@ void LaserDriver::ProgressCallBackHandler(int position, int totalCount)
 
 void LaserDriver::SysMessageCallBackHandler(int sysMsgIndex, int sysMsgCode, wchar_t* sysEventData)
 {
+    static QTextCodec* codecGb = QTextCodec::codecForName("GBK");
+    static QTextCodec* codecUtf16 = QTextCodec::codecForName("UTF-16");
+    static QTextCodec* codecUtf8 = QTextCodec::codecForName("UTF-8");
+    if (!LaserApplication::driver)
+        return;
+
     if (LaserApplication::driver->m_isClosed)
         return;
 
-    QString eventData = QString::fromWCharArray(sysEventData);
+    QString eventData;
+    //QTextCodec* codec = QTextCodec::codecForLocale();
+    //QTextCodec::setCodecForLocale(codecGb);
+    eventData = QString::fromWCharArray(sysEventData);
     qLogD << "System message callback handler: index = " << sysMsgIndex << ", code = " << sysMsgCode << ", event data = " << eventData;
+    //QTextCodec::setCodecForLocale(codec);
     if (sysMsgCode >= E_Base && sysMsgCode < M_Base)
     {
         emit LaserApplication::driver->raiseError(sysMsgCode, eventData);

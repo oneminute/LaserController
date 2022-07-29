@@ -102,11 +102,11 @@ void LaserLayerDialog::initUi()
 
     m_ui->lineEditLayerName->setText(m_layer->name());
 
-    m_ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("OK"));
-    m_ui->buttonBox->button(QDialogButtonBox::Save)->setText(tr("Save"));
-    m_ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Cancel"));
-    m_ui->buttonBox->button(QDialogButtonBox::RestoreDefaults)->setText(tr("Restore Defaults"));
     m_ui->buttonBox->button(QDialogButtonBox::Reset)->setText(tr("Reset"));
+    m_ui->buttonBox->button(QDialogButtonBox::RestoreDefaults)->setText(tr("Restore Defaults"));
+    m_ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("Ok"));
+    m_ui->buttonBox->button(QDialogButtonBox::Save)->setText(tr("Save To Defaults"));
+    m_ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Cancel"));
 
     m_ui->labelCuttingSpeed->setText(Config::CuttingLayer::runSpeedItem()->title());
     m_ui->labelCuttingMinPower->setText(Config::CuttingLayer::minPowerItem()->title());

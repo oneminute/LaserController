@@ -2195,7 +2195,7 @@ void Config::loadSystemRegisters()
     );
     password->setInputWidgetType(IWT_LineEdit);
     password->setVisible(false);
-    password->setExportable(false);
+    //password->setExportable(false);
 
     ConfigItem* storedPassword = group->addConfigItem(
         "storedPassword",
@@ -2269,6 +2269,7 @@ void Config::loadSystemRegisters()
         DT_INT
     );
     sysRunTime->setInputWidgetType(IWT_LineEdit);
+    sysRunTime->setExportable(false);
 
     ConfigItem* laserRunTime = group->addConfigItem(
         "laserRunTime",

@@ -59,6 +59,8 @@ signals:
 
 public:
     static LaserApplication* app;
+    static QStringList args;
+    static QString arg0;
     static LaserControllerWindow* mainWindow;
     static SplashScreen* splashScreen;
     static ProgressItem* globalProgress;

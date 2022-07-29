@@ -236,6 +236,10 @@ ConfigDialog::ConfigDialog(QWidget* parent)
 
     // initialize widgets' state
     Config::Device::uFixtureTypeItem()->emitValueChanged(this);
+
+    QDateTime curr = QDateTime::currentDateTime();
+    m_lastUserInformTime = curr;
+    m_lastSysInformTime = curr;
 }
 
 ConfigDialog::~ConfigDialog()
@@ -371,7 +375,11 @@ void ConfigDialog::save()
         dlg.setButtonText(QMessageBox::No, tr("No"));
         int result = dlg.exec();
         if (result == QMessageBox::StandardButton::Yes)
-            LaserApplication::restart();
+        {
+            this->setResult(1000);
+            //LaserApplication::restart();
+            this->close();
+        }
     }
 }
 
@@ -487,6 +495,8 @@ void ConfigDialog::onSystemRegistersConfirmed()
     {
         LaserRegister* laserRegister = i.value();
         ConfigItem* configItem = laserRegister->configItem();
+        if (!configItem->exportable())
+            continue;
 
         if (!configItem->confirm(laserRegister->value()))
         {
@@ -497,7 +507,12 @@ void ConfigDialog::onSystemRegistersConfirmed()
     }
     if (success)
     {
-        QMessageBox::information(this, tr("Success"), tr("Save system registers successfully!"));
+        QDateTime curr = QDateTime::currentDateTime();
+        if (m_lastSysInformTime.msecsTo(curr) >= 3000)
+        {
+            QMessageBox::information(this, tr("Success"), tr("Save system registers successfully!"));
+            m_lastSysInformTime = curr;
+        }
         Config::SystemRegister::group->save(true, true);
     }
     else
@@ -534,7 +549,12 @@ void ConfigDialog::onUserRegistersConfirmed()
     }
     if (success)
     {
-        QMessageBox::information(this, tr("Success"), tr("Save user registers successfully!"));
+        QDateTime curr = QDateTime::currentDateTime();
+        if (m_lastUserInformTime.msecsTo(curr) >= 3000)
+        {
+            QMessageBox::information(this, tr("Success"), tr("Save user registers successfully!"));
+            m_lastUserInformTime = curr;
+        }
         Config::UserRegister::group->save(true, true);
     }
     else

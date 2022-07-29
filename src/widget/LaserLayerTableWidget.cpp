@@ -150,22 +150,22 @@ void LaserLayerTableWidget::updateItems()
             QTableWidgetItem* itemSpeedPower = new QTableWidgetItem();
             if (layer->type() == LLT_CUTTING)
             {
-                itemSpeedPower->setText(QString("%1/%2").arg(qRound(layer->cuttingRunSpeed() * 0.001)).arg(layer->cuttingRunSpeedPower()));
+                itemSpeedPower->setText(QString("%1/%2%").arg(qRound(layer->cuttingRunSpeed() * 0.001)).arg(layer->cuttingRunSpeedPower() * 0.1, 0, 'f', 1));
             }
             else if (layer->type() == LLT_ENGRAVING)
             {
-                itemSpeedPower->setText(QString("%1/%2").arg(qRound(layer->engravingRunSpeed() * 0.001)).arg(layer->engravingLaserPower()));
+                itemSpeedPower->setText(QString("%1/%2%").arg(qRound(layer->engravingRunSpeed() * 0.001)).arg(layer->engravingLaserPower() * 0.1, 0, 'f', 1));
             }
             else if (layer->type() == LLT_FILLING)
             {
                 if (layer->fillingType() == FT_Line)
-                    itemSpeedPower->setText(QString("%1/%2").arg(qRound(layer->fillingRunSpeed() * 0.001)).arg(layer->fillingRunSpeedPower()));
+                    itemSpeedPower->setText(QString("%1/%2%").arg(qRound(layer->fillingRunSpeed() * 0.001)).arg(layer->engravingLaserPower() * 0.1, 0, 'f', 1));
                 else if (layer->fillingType() == FT_Pixel)
-                    itemSpeedPower->setText(QString("%1/%2").arg(qRound(layer->engravingRunSpeed() * 0.001)).arg(layer->fillingRunSpeedPower()));
+                    itemSpeedPower->setText(QString("%1/%2%").arg(qRound(layer->engravingRunSpeed() * 0.001)).arg(layer->engravingLaserPower() * 0.1, 0, 'f', 1));
             }
             else if (layer->type() == LLT_STAMP)
             {
-                itemSpeedPower->setText(QString("%1/%2").arg(qRound(layer->engravingRunSpeed() * 0.001)).arg(layer->engravingLaserPower()));
+                itemSpeedPower->setText(QString("%1/%2%").arg(qRound(layer->engravingRunSpeed() * 0.001)).arg(layer->engravingLaserPower() * 0.1, 0, 'f', 1));
             }
             itemSpeedPower->setTextAlignment(Qt::AlignCenter);
 

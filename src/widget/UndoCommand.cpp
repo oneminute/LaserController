@@ -2129,7 +2129,8 @@ void StampTextSpinBoxUndoCommand::redo()
 }
 
 LaserPrimitiveSpinBoxUndoCommand::LaserPrimitiveSpinBoxUndoCommand(LaserViewer* viewer, LaserPrimitive* p, LaserDoubleSpinBox* spinBox, qreal lastValue, qreal value, int type, bool isRedo)
-    :m_viewer(viewer), m_spinBox1(spinBox), m_redoValue1(value),m_undoValue1(lastValue),m_isRedo(isRedo), m_type(type), m_primitive(p)
+    : m_viewer(viewer), m_spinBox1(spinBox), m_redoValue1(value),m_undoValue1(lastValue),m_isRedo(isRedo), m_type(type), m_primitive(p)
+    , m_redoValue2(0), m_undoValue2(0), m_spinBox2(nullptr)
 {
     m_primitiveType = p->primitiveType();
 }
@@ -2212,11 +2213,13 @@ void LaserPrimitiveSpinBoxUndoCommand::handle(qreal _v1, qreal _v2)
             }
             laserRect->setCornerRadius(_v1, laserRect->cornerType());
         }
+        break;
     }
     case 4: {//has LockSizeRatio button
-        m_primitive->setBoundingRectWidth(_v1);
+        m_primitive->setBoundingRectWidth(_v2);
         m_primitive->setBoundingRectHeight(_v2);
-        m_spinBox2->setValue(_v2 * 0.001);
+        if (m_spinBox2)
+            m_spinBox2->setValue(_v2 * 0.001);
         break;
     }
     }
