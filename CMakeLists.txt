@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 cmake_policy(SET CMP0074 NEW)
 cmake_policy(SET CMP0087 OLD)
-cmake_policy(SET CMP0121 NEW)
+#cmake_policy(SET CMP0121 NEW)
 
 project(CNELaser LANGUAGES CXX)
 

@@ -1550,7 +1550,7 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
             canvasHeight * 1.0 / boundingRectInDevice.height()
         );
         boundingRectInDevice = t1.mapRect(boundingRectInDevice);
-        QTransform t2 = QTransform::fromTranslate(-boundingRectInDevice.x(), -boundingRectInDevice.y());
+        QTransform t2 = QTransform::fromTranslate(-boundingRectInDevice.left(), -boundingRectInDevice.top());
         boundingRectInDevice = t2.mapRect(boundingRectInDevice);
         
         QImage image(boundingRectInDevice.width(), boundingRectInDevice.height(), QImage::Format_ARGB32);
@@ -1614,14 +1614,14 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
                 painter.setPen(pen);
             }
             sp->setStampBrush(&painter, pen.color(), QSize(sp->boundingRect().width(), sp->boundingRect().height()), t1, true);
-            pPath = sp->sceneTransform().map(pPath);
             pPath = sp->getPath();
+            pPath = sp->sceneTransform().map(pPath);
             pPath = t1.map(pPath);
             pPath = t2.map(pPath);
             painter.drawPath(pPath);
         }
         image = image.mirrored(true, false);
-        QString fileName = "tmp/stamp_img_" + QString::number(i) + ".png";
+        QString fileName = "tmp/images/stamp_img_" + QString::number(i) + ".png";
         image.save(fileName);
         item.layer = layer;
         item.imagePath = fileName;

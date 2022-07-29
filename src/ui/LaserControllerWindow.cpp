@@ -7639,13 +7639,14 @@ void LaserControllerWindow::showEvent(QShowEvent * event)
         m_created = true;
         QTimer::singleShot(1000, this, [=]() {
             //LaserApplication::device->updateDriverLanguage();
-            emit windowCreated();
+            
             qLogD << "orientation: " << m_splitterLayers->orientation();
             m_splitterLayers->setSizes({400, 450});
             LaserApplication::showSplashScreen(tr("Loading completed."), 100, this);
             LaserApplication::hideSplashScreen(1000);
             //LaserApplication::splashScreen->setProgress(100);
             //LaserApplication::splashScreen->delayedHide(1000);
+            emit windowCreated();
         });
     }
 }
