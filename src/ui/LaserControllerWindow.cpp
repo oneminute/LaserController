@@ -5315,7 +5315,7 @@ bool LaserControllerWindow::onActionSave(bool checked)
 
 bool LaserControllerWindow::onActionSaveAs(bool checked)
 {
-	QString name = QFileDialog::getSaveFileName(nullptr, "save file", ".", "File(*lc)");
+	QString name = QFileDialog::getSaveFileName(nullptr, "save file", ".", "File(*.lc)");
 	
 	
 	if (name == "") {

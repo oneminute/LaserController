@@ -20,7 +20,7 @@ private:
     LaserScene* m_scene;
     LaserViewer* m_viewer;
     int m_layerIndex;
-    QString m_defaultTexts[3] = {tr("FSNS"), tr("FSN"), tr("NA") };//ĞÕÊÏÃûÓ¡£¬ĞÕÊÏÃû£¬ĞÕÃû
+    QString m_defaultTexts[3] = {tr("FSNS"), tr("FSN"), tr("NA") };//å§“æ°åå°ï¼Œå§“æ°åï¼Œå§“å
 
 };
 #endif // STAMPDIALOG_H

@@ -106,7 +106,12 @@ void LaserDocument::addPrimitive(LaserPrimitive* item, bool addToQuadTree, bool 
     }
     if (layer->isEmpty())
     {
-        if (item->isShape())
+        LaserStampBase* stamp = qgraphicsitem_cast<LaserStampBase*>(item);
+        if (stamp)
+        {
+            layer->setType(LLT_STAMP);
+        }
+        else if (item->isShape() && layer->type() != LLT_FILLING)
         {
             layer->setType(LLT_CUTTING);
         }
@@ -1523,6 +1528,8 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
         QList<LaserPrimitive*> pList = layer->primitives();
         
         utils::boundingRect(pList, boundingRectInDevice);
+        //boundingRectInDevice.moveTopLeft(QPoint(0, 0));
+        //boundingRectInDevice = LaserApplication::device->to1stQuad().mapRect(boundingRectInDevice);
         qreal offset = 2000;
         boundingRectInDevice = QRect(boundingRectInDevice .left()-offset,  boundingRectInDevice.top() - offset, 
             boundingRectInDevice.width() + 2*offset, boundingRectInDevice.height() + 2 * offset);
@@ -1606,7 +1613,7 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
                 pen.setColor(Qt::black);
                 painter.setPen(pen);
             }
-            sp->setStampBrush(&painter, pen.color(), QSize(sp->boundingRect().width(), sp->boundingRect().height()), t1 * t2, true);
+            sp->setStampBrush(&painter, pen.color(), QSize(sp->boundingRect().width(), sp->boundingRect().height()), t1, true);
             pPath = sp->sceneTransform().map(pPath);
             pPath = sp->getPath();
             pPath = t1.map(pPath);
