@@ -5357,7 +5357,7 @@ void LaserControllerWindow::onActionOpen(bool checked)
 void LaserControllerWindow::onActionZoomIn(bool checked)
 {
 	m_viewer->zoomIn();
-    m_scene->document()->generateStampImages();
+    //m_scene->document()->generateStampImages();
 }
 
 void LaserControllerWindow::onActionZoomOut(bool checked)
