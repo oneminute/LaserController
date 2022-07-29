@@ -1613,7 +1613,7 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
                 pen.setColor(Qt::black);
                 painter.setPen(pen);
             }
-            sp->setStampBrush(&painter, pen.color(), QSize(sp->boundingRect().width(), sp->boundingRect().height()), t1, true);
+            sp->setStampBrush(&painter, pen.color(), QSize(sp->boundingRect().width(), sp->boundingRect().height()), t1*t2, true);
             pPath = sp->getPath();
             pPath = sp->sceneTransform().map(pPath);
             pPath = t1.map(pPath);
