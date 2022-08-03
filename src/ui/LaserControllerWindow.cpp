@@ -2404,7 +2404,7 @@ void LaserControllerWindow::createLayersDockPanel()
 {
     m_tableWidgetLayers = new LaserLayerTableWidget;
     connect(m_tableWidgetLayers, &QTableWidget::cellDoubleClicked, this, &LaserControllerWindow::onTableWidgetLayersCellDoubleClicked);
-    connect(m_tableWidgetLayers, &QTableWidget::itemSelectionChanged, this, &LaserControllerWindow::onTableWidgetItemSelectionChanged);
+    connect(m_tableWidgetLayers, &QTableWidget::itemSelectionChanged, this, &LaserControllerWindow::onTableWidgetLayersSelectionChanged);
 
     m_buttonMoveLayerUp = new QToolButton;
     m_buttonMoveLayerUp->setDefaultAction(m_ui->actionMoveLayerUp);
@@ -5447,7 +5447,7 @@ void LaserControllerWindow::onTableWidgetLayersCellDoubleClicked(int row, int co
     }
 }
 
-void LaserControllerWindow::onTableWidgetItemSelectionChanged()
+void LaserControllerWindow::onTableWidgetLayersSelectionChanged()
 {
     QList<QTableWidgetItem*> items = m_tableWidgetLayers->selectedItems();
     if (items.isEmpty())
@@ -5460,37 +5460,12 @@ void LaserControllerWindow::onTableWidgetItemSelectionChanged()
     if (!doc) {
         return;
     }
-    QList<LaserLayer*>list = doc->layers();
-    if (list.isEmpty()) {
+    LaserLayer* layer = doc->layer(index);
+    if (layer == nullptr)
         return;
-    }
-    LaserLayer* layer = list[index];
-    //m_scene->clearSelection();
-    //清理之前的选区
-    LaserViewer* view = qobject_cast<LaserViewer*>( m_scene->views()[0]);
-    if (!view) {
-        return;
-    }
-    
-    //清空group并将transform设为单位transform
-    if (m_viewer->group()) {
-        m_viewer->group()->reset(true);
-    }
-    else {
-        m_viewer->createGroup();
-    }
-    for (LaserPrimitive* primitive : layer->primitives())
-    {
-        if (!m_scene->document()->primitives().contains(primitive->id())) {
-            continue;
-        }
-        primitive->setSelected(true);
-        m_viewer->group()->addToGroup(primitive);
-    }
-    if (StateControllerInst.isInState(StateControllerInst.documentIdleState())) {
-        emit m_viewer->idleToSelected();
-    }
-    m_viewer->viewport()->repaint();
+
+    layer->setSelected();
+    m_viewer->selectLayer(layer);
 }
 
 void LaserControllerWindow::onActionExportJson(bool checked)
@@ -5740,27 +5715,6 @@ void LaserControllerWindow::onActionDownload(bool checked)
 
     QString filename = QDir::current().absoluteFilePath("tmp/export.json");
 
-    /*QRect boundingRect = m_scene->document()->currentDocBoundingRect();
-    QRect boundingRectAcc = m_scene->document()->currentEngravingBoundingRect(true);
-
-    switch (Config::Device::startFrom())
-    {
-    case SFT_CurrentPosition:
-        boundingRect.moveTo(boundingRect.topLeft() + LaserApplication::device->currentOrigin());
-        boundingRectAcc.moveTo(boundingRectAcc.topLeft() + LaserApplication::device->currentOrigin());
-        break;
-    case SFT_UserOrigin:
-        boundingRect.moveTo(boundingRect.topLeft() + LaserApplication::device->userOrigin().toPoint());
-        boundingRectAcc.moveTo(boundingRectAcc.topLeft() + LaserApplication::device->userOrigin().toPoint());
-        break;
-    }
-
-    if (!LaserApplication::device->checkLayoutForMachining(
-        boundingRect,
-        boundingRectAcc
-    ))
-        return;*/
-
     bool stamp;
     LaserDocument* doc = getMachiningDocument(stamp);
     if (!doc)
@@ -5774,7 +5728,8 @@ void LaserControllerWindow::onActionDownload(bool checked)
         return;
     }
 
-    doc->setSpecifiedOriginIndex(soDlg.origin());
+    int specifiedOrigin = soDlg.origin();
+    doc->setSpecifiedOriginIndex(specifiedOrigin);
     ProgressItem* progress = LaserApplication::resetProcess();
     progress->setMaximum(6);
     progress->setWeights(QVector<qreal>() << 1 << 1 << 1 << 1 << 4 << 10);
@@ -5784,7 +5739,7 @@ void LaserControllerWindow::onActionDownload(bool checked)
         {
             doc->outline(progress);
             doc->setFinishRun(Config::Device::finishRun());
-            PathOptimizer optimizer(m_scene->document()->optimizeNode(), m_scene->document()->primitives().count());
+            PathOptimizer optimizer(doc->optimizeNode(), doc->primitives().count());
             optimizer.optimize(progress);
             PathOptimizer::Path path = optimizer.optimizedPath();
             qDebug() << "exporting to temporary json file:" << filename;

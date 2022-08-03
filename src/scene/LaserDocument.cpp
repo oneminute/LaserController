@@ -41,6 +41,7 @@ class LaserDocumentPrivate : public ILaserDocumentItemPrivate
 public:
     LaserDocumentPrivate(LaserDocument* ptr)
         : ILaserDocumentItemPrivate(ptr, LNT_DOCUMENT)
+        , currentLayer(nullptr)
         , isOpened(false)
         , scene(nullptr)
         , enablePrintAndCut(false)
@@ -52,6 +53,7 @@ public:
     {}
     QMap<QString, LaserPrimitive*> primitives;
     QList<LaserLayer*> layers;
+    LaserLayer* currentLayer;
     //PageInformation pageInfo;
     bool isOpened;
     LaserScene* scene;
@@ -93,21 +95,29 @@ LaserDocument::~LaserDocument()
     close();
 }
 
-void LaserDocument::addPrimitive(LaserPrimitive* item, bool addToQuadTree, bool updateDocBounding)
+bool LaserDocument::addPrimitive(LaserPrimitive* item, bool addToQuadTree, bool updateDocBounding)
 {
     Q_D(LaserDocument);
-    d->primitives.insert(item->id(), item);
     LaserLayer* layer = nullptr;
-    if (item->layerIndex() >= 0 && item->layerIndex() < d->layers.size()) {
-        layer = d->layers[item->layerIndex()];
+    int layerIndex = item->layerIndex();
+    if (layerIndex >= 0 && layerIndex < d->layers.size()) 
+    {
+        layer = d->layers[layerIndex];
     }
-    else {
-        return;
+    else
+    {
+        return false;
     }
+    
+    return addPrimitive(item, layer, addToQuadTree, updateDocBounding);
+}
+
+bool LaserDocument::addPrimitive(LaserPrimitive* item, LaserLayer* layer, bool addToQuadTree, bool updateDocBounding)
+{
+    Q_D(LaserDocument);
     if (layer->isEmpty())
     {
-        LaserStampBase* stamp = qgraphicsitem_cast<LaserStampBase*>(item);
-        if (stamp)
+        if (item->isStamp())
         {
             layer->setType(LLT_STAMP);
         }
@@ -119,28 +129,41 @@ void LaserDocument::addPrimitive(LaserPrimitive* item, bool addToQuadTree, bool 
         {
             layer->setType(LLT_ENGRAVING);
         }
-        //layer->init();
+        else if (item->isText())
+        {
+            layer->setType(LLT_FILLING);
+        }
     }
-	//layer->addPrimitive(item);
-    addPrimitive(item, layer, addToQuadTree, updateDocBounding);
-}
+    if (item->layer() != layer)
+    {
+        // check whether the adding item is capable with the layer
+        if (item->isShape() && layer->type() != LLT_CUTTING && layer->type() != LLT_FILLING)
+            return false;
+        if (item->isText() && layer->type() != LLT_CUTTING && layer->type() != LLT_FILLING)
+            return false;
+        else if (item->isBitmap() && (layer->type() != LLT_ENGRAVING))
+            return false;
+        else if (item->isStamp() && (layer->type() != LLT_STAMP))
+            return false;
 
-void LaserDocument::addPrimitive(LaserPrimitive* item, LaserLayer* layer, bool addToQuadTree, bool updateDocBounding)
-{
-    Q_D(LaserDocument);
-    if (item->layer()) {
-        item->layer()->removePrimitive(item);
+        if (item->layer()) 
+        {
+            // remove the adding primitive from it's previouse layer
+            item->layer()->removePrimitive(item);
+        }
+        else
+        {
+            //not in d->primitives
+            d->primitives.insert(item->id(), item);
+        }
+        layer->addPrimitive(item);
+        if (d->scene)
+            d->scene->addLaserPrimitive(item, addToQuadTree);
+        if (updateDocBounding)
+            updateDocumentBounding();
+        updateLayersStructure();
     }
-    //not in d->primitives
-    else {
-        d->primitives.insert(item->id(), item);
-    }
-    layer->addPrimitive(item);
-    if (d->scene)
-        d->scene->addLaserPrimitive(item, addToQuadTree);
-    if (updateDocBounding)
-        updateDocumentBounding();
-    updateLayersStructure();
+    return true;
 }
 
 void LaserDocument::removePrimitive(LaserPrimitive* item, bool keepLayer, bool updateDocBounding)
@@ -363,6 +386,36 @@ void LaserDocument::removeLayer(LaserLayer* layer)
     d->layers.removeOne(layer);
 
     updateLayersStructure();
+}
+
+LaserLayer* LaserDocument::currentLayer() const
+{
+    Q_D(const LaserDocument);
+    return d->currentLayer;
+}
+
+void LaserDocument::setCurrentLayer(LaserLayer* layer)
+{
+    Q_D(LaserDocument);
+    d->currentLayer = layer;
+}
+
+void LaserDocument::setCurrentLayer(int layerIndex)
+{
+    Q_D(LaserDocument);
+    if (layerIndex >= 0 && layerIndex < d->layers.size())
+    {
+        d->currentLayer = d->layers[layerIndex];
+    }
+}
+
+LaserLayer* LaserDocument::layer(int layerIndex) const
+{
+    Q_D(const LaserDocument);
+    if (layerIndex >= 0 && layerIndex < d->layers.size())
+    {
+        return d->layers[layerIndex];
+    }
 }
 
 QString LaserDocument::newLayerName() const
@@ -1621,8 +1674,20 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
             painter.drawPath(pPath);
         }
         image = image.mirrored(true, false);
+        QDir tmpImagesDir("tmp/images");
+        if (!tmpImagesDir.exists())
+        {
+            tmpImagesDir.mkpath(".");
+        }
         QString fileName = "tmp/images/stamp_img_" + QString::number(i) + ".png";
-        image.save(fileName);
+        QFileInfo fileInfo(fileName);
+        qLogD << fileInfo.absolutePath();
+        QFile file(fileName);
+        if (file.open(QIODevice::WriteOnly))
+            image.save(fileName);
+        else
+            qLogW << "save stamp image failure: " << file.errorString();
+        file.close();
         item.layer = layer;
         item.imagePath = fileName;
         item.bounding = primitiveBounding;
@@ -1722,6 +1787,7 @@ void LaserDocument::init()
         layer->setIndex(i);
 		addLayer(layer);
 	}
+    setCurrentLayer(0);
 
     if (!d->backend)
     {

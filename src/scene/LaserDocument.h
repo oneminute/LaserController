@@ -50,6 +50,10 @@ public:
     QList<LaserLayer*> layers() const;
     void addLayer(LaserLayer* layer);
     void removeLayer(LaserLayer* layer);
+    LaserLayer* currentLayer() const;
+    void setCurrentLayer(LaserLayer* layer);
+    void setCurrentLayer(int layerIndex);
+    LaserLayer* layer(int layerIndex) const;
 
     QString newLayerName() const;
 
@@ -134,8 +138,8 @@ public:
 
     LaserLayer* idleLayer() const;
 
-    void addPrimitive(LaserPrimitive* item, bool addToQuadTree = true, bool updateDocBounding = true);
-    void addPrimitive(LaserPrimitive* item, LaserLayer* layer, bool addToQuadTree = true, bool updateDocBounding = true);
+    bool addPrimitive(LaserPrimitive* item, bool addToQuadTree = true, bool updateDocBounding = true);
+    bool addPrimitive(LaserPrimitive* item, LaserLayer* layer, bool addToQuadTree = true, bool updateDocBounding = true);
     void removePrimitive(LaserPrimitive* item, bool keepLayer = true, bool updateDocBounding = true);
 
     QImage thumbnail() const;

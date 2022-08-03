@@ -1248,10 +1248,41 @@ int LaserViewer::curLayerIndex()
 {
 	return m_curLayerIndex;
 }
+
+void LaserViewer::selectLayer(LaserLayer* layer)
+{
+    //清理之前的选区
+    LaserViewer* view = qobject_cast<LaserViewer*>( m_scene->views()[0]);
+    if (!view) {
+        return;
+    }
+    
+    //清空group并将transform设为单位transform
+    if (group()) {
+        group()->reset(true);
+    }
+    else {
+        createGroup();
+    }
+    for (LaserPrimitive* primitive : layer->primitives())
+    {
+        if (!m_scene->document()->primitives().contains(primitive->id())) {
+            continue;
+        }
+        primitive->setSelected(true);
+        group()->addToGroup(primitive);
+    }
+    if (StateControllerInst.isInState(StateControllerInst.documentIdleState())) {
+        emit idleToSelected();
+    }
+    viewport()->repaint();
+}
+
 void LaserViewer::setCurLayerIndex(int index)
 {
 	m_curLayerIndex = index;
 }
+
 QLineF LaserViewer::modifyTextCursor()
 {
     if (m_editingText && m_editingText->subPathList().length() > 0) {
@@ -4476,8 +4507,8 @@ void LaserViewer::initSpline()
 
 void LaserViewer::addText(QString str)
 {
-    
-    if (!m_editingText) {
+    if (!m_editingText) 
+    {
         m_insertIndex = 0;
         qreal spaceY = qRound(LaserApplication::mainWindow->textSpaceYSpinBox()->value() * 25400.0 / logicalDpiY());
         m_editingText = new LaserText(m_scene->document(), mapToScene(m_textMousePressPos.toPoint()),
@@ -4486,9 +4517,13 @@ void LaserViewer::addText(QString str)
         
         m_editingText->addPath(str, m_insertIndex);
         m_insertIndex += str.size();
-        m_scene->document()->addPrimitive(m_editingText);
+        if (!m_scene->document()->addPrimitive(m_editingText))
+        {
+
+        }
     }
-    else {
+    else 
+    {
         
         m_editingText->addPath(str, m_insertIndex);
         m_insertIndex += str.size();

@@ -569,6 +569,18 @@ bool LaserPrimitive::isText() const
         d->primitiveType == LPT_VERTICALTEXT;
 }
 
+bool LaserPrimitive::isStamp() const
+{
+    Q_D(const LaserPrimitive);
+    return d->primitiveType == LPT_STAR ||
+        d->primitiveType == LPT_PARTYEMBLEM ||
+        d->primitiveType == LPT_FRAME ||
+        d->primitiveType == LPT_RING ||
+        d->primitiveType == LPT_CIRCLETEXT ||
+        d->primitiveType == LPT_HORIZONTALTEXT ||
+        d->primitiveType == LPT_VERTICALTEXT;
+}
+
 bool LaserPrimitive::exportable() const
 {
     Q_D(const LaserPrimitive);
@@ -3223,7 +3235,7 @@ qreal LaserStampBase::fingerMapDensity()
 void LaserStampBase::setStampBrush(QPainter* painter, QColor color, QSize size,  QTransform otherTransform, bool isResetColor)
 {
     Q_D(LaserStampBase);
-    if (d->fingerNoDensityMap == QPixmap() || d->fingerMapDensity == 0) {
+    if (d->fingerNoDensityMap.isNull() || d->fingerMapDensity == 0) {
         painter->setBrush(QBrush(color));
     }
     else {

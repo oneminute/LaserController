@@ -4,13 +4,13 @@
 #include <QColorDialog>
 #include <QPainter>
 #include <QVBoxLayout> 
+#include "scene/LaserLayer.h"
 
 LayerButton::LayerButton(LaserViewer* viewer, QWidget* parent)
     : QLabel(parent)
     , m_color(Qt::red)
     , m_pressed(false)
 	, m_moved(false)
-	//, m_clicked(false)
 	, m_checked(false)
     , m_layer(nullptr)
 	, m_layerIndex(-1)
@@ -60,6 +60,18 @@ void LayerButton::setCheckedTrue()
 	}
 }
 
+void LayerButton::select()
+{
+	for each (QObject * object in this->parent()->children()) {
+		LayerButton* widget = qobject_cast<LayerButton*>(object);
+		if (widget) {
+			widget->setChecked(false);
+			widget->repaint();
+		}
+	}
+	setCheckedTrue();
+}
+
 void LayerButton::contextMenuEvent(QContextMenuEvent * event)
 {
     qDebug() << "context menu event";
@@ -100,19 +112,10 @@ void LayerButton::mouseReleaseEvent(QMouseEvent * event)
     {
         emit clicked();
         m_pressed = false;
-		//m_clicked = true;
 		
-		for each(QObject* object in this->parent()->children()) {
-			LayerButton* widget = qobject_cast<LayerButton*>(object);
-			if (widget) {
-				widget->setChecked(false);
-				widget->repaint();
-			}
-		}
-		setCheckedTrue();
+		select();
+		m_layer->setSelected();
 	}
-
-	
 }
 
 bool LayerButton::eventFilter(QObject *watched, QEvent *event)
@@ -171,7 +174,7 @@ void LayerButton::paintEvent(QPaintEvent * event)
     painter.setPen(QPen(color));
     QRect rect(0, 0, width() - 10, height() - 10);
 	painter.drawRect(rect);
-    //����layer index
+    //锟斤拷锟斤拷layer index
     if (this->isEnabled()) {
         QFont f;
         f.setPixelSize(height() - 16);
