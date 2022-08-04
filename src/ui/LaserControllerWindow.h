@@ -182,6 +182,9 @@ protected:
 
     QList<QPoint> findCanvasPointsWithinRect(const QRect& bounding) const;
 
+    LayerButton* findLayerButtonByLayer(LaserLayer* layer);
+    LayerButton* findLayerButtonByLayer(int layerIndex);
+
 	//key
 	virtual void keyPressEvent(QKeyEvent *event) override;
 	virtual void keyReleaseEvent(QKeyEvent *event) override;
@@ -421,6 +424,8 @@ protected slots:
     // cameras slots
     void onCameraConnected();
     void onCameraDisconnected();
+
+    void onLayerButtonClicked();
 
 public slots:
     void onLaserPrimitiveGroupChildrenChanged();//group emit

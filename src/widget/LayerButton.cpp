@@ -32,6 +32,10 @@ void LayerButton::setColor(const QColor & color)
 {
     m_color = color; 
     update();
+	if (m_layer)
+	{
+		m_layer->setColor(color);
+	}
 }
 
 bool LayerButton::checked()
@@ -113,8 +117,6 @@ void LayerButton::mouseReleaseEvent(QMouseEvent * event)
         emit clicked();
         m_pressed = false;
 		
-		select();
-		m_layer->setSelected();
 	}
 }
 

@@ -229,6 +229,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
         m_layerButtons.append(button);
 
         connect(button, &LayerButton::colorUpdated, m_tableWidgetLayers, &LaserLayerTableWidget::updateItems);
+        connect(button, &LayerButton::clicked, this, &LaserControllerWindow::onLayerButtonClicked);
     }
     m_ui->layoutLayerButtons->addStretch();
     
@@ -4966,6 +4967,26 @@ QList<QPoint> LaserControllerWindow::findCanvasPointsWithinRect(const QRect& bou
     return points;
 }
 
+LayerButton* LaserControllerWindow::findLayerButtonByLayer(LaserLayer* layer)
+{
+    for (LayerButton* button : m_layerButtons)
+    {
+        if (button->layer() == layer)
+            return button;
+    }
+    return nullptr;
+}
+
+LayerButton* LaserControllerWindow::findLayerButtonByLayer(int layerIndex)
+{
+    for (LayerButton* button : m_layerButtons)
+    {
+        if (button->layer()->index() == layerIndex)
+            return button;
+    }
+    return nullptr;
+}
+
 PointPairList LaserControllerWindow::printAndCutPoints() const
 {
     return m_tablePrintAndCutPoints->pointPairs();
@@ -5464,7 +5485,11 @@ void LaserControllerWindow::onTableWidgetLayersSelectionChanged()
     if (layer == nullptr)
         return;
 
-    layer->setSelected();
+    LayerButton* button = findLayerButtonByLayer(layer);
+    if (button)
+    {
+        button->select();
+    }
     m_viewer->selectLayer(layer);
 }
 
@@ -8331,6 +8356,24 @@ void LaserControllerWindow::onCameraDisconnected()
     m_buttonCameraStart->setDefaultAction(m_ui->actionStartCamera);
     m_statusBarCameraState->setText(tr("Camera Disonnected"));
     m_statusBarCameraState->setStyleSheet("color: rgb(255, 0, 0)");
+}
+
+void LaserControllerWindow::onLayerButtonClicked()
+{
+    LayerButton* layerButton = qobject_cast<LayerButton*>(sender());
+    if (!layerButton)
+        return;
+    LaserLayer* layer = layerButton->layer();
+    layerButton->select();
+	if (layer)
+	{
+		layer->setSelected();
+	}
+    if (m_viewer)
+    {
+        m_viewer->selectLayer(layer);
+    }
+    m_tableWidgetLayers->selectLayer(layer);
 }
 
 //void LaserControllerWindow::updateAutoRepeatIntervalChanged(const QVariant& value, ModifiedBy modifiedBy)

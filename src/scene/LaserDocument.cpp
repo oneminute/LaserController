@@ -725,7 +725,9 @@ void LaserDocument::bindLayerButtons(const QList<LayerButton*>& layerButtons)
     Q_D(LaserDocument);
     for (int i = 0; i < d->layersCount; i++)
     {
-        d->layers[i]->bindButton(layerButtons[i], i);
+        layerButtons[i]->setLayer(d->layers[i]);
+        d->layers[i]->setName(layerButtons[i]->text());
+        d->layers[i]->setColor(layerButtons[i]->color());
     }
     updateLayersStructure();
 }
