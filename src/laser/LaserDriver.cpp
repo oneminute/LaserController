@@ -61,6 +61,16 @@ void LaserDriver::SysMessageCallBackHandler(int sysMsgIndex, int sysMsgCode, wch
     if (LaserApplication::driver->m_isClosed)
         return;
 
+    /*int l = lstrlenW(sysEventData);
+    QFile file(QString("%1.txt").arg(sysMsgIndex));
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    char* cBuffer = (char*)sysEventData;
+    for (int i = 0; i < l * 2; i++)
+    {
+        file.write(cBuffer + i, 1);
+    }
+    file.close();*/
+
     QString eventData;
     //QTextCodec* codec = QTextCodec::codecForLocale();
     //QTextCodec::setCodecForLocale(codecGb);

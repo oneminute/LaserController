@@ -27,6 +27,7 @@
 #include "util/MachiningUtils.h"
 #include "util/TypeUtils.h"
 #include "util/Utils.h"
+#include "util/WidgetUtils.h"
 #include "LaserLayer.h"
 #include "state/StateController.h"
 #include "svg/qsvgtinydocument.h"
@@ -41,6 +42,7 @@ class LaserDocumentPrivate : public ILaserDocumentItemPrivate
 public:
     LaserDocumentPrivate(LaserDocument* ptr)
         : ILaserDocumentItemPrivate(ptr, LNT_DOCUMENT)
+        , currentLayer(nullptr)
         , isOpened(false)
         , scene(nullptr)
         , enablePrintAndCut(false)
@@ -48,11 +50,10 @@ public:
         , specifiedOriginIndex(0)
         , layersCount(16)
         , backend(false)
-        //, boundingRect(0, 0, Config::SystemRegister::xMaxLength(), Config::SystemRegister::yMaxLength())
     {}
     QMap<QString, LaserPrimitive*> primitives;
     QList<LaserLayer*> layers;
-    //PageInformation pageInfo;
+    LaserLayer* currentLayer;
     bool isOpened;
     LaserScene* scene;
     FinishRunType finishRun;
@@ -93,21 +94,29 @@ LaserDocument::~LaserDocument()
     close();
 }
 
-void LaserDocument::addPrimitive(LaserPrimitive* item, bool addToQuadTree, bool updateDocBounding)
+bool LaserDocument::addPrimitive(LaserPrimitive* item, bool addToQuadTree, bool updateDocBounding)
 {
     Q_D(LaserDocument);
-    d->primitives.insert(item->id(), item);
     LaserLayer* layer = nullptr;
-    if (item->layerIndex() >= 0 && item->layerIndex() < d->layers.size()) {
-        layer = d->layers[item->layerIndex()];
-    }
-    else {
-        return;
-    }
-    if (layer->isEmpty())
+    int layerIndex = item->layerIndex();
+    if (layerIndex >= 0 && layerIndex < d->layers.size()) 
     {
-        LaserStampBase* stamp = qgraphicsitem_cast<LaserStampBase*>(item);
-        if (stamp)
+        layer = this->layerByIndex(layerIndex);
+    }
+    else
+    {
+        return false;
+    }
+    
+    return addPrimitive(item, layer, addToQuadTree, updateDocBounding);
+}
+
+bool LaserDocument::addPrimitive(LaserPrimitive* item, LaserLayer* layer, bool addToQuadTree, bool updateDocBounding)
+{
+    Q_D(LaserDocument);
+    if (layer && layer->isEmpty())
+    {
+        if (item->isStamp())
         {
             layer->setType(LLT_STAMP);
         }
@@ -119,28 +128,46 @@ void LaserDocument::addPrimitive(LaserPrimitive* item, bool addToQuadTree, bool 
         {
             layer->setType(LLT_ENGRAVING);
         }
-        //layer->init();
+        else if (item->isText())
+        {
+            layer->setType(LLT_FILLING);
+        }
     }
-	//layer->addPrimitive(item);
-    addPrimitive(item, layer, addToQuadTree, updateDocBounding);
+    if (item->layer() != layer)
+    {
+        // check whether the adding item is capable with the layer
+        if (item->isShape() && layer->type() != LLT_CUTTING && layer->type() != LLT_FILLING)
+            return false;
+        if (item->isText() && layer->type() != LLT_FILLING)
+            return false;
+        else if (item->isBitmap() && (layer->type() != LLT_ENGRAVING))
+            return false;
+        else if (item->isStamp() && layer->type() != LLT_STAMP)
+            return false;
+
+        if (item->layer()) 
+        {
+            // remove the adding primitive from it's previouse layer
+            item->layer()->removePrimitive(item);
+        }
+        else
+        {
+            //not in d->primitives
+            d->primitives.insert(item->id(), item);
+        }
+        layer->addPrimitive(item);
+        if (d->scene)
+            d->scene->addLaserPrimitive(item, addToQuadTree);
+        if (updateDocBounding)
+            updateDocumentBounding();
+        updateLayersStructure();
+    }
+    return true;
 }
 
-void LaserDocument::addPrimitive(LaserPrimitive* item, LaserLayer* layer, bool addToQuadTree, bool updateDocBounding)
+bool LaserDocument::addPrimitives(const QList<LaserPrimitive*>& primitives)
 {
-    Q_D(LaserDocument);
-    if (item->layer()) {
-        item->layer()->removePrimitive(item);
-    }
-    //not in d->primitives
-    else {
-        d->primitives.insert(item->id(), item);
-    }
-    layer->addPrimitive(item);
-    if (d->scene)
-        d->scene->addLaserPrimitive(item, addToQuadTree);
-    if (updateDocBounding)
-        updateDocumentBounding();
-    updateLayersStructure();
+    return false;
 }
 
 void LaserDocument::removePrimitive(LaserPrimitive* item, bool keepLayer, bool updateDocBounding)
@@ -363,6 +390,140 @@ void LaserDocument::removeLayer(LaserLayer* layer)
     d->layers.removeOne(layer);
 
     updateLayersStructure();
+}
+
+LaserLayer* LaserDocument::currentLayer() const
+{
+    Q_D(const LaserDocument);
+    return d->currentLayer;
+}
+
+int LaserDocument::currentLayerIndex() const
+{
+    Q_D(const LaserDocument);
+    return d->currentLayer == nullptr ? 0 : d->currentLayer->index();
+}
+
+void LaserDocument::setCurrentLayer(LaserLayer* layer)
+{
+    Q_D(LaserDocument);
+    d->currentLayer = layer;
+}
+
+void LaserDocument::setCurrentLayer(int layerIndex)
+{
+    Q_D(LaserDocument);
+    if (layerIndex >= 0 && layerIndex < d->layers.size())
+    {
+        d->currentLayer = this->layerByIndex(layerIndex);
+    }
+}
+
+LaserLayer* LaserDocument::layerByIndex(int layerIndex) const
+{
+    Q_D(const LaserDocument);
+    if (layerIndex >= 0 && layerIndex < d->layers.size())
+    {
+        for (LaserLayer* layer : d->layers)
+        {
+            if (layer->index() == layerIndex)
+                return layer;
+        }
+    }
+}
+
+LaserLayer* LaserDocument::findCapableLayer(LaserPrimitiveType type) const
+{
+    Q_D(const LaserDocument);
+    QList<LaserLayerType> layerTypes = capableLayerTypeOf(type);
+    for (LaserLayerType layerType : layerTypes)
+    {
+        LaserLayer* layer = findCapableLayer(layerType);
+        if (layer)
+            return layer;
+    }
+    return nullptr;
+}
+
+LaserLayer* LaserDocument::findCapableLayer(LaserPrimitive* primitive) const
+{
+    Q_D(const LaserDocument);
+    return findCapableLayer(primitive->primitiveType());
+}
+
+LaserLayer* LaserDocument::findCapableLayer(LaserLayerType type) const
+{
+    Q_D(const LaserDocument);
+    LaserLayer* emptyLayer = nullptr;
+    LaserLayer* capableLayer = nullptr;
+    for (LaserLayer* layer : d->layers)
+    {
+        if (emptyLayer == nullptr && layer->isEmpty())
+            emptyLayer = layer;
+        if (layer->type() == type)
+            capableLayer = layer;
+    }
+    return emptyLayer ? emptyLayer : capableLayer;
+}
+
+LaserLayer* LaserDocument::getCurrentOrCapableLayer(LaserPrimitiveType type) const
+{
+    Q_D(const LaserDocument);
+    LaserLayer* layer = currentLayer();
+    // determine whether the current layer capable of creating primitive
+    if (layer && !layer->capabaleOf(type))
+        // find a capable layer
+        layer = findCapableLayer(type);
+    if (layer)
+    {
+        return layer;
+    }
+    else
+    {
+        // if there's no capable layer, warn the user.
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow,
+            tr("Warning"), tr("There's no avaiable layer capable of the creating primitive."));
+        return nullptr;
+    }
+}
+
+QList<LaserLayerType> LaserDocument::capableLayerTypeOf(LaserPrimitiveType primitiveType)
+{
+    QList<LaserLayerType> layerTypes;
+    switch (primitiveType)
+    {
+    case LPT_LINE:
+    case LPT_CIRCLE:
+    case LPT_ELLIPSE:
+    case LPT_RECT:
+    case LPT_POLYLINE:
+    case LPT_POLYGON:
+    case LPT_PATH:
+    case LPT_NURBS:
+    case LPT_SHAPE:
+        layerTypes.append(LLT_CUTTING);
+        layerTypes.append(LLT_FILLING);
+        break;
+    case LPT_BITMAP:
+        layerTypes.append(LLT_ENGRAVING);
+        break;
+    case LPT_TEXT:
+        layerTypes.append(LLT_FILLING);
+        break;
+    case LPT_STAR:
+    case LPT_PARTYEMBLEM:
+    case LPT_FRAME:
+    case LPT_RING:
+    case LPT_CIRCLETEXT:
+    case LPT_HORIZONTALTEXT:
+    case LPT_VERTICALTEXT:
+    case LPT_STAMPBITMAP:
+        layerTypes.append(LLT_STAMP);
+        break;
+    default:
+        break;
+    }
+    return layerTypes;
 }
 
 QString LaserDocument::newLayerName() const
@@ -661,9 +822,11 @@ LaserScene* LaserDocument::scene() const
 void LaserDocument::swapLayers(int i, int j)
 {
     Q_D(LaserDocument);
-    LaserLayer* layer = d->layers[i];
-    d->layers[i] = d->layers[j];
-    d->layers[j] = layer;
+    LaserLayer* layer1 = this->layerByIndex(i);
+    LaserLayer* layer2 = this->layerByIndex(j);
+    int index1 = d->layers.indexOf(layer1);
+    int index2 = d->layers.indexOf(layer2);
+    d->layers.swap(index1, index2);
     updateLayersStructure();
 }
 
@@ -672,7 +835,10 @@ void LaserDocument::bindLayerButtons(const QList<LayerButton*>& layerButtons)
     Q_D(LaserDocument);
     for (int i = 0; i < d->layersCount; i++)
     {
-        d->layers[i]->bindButton(layerButtons[i], i);
+        layerButtons[i]->setLayer(d->layers[i]);
+        d->layers[i]->setName(layerButtons[i]->text());
+        d->layers[i]->setColor(layerButtons[i]->color());
+        d->layers[i]->setIndex(i);
     }
     updateLayersStructure();
 }
@@ -901,9 +1067,14 @@ LaserLayer* LaserDocument::idleLayer() const
             break;
         }
     }
-    if (!idle)
+    /*if (!idle)
     {
         idle = d->layers.last();
+    }*/
+    if (!idle)
+    {
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow,
+            tr("Warning"), tr("There's no available layer, try to reorganize your layers in order to free up an empty layer."));
     }
     return idle;
 }
@@ -992,7 +1163,7 @@ void LaserDocument::save(const QString& filename, QWidget* window)
 		if (layerObj.isEmpty()) {
 			continue;
 		}
-		layerObj.insert("index", i);
+		layerObj.insert("index", layer->index());
 		array.append(layerObj);
 	}
 	obj.insert("layers", array);
@@ -1016,14 +1187,14 @@ void LaserDocument::load(const QString& filename, QWidget* window)
 		return;
 	}
 	QJsonParseError *error = new QJsonParseError;
-	QJsonDocument doc = QJsonDocument::fromJson(file.readAll(), error);
+	QJsonDocument jsonDoc = QJsonDocument::fromJson(file.readAll(), error);
 	if (error->error != QJsonParseError::NoError)
 	{
 		qDebug() << "parseJson:" << error->errorString();
 		return;
 	}
 
-    QJsonObject docObject = doc.object();
+    QJsonObject docObject = jsonDoc.object();
     QPoint originOffset = LaserApplication::device->originOffset();
     if (docObject.contains("deviceOrigin"))
     {
@@ -1033,121 +1204,115 @@ void LaserDocument::load(const QString& filename, QWidget* window)
     QJsonArray layers;
     if (docObject.contains("layers"))
     {
-        layers = doc.object()["layers"].toArray();
+        layers = jsonDoc.object()["layers"].toArray();
     }
 
-	//QList<LaserLayer*> laserLayers = this->layers();
     QList<LaserPrimitive*> unavailables;
     this->blockSignals(true);
 	for (int i = 0; i < layers.size(); i++) {
-		QJsonObject layer = layers[i].toObject();
-		QJsonArray array = layer["primitives"].toArray();
+		QJsonObject layerObject = layers[i].toObject();
+		QJsonArray primitivesArray = layerObject["primitives"].toArray();
 		
-		//layer
-		/*LaserLayerType type = (LaserLayerType)layer["type"].toInt();
-		qDebug() << layer["name"].toString();
-		LaserLayer* laserLayer = new LaserLayer(layer["name"].toString(), type, this, true);
-		//laserLayer.
-		this->addLayer(laserLayer);*/
-		int index = layer["index"].toInt();
+		int index = layerObject["index"].toInt();
 		if (index < 0 || index > d->layers.size() - 1) {
 			QMessageBox::critical(window, "critical", "your layer index have changed");
 			qLogD << "your layer index have changed";
 			return;
 		}
-        d->layers[index]->init();
-        if (layer.contains("name")) {
-            d->layers[index]->setName(layer.value("name").toString());
+        LaserLayer* layer = this->layerByIndex(index);
+        layer->init();
+        if (layerObject.contains("name")) {
+            layer->setName(layerObject.value("name").toString());
         }
         
-        if (layer.contains("cuttingRunSpeed"))
+        if (layerObject.contains("cuttingRunSpeed"))
         {
-            d->layers[index]->setCuttingRunSpeed(layer.value("cuttingRunSpeed").toInt());
+            layer->setCuttingRunSpeed(layerObject.value("cuttingRunSpeed").toInt());
         }
-        if (layer.contains("cuttingMinSpeedPower"))
+        if (layerObject.contains("cuttingMinSpeedPower"))
         {
-            d->layers[index]->setCuttingMinSpeedPower(layer.value("cuttingMinSpeedPower").toDouble());
+            layer->setCuttingMinSpeedPower(layerObject.value("cuttingMinSpeedPower").toDouble());
         }
-        if (layer.contains("cuttingRunSpeedPower"))
+        if (layerObject.contains("cuttingRunSpeedPower"))
         {
-            d->layers[index]->setCuttingRunSpeedPower(layer.value("cuttingRunSpeedPower").toDouble());
+            layer->setCuttingRunSpeedPower(layerObject.value("cuttingRunSpeedPower").toDouble());
         }
-        if (layer.contains("engravingRunSpeed"))
+        if (layerObject.contains("engravingRunSpeed"))
         {
-            d->layers[index]->setEngravingRunSpeed(layer.value("engravingRunSpeed").toInt());
+            layer->setEngravingRunSpeed(layerObject.value("engravingRunSpeed").toInt());
         }
-        if (layer.contains("engravingLaserPower"))
+        if (layerObject.contains("engravingLaserPower"))
         {
-            d->layers[index]->setEngravingLaserPower(layer.value("engravingLaserPower").toDouble());
+            layer->setEngravingLaserPower(layerObject.value("engravingLaserPower").toDouble());
         }
-        if (layer.contains("engravingMinSpeedPower"))
+        if (layerObject.contains("engravingMinSpeedPower"))
         {
-            d->layers[index]->setEngravingMinSpeedPower(layer.value("engravingMinSpeedPower").toDouble());
+            layer->setEngravingMinSpeedPower(layerObject.value("engravingMinSpeedPower").toDouble());
         }
-        if (layer.contains("engravingRunSpeedPower"))
+        if (layerObject.contains("engravingRunSpeedPower"))
         {
-            d->layers[index]->setEngravingRunSpeedPower(layer.value("engravingRunSpeedPower").toDouble());
+            layer->setEngravingRunSpeedPower(layerObject.value("engravingRunSpeedPower").toDouble());
         }
-        if (layer.contains("engravingRowInterval")) 
+        if (layerObject.contains("engravingRowInterval")) 
         {
-            d->layers[index]->setEngravingRowInterval(layer.value("engravingRowInterval").toInt());
+            layer->setEngravingRowInterval(layerObject.value("engravingRowInterval").toInt());
         }
-        if (layer.contains("engravingEnableCutting")) 
+        if (layerObject.contains("engravingEnableCutting")) 
         {
-            d->layers[index]->setEngravingEnableCutting(layer.value("engravingEnableCutting").toBool());
+            layer->setEngravingEnableCutting(layerObject.value("engravingEnableCutting").toBool());
         }
-        if (layer.contains("fillingRunSpeed"))
+        if (layerObject.contains("fillingRunSpeed"))
         {
-            d->layers[index]->setFillingRunSpeed(layer.value("fillingRunSpeed").toInt());
+            layer->setFillingRunSpeed(layerObject.value("fillingRunSpeed").toInt());
         }
-        if (layer.contains("fillingMinSpeedPower"))
+        if (layerObject.contains("fillingMinSpeedPower"))
         {
-            d->layers[index]->setFillingMinSpeedPower(layer.value("fillingMinSpeedPower").toDouble());
+            layer->setFillingMinSpeedPower(layerObject.value("fillingMinSpeedPower").toDouble());
         }
-        if (layer.contains("fillingRunSpeedPower"))
+        if (layerObject.contains("fillingRunSpeedPower"))
         {
-            d->layers[index]->setFillingRunSpeedPower(layer.value("fillingRunSpeedPower").toDouble());
+            layer->setFillingRunSpeedPower(layerObject.value("fillingRunSpeedPower").toDouble());
         }
-        if (layer.contains("fillingRowInterval")) 
+        if (layerObject.contains("fillingRowInterval")) 
         {
-            d->layers[index]->setFillingRowInterval(layer.value("fillingRowInterval").toInt());
+            layer->setFillingRowInterval(layerObject.value("fillingRowInterval").toInt());
         }
-        if (layer.contains("fillingEnableCutting")) 
+        if (layerObject.contains("fillingEnableCutting")) 
         {
-            d->layers[index]->setFillingEnableCutting(layer.value("fillingEnableCutting").toBool());
+            layer->setFillingEnableCutting(layerObject.value("fillingEnableCutting").toBool());
         }
-        if (layer.contains("fillingType"))
+        if (layerObject.contains("fillingType"))
         {
-            d->layers[index]->setFillingType(layer.value("fillingType").toInt());
+            layer->setFillingType(layerObject.value("fillingType").toInt());
         }
-        if (layer.contains("errorX"))
+        if (layerObject.contains("errorX"))
         {
-            d->layers[index]->setErrorX(layer.value("errorX").toInt());
+            layer->setErrorX(layerObject.value("errorX").toInt());
         }
-        if (layer.contains("useHalftone"))
+        if (layerObject.contains("useHalftone"))
         {
-            d->layers[index]->setUseHalftone(layer.value("useHalftone").toBool());
+            layer->setUseHalftone(layerObject.value("useHalftone").toBool());
         }
-        if (layer.contains("lpi"))
+        if (layerObject.contains("lpi"))
         {
-            d->layers[index]->setLpi(layer.value("lpi").toInt());
+            layer->setLpi(layerObject.value("lpi").toInt());
         }
-        if (layer.contains("dpi"))
+        if (layerObject.contains("dpi"))
         {
-            d->layers[index]->setDpi(layer.value("dpi").toInt());
+            layer->setDpi(layerObject.value("dpi").toInt());
         }
-        if (layer.contains("halftoneAngles"))
+        if (layerObject.contains("halftoneAngles"))
         {
-            d->layers[index]->setHalftoneAngles(layer.value("halftoneAngles").toDouble());
+            layer->setHalftoneAngles(layerObject.value("halftoneAngles").toDouble());
         }
-        if (layer.contains("stampBoundingDistance"))
+        if (layerObject.contains("stampBoundingDistance"))
         {
-            d->layers[index]->setStampBoundingDistance(layer.value("stampBoundingDistance").toInt());
+            layer->setStampBoundingDistance(layerObject.value("stampBoundingDistance").toInt());
         }
 
 		//primitive
-		for (int j = 0; j < array.size(); j++) {
-			QJsonObject primitiveJson = array[j].toObject();
+		for (int j = 0; j < primitivesArray.size(); j++) {
+			QJsonObject primitiveJson = primitivesArray[j].toObject();
 			QString className = primitiveJson["className"].toString();
             QString name = primitiveJson["name"].toString();
 			int layerIndex = primitiveJson["layerIndex"].toInt();
@@ -1370,20 +1535,17 @@ void LaserDocument::load(const QString& filename, QWidget* window)
                 
             }
 		}
-        if (layer.contains("visible")) {
-            bool bl = layer.value("visible").toBool();
-            d->layers[index]->setVisible(bl);
+        if (layerObject.contains("visible")) {
+            bool bl = layerObject.value("visible").toBool();
+            layer->setVisible(bl);
         }
-        if (layer.contains("exportable")) {
-            bool exportable = layer.value("exportable").toBool();
-            d->layers[index]->setExportable(exportable);
+        if (layerObject.contains("exportable")) {
+            bool exportable = layerObject.value("exportable").toBool();
+            layer->setExportable(exportable);
         }
-        if (layer.contains("type")) {
-            d->layers[index]->setType(static_cast<LaserLayerType>(layer.value("type").toInt()));
+        if (layerObject.contains("type")) {
+            layer->setType(static_cast<LaserLayerType>(layerObject.value("type").toInt()));
         }
-        
-        
-        
 	}
     if (!unavailables.isEmpty())
     {
@@ -1621,8 +1783,20 @@ QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
             painter.drawPath(pPath);
         }
         image = image.mirrored(true, false);
+        QDir tmpImagesDir("tmp/images");
+        if (!tmpImagesDir.exists())
+        {
+            tmpImagesDir.mkpath(".");
+        }
         QString fileName = "tmp/images/stamp_img_" + QString::number(i) + ".png";
-        image.save(fileName);
+        QFileInfo fileInfo(fileName);
+        qLogD << fileInfo.absolutePath();
+        QFile file(fileName);
+        if (file.open(QIODevice::WriteOnly))
+            image.save(fileName);
+        else
+            qLogW << "save stamp image failure: " << file.errorString();
+        file.close();
         item.layer = layer;
         item.imagePath = fileName;
         item.bounding = primitiveBounding;
@@ -1722,6 +1896,7 @@ void LaserDocument::init()
         layer->setIndex(i);
 		addLayer(layer);
 	}
+    setCurrentLayer(0);
 
     if (!d->backend)
     {

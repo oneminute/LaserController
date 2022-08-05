@@ -4,15 +4,17 @@
 #include <QJsonArray>
 #include<QList>
 
+#include "common/Config.h"
 #include "LaserApplication.h"
 #include "laser/LaserDevice.h"
-#include "util/Utils.h"
 #include "LaserDocument.h"
 #include "LaserPrimitive.h"
 #include "LaserScene.h"
-#include "widget/LayerButton.h"
-#include "common/Config.h"
 #include "scene/LaserPrimitiveGroup.h"
+#include "widget/LayerButton.h"
+#include "ui/LaserControllerWindow.h"
+#include "util/Utils.h"
+#include "util/WidgetUtils.h"
 
 class LaserLayerPrivate: public ILaserDocumentItemPrivate
 {
@@ -47,7 +49,6 @@ public:
         , useHalftone(Config::EngravingLayer::useHalftone())
         , halftoneAngles(Config::EngravingLayer::halftoneAngles())
         , stampBoundingDistance(Config::StampLayer::boundingDistance())
-        , button(nullptr)
         , exportable(true)
         , visible(true)
         , row(-1)
@@ -58,6 +59,8 @@ public:
 
     bool removable;
     LaserLayerType type;
+    QString name;
+    QColor color;
 
     // normal fields
     int cuttingRunSpeed;
@@ -93,7 +96,6 @@ public:
     //int halftoneGridSize;
 
     LaserDocument* doc;
-    LayerButton* button;
 
     bool exportable;
     bool visible;
@@ -159,14 +161,13 @@ void LaserLayer::setRemovable(bool removable)
 QString LaserLayer::name() const 
 {
     Q_D(const LaserLayer);
-    if (d->button)
-    {
-        return d->button->text();
-    }
-    else
-    {
-        return tr("undefined");
-    }
+    return d->name;
+}
+
+void LaserLayer::setName(const QString& value)
+{
+    Q_D(LaserLayer);
+    d->name = value;
 }
 
 LaserLayerType LaserLayer::type() const 
@@ -473,16 +474,19 @@ void LaserLayer::removePrimitive(LaserPrimitive * item, bool itemKeepLayer)
 bool LaserLayer::isEmpty() const
 {
     Q_D(const LaserLayer);
-    return d->primitives.count() == 0;
+    return d->primitives.isEmpty();
 }
 
 QColor LaserLayer::color() const 
 {
     Q_D(const LaserLayer);
-    if (d->button)
-        return d->button->color();
-    else
-        return QColor();
+    return d->color;
+}
+
+void LaserLayer::setColor(const QColor& value)
+{
+    Q_D(LaserLayer);
+    d->color = value;
 }
 
 int LaserLayer::lpi() const 
@@ -515,16 +519,6 @@ LaserDocument * LaserLayer::document() const
     return d->doc;
 }
 
-void LaserLayer::bindButton(LayerButton * button, int index)
-{
-    Q_D(LaserLayer);
-    d->button = button;
-	d->button->setLayerIndex(index);
-	//d->button->setEnabled(true);
-    connect(button, &LayerButton::clicked, this, &LaserLayer::onClicked);
-	//m_index = index;
-}
-
 bool LaserLayer::exportable() const 
 { 
     Q_D(const LaserLayer);
@@ -555,7 +549,6 @@ void LaserLayer::setVisible(bool visible)
     if (m_checkBox && m_checkBox->isChecked() != visible) {
         m_checkBox->setChecked(visible);
     }
-
 }
 
 int LaserLayer::row() const 
@@ -752,18 +745,19 @@ void LaserLayer::setCheckBox(QCheckBox * box)
     m_checkBox = box;
 }
 
-void LaserLayer::onClicked()
+void LaserLayer::setSelected()
 {
     Q_D(LaserLayer);
     LaserScene* scene = d->doc->scene();
-    if (scene->selectedPrimitives().count() > 0)
+    if (!scene->selectedPrimitives().isEmpty())
     {
         int shapes = 0;
         int bitmaps = 0;
+        int stamps = 0;
+        int texts = 0;
         for (LaserPrimitive* primitive : scene->selectedPrimitives())
         {
             //scene->addLaserPrimitive(primitive, this, false);
-            scene->document()->addPrimitive(primitive, this);
             if (primitive->isShape())
             {
                 shapes++;
@@ -772,17 +766,64 @@ void LaserLayer::onClicked()
             {
                 bitmaps++;
             }
+            else if (primitive->isStamp())
+            {
+                stamps++;
+            }
+            else if (primitive->isText())
+            {
+                texts++;
+            }
         }
-        if (bitmaps > shapes)
+        int types = 0;
+        if (shapes > 0)
+            types++;
+        if (bitmaps > 0)
+            types++;
+        if (stamps > 0)
+            types++;
+        if (texts > 0)
+            types++;
+
+        if (types > 1)
+        {
+            widgetUtils::showWarningMessage(
+                LaserApplication::mainWindow,
+                tr("Warning"),
+                tr("You have selected multiple types of primitives. Please select primitives with the same types."));
+            return;
+        }
+
+        for (LaserPrimitive* primitive : scene->selectedPrimitives())
+        {
+            scene->document()->addPrimitive(primitive, this);
+        }
+        if (bitmaps > 0)
         {
             setType(LLT_ENGRAVING);
         }
-        else
+        else if (shapes > 0)
         {
             setType(LLT_CUTTING);
         }
-
-        scene->document()->updateLayersStructure();
+        else if (stamps > 0)
+        {
+            setType(LLT_STAMP);
+        }
+        else if (texts > 0)
+        {
+            setType(LLT_FILLING);
+        }
     }
+
+    d->doc->setCurrentLayer(this);
+    scene->document()->updateLayersStructure();
+}
+
+bool LaserLayer::capabaleOf(LaserPrimitiveType primitiveType) const
+{
+    Q_D(const LaserLayer);
+    QList<LaserLayerType> layerTypes = LaserDocument::capableLayerTypeOf(primitiveType);
+    return layerTypes.contains(d->type);
 }
 

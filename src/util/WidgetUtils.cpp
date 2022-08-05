@@ -34,11 +34,13 @@ namespace widgetUtils
     {
         QMessageBox dlg(QMessageBox::Icon::Warning, title, msg, QMessageBox::Ok, parentWnd);
         dlg.setButtonText(QMessageBox::Ok, QObject::tr("Ok"));
+        dlg.exec();
     }
 
     void showInfoMessage(QWidget* parentWnd, const QString& title, const QString& msg)
     {
         QMessageBox dlg(QMessageBox::Icon::Information, title, msg, QMessageBox::Ok, parentWnd);
         dlg.setButtonText(QMessageBox::Ok, QObject::tr("Ok"));
+        dlg.exec();
     }
 }

@@ -182,6 +182,10 @@ protected:
 
     QList<QPoint> findCanvasPointsWithinRect(const QRect& bounding) const;
 
+    LayerButton* findLayerButtonByLayer(LaserLayer* layer) const;
+    LayerButton* findLayerButtonByLayer(int layerIndex) const;
+    LayerButton* currentLayerButton() const;
+
 	//key
 	virtual void keyPressEvent(QKeyEvent *event) override;
 	virtual void keyReleaseEvent(QKeyEvent *event) override;
@@ -196,7 +200,7 @@ protected slots:
     void onActionImportCorelDraw(bool checked = false);
     void onActionRemoveLayer(bool checked = false);
     void onTableWidgetLayersCellDoubleClicked(int row, int column);
-    void onTableWidgetItemSelectionChanged();
+    void onTableWidgetLayersSelectionChanged();
     void onActionExportJson(bool checked = false);
     void onActionLoadJson(bool checked = false);
     void onActionPauseMechining(bool checked = false);
@@ -421,6 +425,8 @@ protected slots:
     // cameras slots
     void onCameraConnected();
     void onCameraDisconnected();
+
+    void onLayerButtonClicked();
 
 public slots:
     void onLaserPrimitiveGroupChildrenChanged();//group emit

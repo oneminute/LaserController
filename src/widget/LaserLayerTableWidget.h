@@ -17,6 +17,9 @@ public:
     LaserDocument* document() const { return m_doc; }
     void setDocument(LaserDocument* doc);
 
+    void selectLayer(LaserLayer* layer);
+    void selectLayer(int layerIndex);
+
 public slots:
     void updateItems();
     void laserDocumentClosed();

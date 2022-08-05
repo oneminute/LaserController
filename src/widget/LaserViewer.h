@@ -14,6 +14,7 @@ class LaserPrimitive;
 class LaserBitmap;
 class LaserLayer;
 class LaserText;
+class LaserPolyline;
 struct LaserTextRowPath;
 class LaserControllerWindow;
 
@@ -76,9 +77,10 @@ public:
 
 	QMap<LaserPrimitive*, QTransform>& copyedList();
 	QMap<QString, QList<LaserPrimitive*>>& groupedMap();
-	int curLayerIndex();
+	//int curLayerIndex();
+	void selectLayer(LaserLayer* layer);
 
-	void setCurLayerIndex(int index);
+	//void setCurLayerIndex(int index);
     //text
     QLineF modifyTextCursor();
     QFont* textFont();
@@ -257,6 +259,7 @@ private:
 	QVector<QPointF> m_creatingPolygonPoints;
 	QList<QLineF> m_creatingPolygonLines;
 	LaserPrimitive* m_lastPolygon;
+	LaserPolyline* m_currentPolyline;
 	/*QRectF m_polygonStartRect;
 	bool m_isMouseInStartRect;*/
 	//Spline
@@ -324,7 +327,7 @@ private:
 	QMap<LaserPrimitive*, QTransform> m_copyedList;
 	QMap<QString, QList<LaserPrimitive*>> m_groupedMap;
 	//layer
-	int m_curLayerIndex;
+	//int m_curLayerIndex;
     //text
     //QPointF m_textInsertPos;
     LaserText* m_editingText;

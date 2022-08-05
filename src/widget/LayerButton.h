@@ -25,6 +25,7 @@ public:
 	void setChecked(bool checked);
 	void setLayerIndex(int index);
 	void setCheckedTrue();
+    void select();
 
 protected:
     virtual void contextMenuEvent(QContextMenuEvent *event) override;

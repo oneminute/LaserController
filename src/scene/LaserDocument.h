@@ -50,6 +50,16 @@ public:
     QList<LaserLayer*> layers() const;
     void addLayer(LaserLayer* layer);
     void removeLayer(LaserLayer* layer);
+    LaserLayer* currentLayer() const;
+    int currentLayerIndex() const;
+    void setCurrentLayer(LaserLayer* layer);
+    void setCurrentLayer(int layerIndex);
+    LaserLayer* layerByIndex(int layerIndex) const;
+    LaserLayer* findCapableLayer(LaserPrimitiveType type) const;
+    LaserLayer* findCapableLayer(LaserPrimitive* primitive) const;
+    LaserLayer* findCapableLayer(LaserLayerType type) const;
+    LaserLayer* getCurrentOrCapableLayer(LaserPrimitiveType type) const;
+    static QList<LaserLayerType> capableLayerTypeOf(LaserPrimitiveType primitiveType);
 
     QString newLayerName() const;
 
@@ -134,8 +144,9 @@ public:
 
     LaserLayer* idleLayer() const;
 
-    void addPrimitive(LaserPrimitive* item, bool addToQuadTree = true, bool updateDocBounding = true);
-    void addPrimitive(LaserPrimitive* item, LaserLayer* layer, bool addToQuadTree = true, bool updateDocBounding = true);
+    bool addPrimitive(LaserPrimitive* item, bool addToQuadTree = true, bool updateDocBounding = true);
+    bool addPrimitive(LaserPrimitive* item, LaserLayer* layer, bool addToQuadTree = true, bool updateDocBounding = true);
+    bool addPrimitives(const QList<LaserPrimitive*>& primitives);
     void removePrimitive(LaserPrimitive* item, bool keepLayer = true, bool updateDocBounding = true);
 
     QImage thumbnail() const;

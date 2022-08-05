@@ -229,6 +229,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
         m_layerButtons.append(button);
 
         connect(button, &LayerButton::colorUpdated, m_tableWidgetLayers, &LaserLayerTableWidget::updateItems);
+        connect(button, &LayerButton::clicked, this, &LaserControllerWindow::onLayerButtonClicked);
     }
     m_ui->layoutLayerButtons->addStretch();
     
@@ -2404,7 +2405,7 @@ void LaserControllerWindow::createLayersDockPanel()
 {
     m_tableWidgetLayers = new LaserLayerTableWidget;
     connect(m_tableWidgetLayers, &QTableWidget::cellDoubleClicked, this, &LaserControllerWindow::onTableWidgetLayersCellDoubleClicked);
-    connect(m_tableWidgetLayers, &QTableWidget::itemSelectionChanged, this, &LaserControllerWindow::onTableWidgetItemSelectionChanged);
+    connect(m_tableWidgetLayers, &QTableWidget::itemSelectionChanged, this, &LaserControllerWindow::onTableWidgetLayersSelectionChanged);
 
     m_buttonMoveLayerUp = new QToolButton;
     m_buttonMoveLayerUp->setDefaultAction(m_ui->actionMoveLayerUp);
@@ -4966,6 +4967,34 @@ QList<QPoint> LaserControllerWindow::findCanvasPointsWithinRect(const QRect& bou
     return points;
 }
 
+LayerButton* LaserControllerWindow::findLayerButtonByLayer(LaserLayer* layer) const
+{
+    for (LayerButton* button : m_layerButtons)
+    {
+        if (button->layer() == layer)
+            return button;
+    }
+    return nullptr;
+}
+
+LayerButton* LaserControllerWindow::findLayerButtonByLayer(int layerIndex) const
+{
+    for (LayerButton* button : m_layerButtons)
+    {
+        if (button->layer()->index() == layerIndex)
+            return button;
+    }
+    return nullptr;
+}
+
+LayerButton* LaserControllerWindow::currentLayerButton() const
+{
+    LaserDocument* doc = m_scene->document();
+    if (!doc)
+        return findLayerButtonByLayer(0);
+    return findLayerButtonByLayer(doc->currentLayer());
+}
+
 PointPairList LaserControllerWindow::printAndCutPoints() const
 {
     return m_tablePrintAndCutPoints->pointPairs();
@@ -5447,7 +5476,7 @@ void LaserControllerWindow::onTableWidgetLayersCellDoubleClicked(int row, int co
     }
 }
 
-void LaserControllerWindow::onTableWidgetItemSelectionChanged()
+void LaserControllerWindow::onTableWidgetLayersSelectionChanged()
 {
     QList<QTableWidgetItem*> items = m_tableWidgetLayers->selectedItems();
     if (items.isEmpty())
@@ -5460,37 +5489,16 @@ void LaserControllerWindow::onTableWidgetItemSelectionChanged()
     if (!doc) {
         return;
     }
-    QList<LaserLayer*>list = doc->layers();
-    if (list.isEmpty()) {
+    LaserLayer* layer = doc->layerByIndex(index);
+    if (layer == nullptr)
         return;
-    }
-    LaserLayer* layer = list[index];
-    //m_scene->clearSelection();
-    //清理之前的选区
-    LaserViewer* view = qobject_cast<LaserViewer*>( m_scene->views()[0]);
-    if (!view) {
-        return;
-    }
-    
-    //清空group并将transform设为单位transform
-    if (m_viewer->group()) {
-        m_viewer->group()->reset(true);
-    }
-    else {
-        m_viewer->createGroup();
-    }
-    for (LaserPrimitive* primitive : layer->primitives())
+
+    LayerButton* button = findLayerButtonByLayer(layer);
+    if (button)
     {
-        if (!m_scene->document()->primitives().contains(primitive->id())) {
-            continue;
-        }
-        primitive->setSelected(true);
-        m_viewer->group()->addToGroup(primitive);
+        button->select();
     }
-    if (StateControllerInst.isInState(StateControllerInst.documentIdleState())) {
-        emit m_viewer->idleToSelected();
-    }
-    m_viewer->viewport()->repaint();
+    m_viewer->selectLayer(layer);
 }
 
 void LaserControllerWindow::onActionExportJson(bool checked)
@@ -5740,27 +5748,6 @@ void LaserControllerWindow::onActionDownload(bool checked)
 
     QString filename = QDir::current().absoluteFilePath("tmp/export.json");
 
-    /*QRect boundingRect = m_scene->document()->currentDocBoundingRect();
-    QRect boundingRectAcc = m_scene->document()->currentEngravingBoundingRect(true);
-
-    switch (Config::Device::startFrom())
-    {
-    case SFT_CurrentPosition:
-        boundingRect.moveTo(boundingRect.topLeft() + LaserApplication::device->currentOrigin());
-        boundingRectAcc.moveTo(boundingRectAcc.topLeft() + LaserApplication::device->currentOrigin());
-        break;
-    case SFT_UserOrigin:
-        boundingRect.moveTo(boundingRect.topLeft() + LaserApplication::device->userOrigin().toPoint());
-        boundingRectAcc.moveTo(boundingRectAcc.topLeft() + LaserApplication::device->userOrigin().toPoint());
-        break;
-    }
-
-    if (!LaserApplication::device->checkLayoutForMachining(
-        boundingRect,
-        boundingRectAcc
-    ))
-        return;*/
-
     bool stamp;
     LaserDocument* doc = getMachiningDocument(stamp);
     if (!doc)
@@ -5774,7 +5761,8 @@ void LaserControllerWindow::onActionDownload(bool checked)
         return;
     }
 
-    doc->setSpecifiedOriginIndex(soDlg.origin());
+    int specifiedOrigin = soDlg.origin();
+    doc->setSpecifiedOriginIndex(specifiedOrigin);
     ProgressItem* progress = LaserApplication::resetProcess();
     progress->setMaximum(6);
     progress->setWeights(QVector<qreal>() << 1 << 1 << 1 << 1 << 4 << 10);
@@ -5784,7 +5772,7 @@ void LaserControllerWindow::onActionDownload(bool checked)
         {
             doc->outline(progress);
             doc->setFinishRun(Config::Device::finishRun());
-            PathOptimizer optimizer(m_scene->document()->optimizeNode(), m_scene->document()->primitives().count());
+            PathOptimizer optimizer(doc->optimizeNode(), doc->primitives().count());
             optimizer.optimize(progress);
             PathOptimizer::Path path = optimizer.optimizedPath();
             qDebug() << "exporting to temporary json file:" << filename;
@@ -6296,15 +6284,18 @@ void LaserControllerWindow::onActionBitmap(bool checked)
         layout.left() + (layout.width() - width) / 2,
         layout.top() + (layout.height() - height) / 2,
         width, height);
-	LaserBitmap* bitmap = new LaserBitmap(image, bitmapRect, m_scene->document());
-	//undo 创建完后会执行redo
-	QList<QGraphicsItem*> list;
-	list.append(bitmap);
-	AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene, list);
-	m_viewer->undoStack()->push(addCmd);
-	//m_scene->addLaserPrimitive(bitmap);
-	m_viewer->onReplaceGroup(bitmap);
-    
+    LaserLayer* layer = m_scene->document()->getCurrentOrCapableLayer(LPT_BITMAP);
+    if (layer)
+    {
+        LaserBitmap* bitmap = new LaserBitmap(image, bitmapRect, m_scene->document(), QTransform(), layer->index());
+        //undo 创建完后会执行redo
+        QList<QGraphicsItem*> list;
+        list.append(bitmap);
+        AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene, list);
+        m_viewer->undoStack()->push(addCmd);
+        //m_scene->addLaserPrimitive(bitmap);
+        m_viewer->onReplaceGroup(bitmap);
+    }
 }
 
 void LaserControllerWindow::onActionRegiste(bool checked)
@@ -7403,7 +7394,8 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
     connect(doc, &LaserDocument::exportFinished, this, &LaserControllerWindow::onDocumentExportFinished);
 
     doc->bindLayerButtons(m_layerButtons);
-    m_layerButtons[m_viewer->curLayerIndex()]->setCheckedTrue();
+    LayerButton* layerButton = this->currentLayerButton();
+    layerButton->select();
     m_tableWidgetLayers->setDocument(doc);
     m_tableWidgetLayers->updateItems();
     setWindowTitle(doc->name());
@@ -7913,7 +7905,7 @@ void LaserControllerWindow::onActionStampImport(bool checked)
     QPoint c = m_viewer->mapToScene(m_viewer->rect().center()).toPoint();
     QRect bounds(c.x() - w * 0.5, c.y() - h * 0.5, w, h);
 
-    LaserStampBitmap* stampBitmap = new LaserStampBitmap(img, bounds, false, m_scene->document(), QTransform(), m_viewer->curLayerIndex());
+    LaserStampBitmap* stampBitmap = new LaserStampBitmap(img, bounds, false, m_scene->document(), QTransform(), m_scene->document()->currentLayerIndex());
     stampBitmap->computeImage();
     bool result = m_viewer->addPrimitiveAndExamRegionByBounds(stampBitmap);
     
@@ -7921,29 +7913,41 @@ void LaserControllerWindow::onActionStampImport(bool checked)
 
 void LaserControllerWindow::onActionCreateNameStamp()      
 {
-    StampFrameDialog dialog(m_scene);
-  
+    LaserLayer* layer = m_scene->document()->idleLayer();
+    if (!layer)
+        return;
+
+    StampFrameDialog dialog(m_scene, layer);
     dialog.exec();
 }
 
 void LaserControllerWindow::onActionCreateStripStamp()
 {
-    StampStripDialog dialog(m_scene);
+    LaserLayer* layer = m_scene->document()->idleLayer();
+    if (!layer)
+        return;
 
+    StampStripDialog dialog(m_scene, layer);
     dialog.exec();
 }
 
 void LaserControllerWindow::onActionCreateCircleStamp()
 {
-    StampCircleDialog dialog(m_scene);
+    LaserLayer* layer = m_scene->document()->idleLayer();
+    if (!layer)
+        return;
 
+    StampCircleDialog dialog(m_scene, layer);
     dialog.exec();
 }
 
 void LaserControllerWindow::onActionCreateEllipseStamp()
 {
-    StampCircleDialog dialog(m_scene, true);
+    LaserLayer* layer = m_scene->document()->idleLayer();
+    if (!layer)
+        return;
 
+    StampCircleDialog dialog(m_scene, layer, true);
     dialog.exec();
     
 }
@@ -8376,6 +8380,24 @@ void LaserControllerWindow::onCameraDisconnected()
     m_buttonCameraStart->setDefaultAction(m_ui->actionStartCamera);
     m_statusBarCameraState->setText(tr("Camera Disonnected"));
     m_statusBarCameraState->setStyleSheet("color: rgb(255, 0, 0)");
+}
+
+void LaserControllerWindow::onLayerButtonClicked()
+{
+    LayerButton* layerButton = qobject_cast<LayerButton*>(sender());
+    if (!layerButton)
+        return;
+    LaserLayer* layer = layerButton->layer();
+    layerButton->select();
+	if (layer)
+	{
+		layer->setSelected();
+	}
+    if (m_viewer)
+    {
+        m_viewer->selectLayer(layer);
+    }
+    m_tableWidgetLayers->selectLayer(layer);
 }
 
 //void LaserControllerWindow::updateAutoRepeatIntervalChanged(const QVariant& value, ModifiedBy modifiedBy)

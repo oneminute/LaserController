@@ -79,6 +79,7 @@ public:
     bool isShape() const;
     bool isBitmap() const;
     bool isText() const;
+    bool isStamp() const;
 
     bool exportable() const;
     void setExportable(bool value);

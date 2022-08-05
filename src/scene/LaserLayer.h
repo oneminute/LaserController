@@ -31,6 +31,7 @@ public:
     void setRemovable(bool removable);
 
     QString name() const;
+    void setName(const QString& value);
     LaserLayerType type() const;
     void setType(LaserLayerType type);
 
@@ -106,6 +107,7 @@ public:
     bool isEmpty() const;
 
     QColor color() const;
+    void setColor(const QColor& value);
 
     int lpi() const;
     void setLpi(int lpi);
@@ -114,8 +116,6 @@ public:
     void setDpi(int dpi);
 
     LaserDocument* document() const;
-
-    void bindButton(LayerButton* button, int index);
 
     bool exportable() const;
     void setExportable(bool value);
@@ -150,11 +150,11 @@ public:
 
     void setCheckBox(QCheckBox* box);
 
-protected:
-    void onClicked();
+    void setSelected();
+
+    bool capabaleOf(LaserPrimitiveType primitiveType) const;
 
 protected:
-    
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserLayer);
     Q_DISABLE_COPY(LaserLayer)
 private:

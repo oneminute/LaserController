@@ -1,29 +1,32 @@
 #include "StampCircleDialog.h"
 #include "ui_StampCircleDialog.h"
-#include<QAbstractItemView>
-#include<QListView>
-#include<QStyledItemDelegate>
-#include<QComboBox>
-#include<QHeaderView>
-#include<QCheckBox>
-#include<QPushButton>
-#include "ui/StampDialog.h"
-#include "scene/LaserPrimitiveGroup.h"
-#include"scene/LaserPrimitive.h"
-#include"scene/LaserDocument.h"
-#include "scene/LaserLayer.h"
-#include "util/Utils.h"
-#include <QFileDialog>
 
-StampCircleDialog::StampCircleDialog(LaserScene* scene,bool isEllipse, QWidget* parent) 
-   : StampDialog(scene, parent),
-    m_ui(new Ui::StampCircleDialog), m_isEllipse(isEllipse)
+#include <QAbstractItemView>
+#include <QCheckBox>
+#include <QComboBox>
+#include <QFileDialog>
+#include <QHeaderView>
+#include <QListView>
+#include <QStyledItemDelegate>
+#include <QPushButton>
+
+#include "scene/LaserPrimitiveGroup.h"
+#include "scene/LaserPrimitive.h"
+#include "scene/LaserDocument.h"
+#include "scene/LaserLayer.h"
+#include "scene/LaserScene.h"
+#include "ui/StampDialog.h"
+#include "util/Utils.h"
+#include "widget/LaserViewer.h"
+
+StampCircleDialog::StampCircleDialog(LaserScene* scene, LaserLayer* layer, bool isEllipse, QWidget* parent) 
+    : StampDialog(scene, layer, parent)
+    , m_ui(new Ui::StampCircleDialog)
+    , m_isEllipse(isEllipse)
 {
     m_viewer = qobject_cast<LaserViewer*> (scene->views()[0]);
     m_ui->setupUi(this);
-    LaserLayer* layer = m_scene->document()->idleLayer();
     layer->setType(LLT_STAMP);
-    m_layerIndex = layer->index();
     m_preview = m_ui->graphicsView;
 
     m_ui->fontComboBox->setCurrentText(tr("FangSong"));
@@ -524,7 +527,7 @@ QList<LaserPrimitive*> StampCircleDialog::createStampPrimitive()
     else {
         rect = QRect(point.x(), point.y(), circleW, circleW);
     }
-    LaserRing* circle = new LaserRing(m_scene->document(), rect, circleBorder, stampIntaglio, QTransform(), m_layerIndex);
+    LaserRing* circle = new LaserRing(m_scene->document(), rect, circleBorder, stampIntaglio, QTransform(), m_layer->index());
     stampList.append(circle);
     LaserRing* innerCircle = nullptr;;
     QRect innerRect;
@@ -545,7 +548,7 @@ QList<LaserPrimitive*> StampCircleDialog::createStampPrimitive()
 
 
         innerRect = QRect(point.x() + innderMargin + circleBorder, point.y() + innderMargin + circleBorder, innerW, innerH);
-        innerCircle = new LaserRing(m_scene->document(), innerRect, innerBorder, stampIntaglio, QTransform(), m_layerIndex);
+        innerCircle = new LaserRing(m_scene->document(), innerRect, innerBorder, stampIntaglio, QTransform(), m_layer->index());
         innerCircle->setInner(true);
         stampList.append(innerCircle);
     }
@@ -593,7 +596,7 @@ QList<LaserPrimitive*> StampCircleDialog::createStampPrimitive()
         if (propertyText == m_textRowProperty[0]) {
 
             LaserCircleText* topCircleText = new LaserCircleText(m_scene->document(), contentStr, textBounds, angle,
-                bold, italic, false, stampIntaglio, family, textSpace, true, 0.0, 0.0, QSize(), QTransform(), m_layerIndex);
+                bold, italic, false, stampIntaglio, family, textSpace, true, 0.0, 0.0, QSize(), QTransform(), m_layer->index());
             QSize textSize(topCircleText->textSize().width(), textHeight);
             topCircleText->computeTextPath(topCircleText->angle(), textSize, false);
             stampList.append(topCircleText);
@@ -621,7 +624,7 @@ QList<LaserPrimitive*> StampCircleDialog::createStampPrimitive()
             QSize lineTextSize((w - textSpace * (textLength - 1)) / textLength, h);
 
             LaserHorizontalText* lineText = new LaserHorizontalText(m_scene->document(), content->text(), lineTextSize,
-                QPointF(centerX, centerY), bold, italic, false, stampIntaglio, family, textSpace, QTransform(), m_layerIndex);
+                QPointF(centerX, centerY), bold, italic, false, stampIntaglio, family, textSpace, QTransform(), m_layer->index());
             stampList.append(lineText);
         }
         //Bottom Circle Text
@@ -633,7 +636,7 @@ QList<LaserPrimitive*> StampCircleDialog::createStampPrimitive()
             }
 
             LaserCircleText* bottomCircleText = new LaserCircleText(m_scene->document(), invertContentStr, textBounds, 320 - angle,
-                bold, italic, false, stampIntaglio, family, textSpace, true, 0.0, 0.0, QSize(), QTransform(), m_layerIndex);
+                bold, italic, false, stampIntaglio, family, textSpace, true, 0.0, 0.0, QSize(), QTransform(), m_layer->index());
 
             //qreal hsize = bottomCircleText->textSize().height() * 0.5;
             qreal hsize = textHeight;
@@ -651,7 +654,7 @@ QList<LaserPrimitive*> StampCircleDialog::createStampPrimitive()
             qreal w = 26000;
             QSize size((w - (textLength - 1) * textSpace) / textLength, h);
             LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), contentStr, size, rect.center(),
-                bold, italic, false, stampIntaglio, family, textSpace, QTransform(), m_layerIndex);
+                bold, italic, false, stampIntaglio, family, textSpace, QTransform(), m_layer->index());
             text->setBoundingRectWidth(26000);
             stampList.append(text);
         }
@@ -672,7 +675,7 @@ QList<LaserPrimitive*> StampCircleDialog::createStampPrimitive()
             }*/
             QPoint center(rect.center().x(), centerY);
             LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), contentStr, size, center,
-                bold, italic, false, stampIntaglio, family, textSpace, QTransform(), m_layerIndex);
+                bold, italic, false, stampIntaglio, family, textSpace, QTransform(), m_layer->index());
             text->setBoundingRectHeight(h);
             stampList.append(text);
         }
@@ -696,11 +699,11 @@ QList<LaserPrimitive*> StampCircleDialog::createStampPrimitive()
     }
     if (drawEmble) {
         if (emblemIndex == 0) {
-            LaserStar* star = new LaserStar(m_scene->document(), rect.center(), radius, stampIntaglio, QTransform(), m_layerIndex);
+            LaserStar* star = new LaserStar(m_scene->document(), rect.center(), radius, stampIntaglio, QTransform(), m_layer->index());
             stampList.append(star);
         }
         else if (emblemIndex == 1) {
-            LaserPartyEmblem* party = new LaserPartyEmblem(m_scene->document(), rect.center(), radius, stampIntaglio, QTransform(), m_layerIndex);
+            LaserPartyEmblem* party = new LaserPartyEmblem(m_scene->document(), rect.center(), radius, stampIntaglio, QTransform(), m_layer->index());
             stampList.append(party);
         }
         else if (emblemIndex == 2) {
@@ -712,7 +715,7 @@ QList<LaserPrimitive*> StampCircleDialog::createStampPrimitive()
             if (bl) {
                 QRect bounds(rect.center().x() - radius, rect.center().y() - radius,
                     radius * 2, radius * 2);
-                LaserStampBitmap* stampBitmap = new LaserStampBitmap(img, bounds, stampIntaglio, m_scene->document(), QTransform(), m_layerIndex);
+                LaserStampBitmap* stampBitmap = new LaserStampBitmap(img, bounds, stampIntaglio, m_scene->document(), QTransform(), m_layer->index());
                 stampBitmap->computeImage();
                 stampList.append(stampBitmap);
             }
@@ -745,11 +748,11 @@ QList<LaserPrimitive*> StampCircleDialog::createStampPrimitive()
         QRect lineRect1(left1, top, w, h);
         QRect lineRect2(left2, top, w, h);
         qreal borderWidth = h * 0.5;
-        LaserFrame* line1 = new LaserFrame(m_scene->document(), lineRect1, borderWidth, 0, stampIntaglio, QTransform(), m_layerIndex);
+        LaserFrame* line1 = new LaserFrame(m_scene->document(), lineRect1, borderWidth, 0, stampIntaglio, QTransform(), m_layer->index());
         line1->setInner(true);
         line1->setZValue(3);
         line1->setNeedAuxiliaryLine(false);
-        LaserFrame* line2 = new LaserFrame(m_scene->document(), lineRect2, borderWidth, 0, stampIntaglio, QTransform(), m_layerIndex);
+        LaserFrame* line2 = new LaserFrame(m_scene->document(), lineRect2, borderWidth, 0, stampIntaglio, QTransform(), m_layer->index());
         line2->setInner(true);
         line2->setZValue(3);
         line2->setNeedAuxiliaryLine(false);

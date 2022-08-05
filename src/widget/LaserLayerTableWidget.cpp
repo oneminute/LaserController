@@ -82,6 +82,27 @@ void LaserLayerTableWidget::setDocument(LaserDocument * doc)
     connect(m_doc, &LaserDocument::closed, this, &LaserLayerTableWidget::laserDocumentClosed);
 }
 
+void LaserLayerTableWidget::selectLayer(LaserLayer* layer)
+{
+    selectLayer(layer->index());
+}
+
+void LaserLayerTableWidget::selectLayer(int layerIndex)
+{
+    this->blockSignals(true);
+    clearSelection();
+    for (int i = 0; i < rowCount(); i++)
+    {
+        QTableWidgetItem* tableItem = item(i, 0);
+        int itemLayerIndex = tableItem->data(Qt::UserRole).toInt();
+        if (layerIndex == itemLayerIndex)
+        {
+            selectRow(i);
+        }
+    }
+    this->blockSignals(false);
+}
+
 void LaserLayerTableWidget::laserDocumentClosed()
 {
     m_doc = nullptr;
@@ -217,7 +238,7 @@ void LaserLayerTableWidget::updateItems()
             setItem(row, 3, itemCount);
             setItem(row, 4, itemSpeedPower);
 
-            item(row, 0)->setData(Qt::UserRole, i);
+            item(row, 0)->setData(Qt::UserRole, layer->index());
         }
     }
 }

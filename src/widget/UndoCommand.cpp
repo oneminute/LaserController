@@ -219,19 +219,21 @@ void AddDelUndoCommand::redo()
 	else {
 
 		m_selectedBeforeAdd = m_viewer->clearGroupSelection();
+        LaserDocument* doc = m_scene->document();
 		//����ӵ�scene
         if (m_primitiveList.isEmpty()) {
             for each(QGraphicsItem* item in m_list) {
                 
                 LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
                 //m_scene->addLaserPrimitive(primitive, true);
-                m_scene->document()->addPrimitive(primitive, false, false);
+                doc->addPrimitive(primitive, false, false);
                 primitive->setSelected(true);
             }
         }
         else {
             for each(LaserPrimitive* primitive in m_primitiveList) {
-                m_scene->document()->addPrimitive(primitive, false, false);
+                //m_scene->document()->addPrimitive(primitive, false, false);
+                doc->addPrimitive(primitive, false, false);
                 primitive->setSelected(true);
             }
         }
@@ -281,7 +283,6 @@ void PolygonUndoCommand::undo()
         m_scene->document()->removePrimitive(m_curItem);
 	}
 	if (m_lastItem) {
-
         m_scene->document()->addPrimitive(m_lastItem);
 		m_lastItem->setSelected(true);
 		m_viewer->onSelectedFillGroup();
@@ -313,7 +314,6 @@ void PolygonUndoCommand::undo()
 
 void PolygonUndoCommand::redo()
 {
-
 	if (m_lastItem) {
 		m_viewer->clearGroupSelection();
 		sceneTransformToItemTransform(m_lastItem->sceneTransform(), m_lastItem);

@@ -21,6 +21,7 @@
 #include "ui/LaserControllerWindow.h"
 #include "util/UnitUtils.h"
 #include "util/MachiningUtils.h"
+#include "util/WidgetUtils.h"
 
 SvgImporter::SvgImporter(QObject* parent)
     : Importer(parent)
@@ -36,7 +37,6 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
 {
 	LaserApplication::mainWindow->activateWindow();
     LaserDocument* doc = scene->document();
-    LaserLayer* idleLayer = doc->idleLayer();
 
     //调用QSvgTinyDocument组件，解析并读取SVG文件。
     QSvgTinyDocument* svgDoc = QSvgTinyDocument::load(filename);
@@ -74,6 +74,8 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
 
 	QMatrix matrix;
 	matrix.scale(docScaleWidth, docScaleHeight);
+
+    QList<QString> errors;
 
     while (!stack.empty())
     {
@@ -127,8 +129,12 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
             QPainterPath path;
             path.addEllipse(bounds);
             path = t.map(path);
-            //item = new LaserEllipse(bounds.toRect(), doc, QTransform(), idleLayer->index());
-            item = new LaserPath(path, doc, QTransform(), idleLayer->index());
+            LaserLayer* layer = doc->getCurrentOrCapableLayer(LPT_CIRCLE);
+            if (layer)
+                item = new LaserPath(path, doc, QTransform(), layer->index());
+            else
+                errors << QString(tr("A circle or ellipse cannnot be imported as there's no capable layer to be added: %1"))
+                .arg(QVariant(bounds).toString());
         }
             break;
         case QSvgNode::LINE:
@@ -136,7 +142,12 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
             QSvgLine* svgLineNode = reinterpret_cast<QSvgLine*>(node);
 			QLineF line = matrix.map(svgLineNode->line());
             line = t.map(line);
-            item = new LaserLine(line.toLine(), doc, QTransform(), idleLayer->index());
+            LaserLayer* layer = doc->getCurrentOrCapableLayer(LPT_LINE);
+            if (layer)
+                item = new LaserLine(line.toLine(), doc, QTransform(), layer->index());
+            else
+                errors << QString(tr("A line cannnot be imported as there's no capable layer to be added: %1"))
+                .arg(QVariant(line).toString());
         }
             break;
         case QSvgNode::ARC:
@@ -150,8 +161,14 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
             {
                 QPainterPath subPath;
                 subPath.addPolygon(subPoly);
-                LaserPrimitive* subItem = new LaserPath(subPath, doc, QTransform(), idleLayer->index());
-                items.append(subItem);
+                LaserLayer* layer = doc->getCurrentOrCapableLayer(LPT_POLYGON);
+                if (layer)
+                {
+                    LaserPrimitive* subItem = new LaserPath(subPath, doc, QTransform(), layer->index());
+                    items.append(subItem);
+                }
+                else
+                    errors << QString(tr("A sub path of an arc or path cannnot be imported as there's no capable layer to be added."));
             }
         }
             break;
@@ -160,7 +177,11 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
             QSvgPolygon* svgPolygonNode = reinterpret_cast<QSvgPolygon*>(node);
 			QPolygonF polygon = matrix.map(svgPolygonNode->polygon());
             polygon = t.map(polygon);
-            item = new LaserPolygon(polygon.toPolygon(), doc, QTransform(), idleLayer->index());
+            LaserLayer* layer = doc->getCurrentOrCapableLayer(LPT_POLYGON);
+            if (layer)
+                item = new LaserPolygon(polygon.toPolygon(), doc, QTransform(), layer->index());
+            else
+                errors << QString(tr("A polygon cannnot be imported as there's no capable layer to be added."));
         }
             break;
         case QSvgNode::POLYLINE:
@@ -168,7 +189,11 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
             QSvgPolyline* svgPolylineNode = reinterpret_cast<QSvgPolyline*>(node);
 			QPolygonF polyline = matrix.map(svgPolylineNode->polyline());
             polyline = t.map(polyline);
-            item = new LaserPolyline(polyline.toPolygon(), doc, QTransform(), idleLayer->index());
+            LaserLayer* layer = doc->getCurrentOrCapableLayer(LPT_POLYGON);
+            if (layer)
+                item = new LaserPolyline(polyline.toPolygon(), doc, QTransform(), layer->index());
+            else
+                errors << QString(tr("A polyline cannnot be imported as there's no capable layer to be added."));
         }
             break;
         case QSvgNode::RECT:
@@ -177,15 +202,20 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
             {
                 QSvgRect* svgRectNode = reinterpret_cast<QSvgRect*>(node);
                 qreal area = svgRectNode->rect().width() * svgRectNode->rect().height();
-				if (area > 0)
-				{
-					QRectF rect = matrix.mapRect(svgRectNode->rect());
+                if (area > 0)
+                {
+                    QRectF rect = matrix.mapRect(svgRectNode->rect());
                     qreal cornerRadius = svgRectNode->rx() * docScaleWidth;
                     QPainterPath path;
                     path.addRoundedRect(rect, cornerRadius, cornerRadius);
                     path = t.map(path);
-                    item = new LaserPath(path, doc, QTransform(), idleLayer->index());
-				}
+                    LaserLayer* layer = doc->getCurrentOrCapableLayer(LPT_POLYGON);
+                    if (layer)
+                        item = new LaserPath(path, doc, QTransform(), layer->index());
+                    else
+                        errors << QString(tr("A rectangle cannnot be imported as there's no capable layer to be added: %1")
+                        .arg(QVariant(rect).toString()));
+                }
             }
             break;
         }
@@ -215,10 +245,19 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
             }
             qLogD << font;
             QPointF pos = matrix.map(svgTextNode->coord());
-            LaserText* laserText = new LaserText(doc, pos, font,0,  Qt::AlignLeft, Qt::AlignVCenter, QTransform(), idleLayer->index());
-            laserText->setContent(svgTextNode->text());
-            laserText->modifyPathList();
-            item = laserText;
+            LaserLayer* layer = doc->getCurrentOrCapableLayer(LPT_TEXT);
+            if (layer)
+            {
+                LaserText* laserText = new LaserText(doc, pos, font, 0, Qt::AlignLeft, Qt::AlignVCenter, QTransform(), layer->index());
+                laserText->setContent(svgTextNode->text());
+                laserText->modifyPathList();
+                item = laserText;
+            }
+            else
+            {
+                errors << QString(tr("A text element cannnot be imported as there's no capable layer to be added: %1")
+                .arg(svgTextNode->text()));
+            }
             break;
         }
         case QSvgNode::TEXTAREA:
@@ -228,7 +267,12 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
             QSvgImage* svgImageNode = reinterpret_cast<QSvgImage*>(node);
 			QRectF bounds = matrix.mapRect(svgImageNode->imageBounds());
             //bounds = t.mapRect(bounds);
-            item = new LaserBitmap(svgImageNode->image(), bounds.toRect(), doc, t, idleLayer->index());
+            LaserLayer* layer = doc->getCurrentOrCapableLayer(LPT_BITMAP);
+            if (layer)
+                item = new LaserBitmap(svgImageNode->image(), bounds.toRect(), doc, t, layer->index());
+            else
+                errors << QString(tr("A bitmap cannnot be imported as there's no capable layer to be added: %1")
+                .arg(QVariant(bounds).toString()));
         }
             break;
         default:
@@ -270,6 +314,12 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
         docName = "root";
     }
     doc->blockSignals(false);
+    if (!errors.isEmpty())
+    {
+        QString errorInfo = errors.join("\n");
+        widgetUtils::showWarningMessage(LaserApplication::mainWindow,
+            tr("Warning"), errorInfo);
+    }
     emit imported();
     progress->finish();
 }

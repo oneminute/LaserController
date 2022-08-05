@@ -1,11 +1,11 @@
 #ifndef STAMPCIRCLEDIALOG_H
 #define STAMPCIRCLEDIALOG_H
+
 #include <QDialog>
-#include<QStandardItem>
+#include <QStandardItem>
 #include <QScopedPointer>
 #include "ui/StampDialog.h"
-#include "scene/LaserScene.h"
-#include "widget/LaserViewer.h"
+
 namespace Ui
 {
     class StampCircleDialog;
@@ -13,11 +13,13 @@ namespace Ui
 class StampCircleDialog : public StampDialog {
     Q_OBJECT
 public:
-    StampCircleDialog(LaserScene* scene, bool isEllipse = false,  QWidget* parent = nullptr);
+    StampCircleDialog(LaserScene* scene, LaserLayer* layer, bool isEllipse = false, QWidget* parent = nullptr);
     virtual ~StampCircleDialog();
-    void addTableViewRow(int row, QString contentStr, QString fontStr, 
-        QString propertyStr,Qt::CheckState checkState, qreal textSpacing, qreal textHeight);
+    void addTableViewRow(int row, QString contentStr, QString fontStr,
+        QString propertyStr, Qt::CheckState checkState, qreal textSpacing, qreal textHeight);
     QList<LaserPrimitive*> createStampPrimitive();
+protected slots:
+    virtual void accept();
 private:
     typedef struct itemStruct {
     private:
@@ -31,6 +33,7 @@ private:
         QString getStr() { return str; }
         Qt::CheckState getCheckState() { return checkState; }
     } _itemStruct;
+
     QScopedPointer<Ui::StampCircleDialog> m_ui;
     QStandardItemModel* m_viewItemModel;
     int m_preLayoutIndex;
@@ -42,13 +45,10 @@ private:
         QString(tr("Horizontal Invoice Number")), QString(tr("Bottom Horizontal Number"))
     };
     QString m_textInitRowContent[5] = {
-        QString(tr("Laser Test Seal")), QString(tr("Horizontal Text")), QString(tr("123456789012345678")), 
+        QString(tr("Laser Test Seal")), QString(tr("Horizontal Text")), QString(tr("123456789012345678")),
         QString(tr("Invoice Seal")), QString("(0)")
     };
     bool m_isEllipse;
-    int m_layerIndex;
     QString m_importEmblemPath;
-protected slots:
-    virtual void accept();
 };
 #endif // STAMPDIALOG_H
