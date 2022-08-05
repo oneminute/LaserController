@@ -94,6 +94,9 @@ FILE(GLOB IMPORT_SOURCES src/import/*.cpp)
 FILE(GLOB LASER_HEADERS src/laser/*.h)
 FILE(GLOB LASER_SOURCES src/laser/*.cpp)
 
+FILE(GLOB PRIMITIVE_HEADERS src/primitive/*.h)
+FILE(GLOB PRIMITIVE_SOURCES src/primitive/*.cpp)
+
 FILE(GLOB RES src/res/*.qrc)
 
 FILE(GLOB SCENE_HEADERS src/scene/*.h)
@@ -158,6 +161,7 @@ set(HEADER_FILES
     ${HALFTONE_HEADERS}
     ${IMPORT_HEADERS}
     ${LASER_HEADERS}
+    ${PRIMITIVE_HEADERS}
 	${SCENE_HEADERS}
     ${STATE_HEADERS}
     ${SVG_HEADERS}
@@ -179,6 +183,7 @@ set(SRC_FILES
     ${HALFTONE_SOURCES}
     ${IMPORT_SOURCES}
     ${LASER_SOURCES}
+    ${PRIMITIVE_SOURCES}
     ${RES}
 	${SCENE_SOURCES}
     ${STATE_SOURCES}
@@ -209,6 +214,8 @@ IF(MSVC)
     source_group("header\\import" FILES ${IMPORT_HEADERS})
     source_group("source\\laser" FILES ${LASER_SOURCES})
     source_group("header\\laser" FILES ${LASER_HEADERS})
+    source_group("source\\primitive" FILES ${PRIMITIVE_SOURCES})
+    source_group("header\\primitive" FILES ${PRIMITIVE_HEADERS})
 	source_group("source\\scene" FILES ${SCENE_SOURCES})
 	source_group("header\\scene" FILES ${SCENE_HEADERS})
     source_group("header\\state" FILES ${STATE_HEADERS})
