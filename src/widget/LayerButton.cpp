@@ -58,7 +58,7 @@ void LayerButton::setCheckedTrue()
 	m_checked = true;
 	if (m_layerIndex >= 0)
 	{
-		m_viewer->setCurLayerIndex(m_layerIndex);
+		//m_viewer->setCurLayerIndex(m_layerIndex);
 		this->repaint();
 		m_viewer->viewport()->repaint();
 	}

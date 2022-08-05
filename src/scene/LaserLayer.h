@@ -152,6 +152,8 @@ public:
 
     void setSelected();
 
+    bool capabaleOf(LaserPrimitiveType primitiveType) const;
+
 protected:
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserLayer);
     Q_DISABLE_COPY(LaserLayer)

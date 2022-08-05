@@ -314,7 +314,6 @@ void PolygonUndoCommand::undo()
 
 void PolygonUndoCommand::redo()
 {
-
 	if (m_lastItem) {
 		m_viewer->clearGroupSelection();
 		sceneTransformToItemTransform(m_lastItem->sceneTransform(), m_lastItem);
@@ -324,8 +323,7 @@ void PolygonUndoCommand::redo()
 		m_selectedBeforeAdd = m_viewer->clearGroupSelection();
 	}
 	if (m_curItem) {
-        LaserLayer* layer = m_curItem->layer();
-        m_scene->document()->addPrimitive(m_curItem, layer);
+        m_scene->document()->addPrimitive(m_curItem);
 		m_curItem->setSelected(true);
 		m_viewer->onSelectedFillGroup();
 

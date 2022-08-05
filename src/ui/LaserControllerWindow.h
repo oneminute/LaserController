@@ -182,8 +182,9 @@ protected:
 
     QList<QPoint> findCanvasPointsWithinRect(const QRect& bounding) const;
 
-    LayerButton* findLayerButtonByLayer(LaserLayer* layer);
-    LayerButton* findLayerButtonByLayer(int layerIndex);
+    LayerButton* findLayerButtonByLayer(LaserLayer* layer) const;
+    LayerButton* findLayerButtonByLayer(int layerIndex) const;
+    LayerButton* currentLayerButton() const;
 
 	//key
 	virtual void keyPressEvent(QKeyEvent *event) override;

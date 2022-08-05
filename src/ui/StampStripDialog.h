@@ -1,19 +1,22 @@
 #ifndef STAMSTRIPPDIALOG_H
 #define STAMSTRIPPDIALOG_H
-#include<QStandardItem>
+#include <QStandardItem>
 #include <QDialog>
 #include <QScopedPointer>
-#include<scene/LaserScene.h>
-#include <widget/LaserViewer.h>
 #include "ui/StampDialog.h"
+
+class LaserHorizontalText;
+class LaserVerticalText;
+
 namespace Ui
 {
     class StampStripDialog;
 }
+
 class StampStripDialog : public StampDialog {
     Q_OBJECT
 public:
-    StampStripDialog(LaserScene* scene, QWidget* parent = nullptr);
+    StampStripDialog(LaserScene* scene, LaserLayer* layer, QWidget* parent = nullptr);
     virtual ~StampStripDialog();
     void rectifyTextSize(qreal w, qreal h, LaserHorizontalText* text);
     void rectifyTextSize(qreal w, qreal h, LaserVerticalText* text);
@@ -23,7 +26,6 @@ private:
     QStandardItemModel* m_viewItemModel;
     int m_preLayoutIndex;
     QList<QMap<QModelIndex, QString>> m_tablesModelList;
-    int m_layerIndex;
     QString m_defaultTexts[3] = {tr("single-line"), tr("multi-row"), tr("multi-column")};
 
 };

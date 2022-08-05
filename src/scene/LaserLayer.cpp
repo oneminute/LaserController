@@ -474,7 +474,7 @@ void LaserLayer::removePrimitive(LaserPrimitive * item, bool itemKeepLayer)
 bool LaserLayer::isEmpty() const
 {
     Q_D(const LaserLayer);
-    return d->primitives.count() == 0;
+    return d->primitives.isEmpty();
 }
 
 QColor LaserLayer::color() const 
@@ -789,11 +789,11 @@ void LaserLayer::setSelected()
         {
             widgetUtils::showWarningMessage(
                 LaserApplication::mainWindow,
-                tr("Warning"), 
-                tr("The layer types of your selected primitives is more one. You need only select the same type of primitives."));
+                tr("Warning"),
+                tr("You have selected multiple types of primitives. Please select primitives with the same types."));
             return;
         }
-        
+
         for (LaserPrimitive* primitive : scene->selectedPrimitives())
         {
             scene->document()->addPrimitive(primitive, this);
@@ -814,9 +814,16 @@ void LaserLayer::setSelected()
         {
             setType(LLT_FILLING);
         }
-
-        d->doc->setCurrentLayer(this);
-        scene->document()->updateLayersStructure();
     }
+
+    d->doc->setCurrentLayer(this);
+    scene->document()->updateLayersStructure();
+}
+
+bool LaserLayer::capabaleOf(LaserPrimitiveType primitiveType) const
+{
+    Q_D(const LaserLayer);
+    QList<LaserLayerType> layerTypes = LaserDocument::capableLayerTypeOf(primitiveType);
+    return layerTypes.contains(d->type);
 }
 

@@ -4967,7 +4967,7 @@ QList<QPoint> LaserControllerWindow::findCanvasPointsWithinRect(const QRect& bou
     return points;
 }
 
-LayerButton* LaserControllerWindow::findLayerButtonByLayer(LaserLayer* layer)
+LayerButton* LaserControllerWindow::findLayerButtonByLayer(LaserLayer* layer) const
 {
     for (LayerButton* button : m_layerButtons)
     {
@@ -4977,7 +4977,7 @@ LayerButton* LaserControllerWindow::findLayerButtonByLayer(LaserLayer* layer)
     return nullptr;
 }
 
-LayerButton* LaserControllerWindow::findLayerButtonByLayer(int layerIndex)
+LayerButton* LaserControllerWindow::findLayerButtonByLayer(int layerIndex) const
 {
     for (LayerButton* button : m_layerButtons)
     {
@@ -4985,6 +4985,14 @@ LayerButton* LaserControllerWindow::findLayerButtonByLayer(int layerIndex)
             return button;
     }
     return nullptr;
+}
+
+LayerButton* LaserControllerWindow::currentLayerButton() const
+{
+    LaserDocument* doc = m_scene->document();
+    if (!doc)
+        return findLayerButtonByLayer(0);
+    return findLayerButtonByLayer(doc->currentLayer());
 }
 
 PointPairList LaserControllerWindow::printAndCutPoints() const
@@ -5481,7 +5489,7 @@ void LaserControllerWindow::onTableWidgetLayersSelectionChanged()
     if (!doc) {
         return;
     }
-    LaserLayer* layer = doc->layer(index);
+    LaserLayer* layer = doc->layerByIndex(index);
     if (layer == nullptr)
         return;
 
@@ -6276,15 +6284,18 @@ void LaserControllerWindow::onActionBitmap(bool checked)
         layout.left() + (layout.width() - width) / 2,
         layout.top() + (layout.height() - height) / 2,
         width, height);
-	LaserBitmap* bitmap = new LaserBitmap(image, bitmapRect, m_scene->document());
-	//undo 创建完后会执行redo
-	QList<QGraphicsItem*> list;
-	list.append(bitmap);
-	AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene, list);
-	m_viewer->undoStack()->push(addCmd);
-	//m_scene->addLaserPrimitive(bitmap);
-	m_viewer->onReplaceGroup(bitmap);
-    
+    LaserLayer* layer = m_scene->document()->getCurrentOrCapableLayer(LPT_BITMAP);
+    if (layer)
+    {
+        LaserBitmap* bitmap = new LaserBitmap(image, bitmapRect, m_scene->document(), QTransform(), layer->index());
+        //undo 创建完后会执行redo
+        QList<QGraphicsItem*> list;
+        list.append(bitmap);
+        AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene, list);
+        m_viewer->undoStack()->push(addCmd);
+        //m_scene->addLaserPrimitive(bitmap);
+        m_viewer->onReplaceGroup(bitmap);
+    }
 }
 
 void LaserControllerWindow::onActionRegiste(bool checked)
@@ -7383,7 +7394,8 @@ void LaserControllerWindow::initDocument(LaserDocument* doc)
     connect(doc, &LaserDocument::exportFinished, this, &LaserControllerWindow::onDocumentExportFinished);
 
     doc->bindLayerButtons(m_layerButtons);
-    m_layerButtons[m_viewer->curLayerIndex()]->setCheckedTrue();
+    LayerButton* layerButton = this->currentLayerButton();
+    layerButton->select();
     m_tableWidgetLayers->setDocument(doc);
     m_tableWidgetLayers->updateItems();
     setWindowTitle(doc->name());
@@ -7893,7 +7905,7 @@ void LaserControllerWindow::onActionStampImport(bool checked)
     QPoint c = m_viewer->mapToScene(m_viewer->rect().center()).toPoint();
     QRect bounds(c.x() - w * 0.5, c.y() - h * 0.5, w, h);
 
-    LaserStampBitmap* stampBitmap = new LaserStampBitmap(img, bounds, false, m_scene->document(), QTransform(), m_viewer->curLayerIndex());
+    LaserStampBitmap* stampBitmap = new LaserStampBitmap(img, bounds, false, m_scene->document(), QTransform(), m_scene->document()->currentLayerIndex());
     stampBitmap->computeImage();
     bool result = m_viewer->addPrimitiveAndExamRegionByBounds(stampBitmap);
     
@@ -7901,29 +7913,41 @@ void LaserControllerWindow::onActionStampImport(bool checked)
 
 void LaserControllerWindow::onActionCreateNameStamp()      
 {
-    StampFrameDialog dialog(m_scene);
-  
+    LaserLayer* layer = m_scene->document()->idleLayer();
+    if (!layer)
+        return;
+
+    StampFrameDialog dialog(m_scene, layer);
     dialog.exec();
 }
 
 void LaserControllerWindow::onActionCreateStripStamp()
 {
-    StampStripDialog dialog(m_scene);
+    LaserLayer* layer = m_scene->document()->idleLayer();
+    if (!layer)
+        return;
 
+    StampStripDialog dialog(m_scene, layer);
     dialog.exec();
 }
 
 void LaserControllerWindow::onActionCreateCircleStamp()
 {
-    StampCircleDialog dialog(m_scene);
+    LaserLayer* layer = m_scene->document()->idleLayer();
+    if (!layer)
+        return;
 
+    StampCircleDialog dialog(m_scene, layer);
     dialog.exec();
 }
 
 void LaserControllerWindow::onActionCreateEllipseStamp()
 {
-    StampCircleDialog dialog(m_scene, true);
+    LaserLayer* layer = m_scene->document()->idleLayer();
+    if (!layer)
+        return;
 
+    StampCircleDialog dialog(m_scene, layer, true);
     dialog.exec();
     
 }

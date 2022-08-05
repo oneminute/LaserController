@@ -242,7 +242,7 @@ bool utils::computeBoundingRect(LaserPrimitive* primitive, QRect& bounding, QRec
     LaserLayer* layer = primitive->layer();
     if (primitive->isBitmap() ||
         (layer->type() == LLT_FILLING && layer->fillingType() == FT_Pixel && (primitive->isShape() || primitive->isText())) ||
-        (layer->type() == LLT_STAMP && (primitive->isShape() || primitive->isText())))
+        (layer->type() == LLT_STAMP && (primitive->isStamp())))
     {
         if (accCount++ == 0)
         {

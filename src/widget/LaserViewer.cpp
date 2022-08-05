@@ -30,9 +30,10 @@
 #include "state/StateController.h"
 #include "widget/RulerWidget.h"
 #include "common/Config.h"
+#include "widget/OverstepMessageBoxWarn.h"
 #include "widget/UndoCommand.h";
 #include "util/utils.h"
-#include "widget/OverstepMessageBoxWarn.h"
+#include "util/WidgetUtils.h"
 
 LaserViewer::LaserViewer(QWidget* parent)
 	: QGraphicsView(parent)
@@ -56,7 +57,7 @@ LaserViewer::LaserViewer(QWidget* parent)
 	, m_mousePressState(nullptr)
 	, m_isPrimitiveInteractPoint(false)
 	, m_isGridNode(false)
-	, m_curLayerIndex(0)
+	//, m_curLayerIndex(0)
     , m_editingText(nullptr)
     , m_isCapsLock(false)
     , m_insertIndex(-1)
@@ -64,6 +65,8 @@ LaserViewer::LaserViewer(QWidget* parent)
     , m_textAlighV(Qt::AlignBottom)
     , m_isTextMessageBoxShow(false)
     , m_showLaserPos(false)
+    , m_lastPolygon(nullptr)
+    , m_currentPolyline(nullptr)
 {
     setScene(m_scene.data());
     init();
@@ -1244,10 +1247,10 @@ QMap<QString, QList<LaserPrimitive*>>& LaserViewer::groupedMap()
 	return m_groupedMap;
 }
 
-int LaserViewer::curLayerIndex()
-{
-	return m_curLayerIndex;
-}
+//int LaserViewer::curLayerIndex()
+//{
+//	return m_curLayerIndex;
+//}
 
 void LaserViewer::selectLayer(LaserLayer* layer)
 {
@@ -1278,10 +1281,10 @@ void LaserViewer::selectLayer(LaserLayer* layer)
     viewport()->repaint();
 }
 
-void LaserViewer::setCurLayerIndex(int index)
-{
-	m_curLayerIndex = index;
-}
+//void LaserViewer::setCurLayerIndex(int index)
+//{
+//	m_curLayerIndex = index;
+//}
 
 QLineF LaserViewer::modifyTextCursor()
 {
@@ -2382,6 +2385,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		return;
 	}
 
+    int layerIndex = m_scene->document()->currentLayerIndex();
     if (StateControllerInst.isInState(StateControllerInst.documentPrintAndCutSelectingState()))
     {
         QGraphicsView::mouseReleaseEvent(event);
@@ -2562,22 +2566,24 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         }
         QRectF rect(QPointF(left, top), QPointF(right, bottom));
         if (rect.width() != 0 && rect.height() != 0) {
-            LaserRect* rectItem = new LaserRect(rect.toRect(), 0, m_scene->document(), QTransform(), m_curLayerIndex);
-            //判断是否在4叉树的有效区域内
-            if (m_scene->maxRegion().contains(QRectF(m_creatingRectStartPoint, m_creatingRectEndPoint).toRect())) {
-                //undo 创建完后会执行redo
-                QList<QGraphicsItem*> list;
-                list.append(rectItem);
-                AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene.data(), list);
-                m_undoStack->push(addCmd);
-                //m_scene->addLaserPrimitive(rectItem);
-                onReplaceGroup(rectItem);
+            LaserLayer* layer = m_scene->document()->getCurrentOrCapableLayer(LPT_RECT);
+            if (layer)
+            {
+                LaserRect* rectItem = new LaserRect(rect.toRect(), 0, m_scene->document(), QTransform(), layer->index());
+                //判断是否在4叉树的有效区域内
+                if (m_scene->maxRegion().contains(QRectF(m_creatingRectStartPoint, m_creatingRectEndPoint).toRect())) {
+                    //undo 创建完后会执行redo
+                    QList<QGraphicsItem*> list;
+                    list.append(rectItem);
+                    AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene.data(), list);
+                    m_undoStack->push(addCmd);
+                    //m_scene->addLaserPrimitive(rectItem);
+                    onReplaceGroup(rectItem);
+                }
+                else {
+                    QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+                }
             }
-            else {
-                QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
-                
-            }
-            
         }
         viewport()->repaint();
         emit readyRectangle();
@@ -2589,7 +2595,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 			return;
 		}
         QRectF rect(m_creatingEllipseStartPoint, m_EllipseEndPoint);
-        LaserEllipse* ellipseItem = new LaserEllipse(rect.toRect(), m_scene->document(), QTransform(), m_curLayerIndex);
+        LaserEllipse* ellipseItem = new LaserEllipse(rect.toRect(), m_scene->document(), QTransform(), layerIndex);
         //m_scene->addLaserPrimitive(ellipseItem);
         //判断是否在4叉树的有效区域内
         if (m_scene->maxRegion().contains(rect.toRect())) {
@@ -2627,7 +2633,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 		if (m_creatingLineStartPoint != m_creatingLineEndPoint) {
 			if (event->button() == Qt::LeftButton) {
 				QLineF line(m_creatingLineStartPoint, m_creatingLineEndPoint);
-				LaserLine* lineItem = new LaserLine(line.toLine(), m_scene->document(), QTransform(), m_curLayerIndex);
+				LaserLine* lineItem = new LaserLine(line.toLine(), m_scene->document(), QTransform(), layerIndex);
 				//m_scene->addLaserPrimitive(lineItem);
                 //判断是否在4叉树的有效区域内
                 if (m_scene->maxRegion().contains(m_creatingLineStartPoint.toPoint()) && 
@@ -2687,58 +2693,80 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonCreatingState())) {
 		
 		if (event->button() == Qt::LeftButton) {
-			if (!isRepeatPoint()) {
-				m_creatingPolygonLines.append(QLineF(m_creatingPolygonPoints[m_creatingPolygonPoints.size() - 1], m_creatingPolygonEndPoint));
-				m_creatingPolygonPoints.append(m_creatingPolygonEndPoint);
-				LaserPrimitive* primitive;
-				LaserPolyline * curPolyline = new LaserPolyline(QPolygonF(m_creatingPolygonPoints).toPolygon(), m_scene->document(),
-					QTransform(), m_curLayerIndex);
-				//m_scene->addLaserPrimitive(curPolyline);
-				primitive = curPolyline;
-				if (m_creatingPolygonEndPoint == m_creatingPolygonStartPoint) {
-					LaserPolygon* polygon = new LaserPolygon(QPolygonF(m_creatingPolygonPoints).toPolygon(), m_scene->document(),
-						QTransform(), m_curLayerIndex);
-					//m_scene->addLaserPrimitive(polygon);
-					//onReplaceGroup(polygon);
-					m_creatingPolygonPoints.clear();
-					setCursor(Qt::ArrowCursor);
-					emit readyPolygon();				
-					primitive = polygon;
-				}	
-                //判断是否在4叉树的有效区域内
-                if (m_scene->maxRegion().contains(m_creatingPolygonEndPoint.toPoint())) {
-                    //undo
-                    PolygonUndoCommand* polyCmd = new PolygonUndoCommand(m_scene.data(), m_lastPolygon, primitive);
-                    m_undoStack->push(polyCmd);
-                    m_lastPolygon = primitive;
+            if (!isRepeatPoint()) {
+                LaserLayer* layer = nullptr;
+                if (m_currentPolyline == nullptr)
+                {
+                    layer = m_scene->document()->findCapableLayer(LPT_POLYLINE);
                 }
-                else {
-                    QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
-                    m_creatingPolygonPoints.removeLast();
+                else
+                {
+                    layer = m_currentPolyline->layer();
                 }
-				
-			}
+                if (layer)
+                {
+                    m_creatingPolygonLines.append(QLineF(m_creatingPolygonPoints[m_creatingPolygonPoints.size() - 1], m_creatingPolygonEndPoint));
+                    m_creatingPolygonPoints.append(m_creatingPolygonEndPoint);
+                    LaserPrimitive* primitive;
+                    LaserPolyline* curPolyline = new LaserPolyline(QPolygonF(m_creatingPolygonPoints).toPolygon(), m_scene->document(),
+                        QTransform(), layerIndex);
+                    //m_scene->addLaserPrimitive(curPolyline);
+                    primitive = curPolyline;
+                    m_currentPolyline = curPolyline;
+                    if (m_creatingPolygonEndPoint.toPoint() == m_creatingPolygonStartPoint.toPoint()) {
+                        layer = m_scene->document()->findCapableLayer(LPT_POLYGON);
+                        if (layer)
+                        {
+                            LaserPolygon* polygon = new LaserPolygon(QPolygonF(m_creatingPolygonPoints).toPolygon(), m_scene->document(),
+                                QTransform(), layer->index());
+                            //m_scene->addLaserPrimitive(polygon);
+                            //onReplaceGroup(polygon);
+                            emit readyPolygon();
+                            primitive = polygon;
+                        }
+                        m_creatingPolygonPoints.clear();
+                        m_currentPolyline = nullptr;
+                        setCursor(Qt::ArrowCursor);
+                    }
+                    //判断是否在4叉树的有效区域内
+                    if (m_scene->maxRegion().contains(m_creatingPolygonEndPoint.toPoint())) {
+                        //undo
+                        PolygonUndoCommand* polyCmd = new PolygonUndoCommand(m_scene.data(), m_lastPolygon, primitive);
+                        m_undoStack->push(polyCmd);
+                        m_lastPolygon = primitive;
+                    }
+                    else {
+                        QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+                        m_creatingPolygonPoints.removeLast();
+                    }
+                }
+            }
 		}
         else if (event->button() == Qt::RightButton) {
             if (m_creatingPolygonPoints.size() > 0) {
-                LaserPolyline* polyLine = new LaserPolyline(QPolygonF(m_creatingPolygonPoints).toPolygon(), m_scene->document(),
-                    QTransform(), m_curLayerIndex);
-                //m_scene->addLaserPrimitive(polyLine);
-                //onReplaceGroup(polyLine);
-                //undo
-                //判断是否在4叉树的有效区域内
-                if (m_scene->maxRegion().contains(m_creatingPolygonEndPoint.toPoint())) {
+                LaserLayer* layer = m_scene->document()->findCapableLayer(LPT_POLYGON);
+                if (layer)
+                {
+                    LaserPolyline* polyLine = new LaserPolyline(QPolygonF(m_creatingPolygonPoints).toPolygon(), m_scene->document(),
+                        QTransform(), layer->index());
+                    //m_scene->addLaserPrimitive(polyLine);
+                    //onReplaceGroup(polyLine);
                     //undo
-                    PolygonUndoCommand* polyCmd = new PolygonUndoCommand(m_scene.data(), m_lastPolygon, polyLine);
-                    m_undoStack->push(polyCmd);
-                    m_lastPolygon = polyLine;
+                    //判断是否在4叉树的有效区域内
+                    if (m_scene->maxRegion().contains(m_creatingPolygonEndPoint.toPoint())) {
+                        //undo
+                        PolygonUndoCommand* polyCmd = new PolygonUndoCommand(m_scene.data(), m_lastPolygon, polyLine);
+                        m_undoStack->push(polyCmd);
+                        m_lastPolygon = polyLine;
+                    }
+                    else {
+                        QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
+                        m_creatingPolygonPoints.removeLast();
+                    }
+                    //m_undoStack->push(polyCmd);
                 }
-                else {
-                    QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
-                    m_creatingPolygonPoints.removeLast();
-                }
-                //m_undoStack->push(polyCmd);
             }
+            m_currentPolyline = nullptr;
             m_creatingPolygonPoints.clear();
             setCursor(Qt::ArrowCursor);
             emit readyPolygon();
@@ -2764,7 +2792,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
             LaserPrimitive* cursorIn = nullptr;
             cursorIn = cursorInLaserPrimitive(mapToScene(event->pos()));
             //create
-            LaserStar* star = new LaserStar(m_scene->document(), mapToScene(event->pos()).toPoint(), 5500, false, QTransform(), m_curLayerIndex);
+            LaserStar* star = new LaserStar(m_scene->document(), mapToScene(event->pos()).toPoint(), 5500, false, QTransform(), layerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(star);
             emit LaserApplication::mainWindow->isIdle();
@@ -2781,7 +2809,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
             LaserPrimitive* cursorIn = nullptr;
             cursorIn = cursorInLaserPrimitive(mapToScene(event->pos()));
             //create
-            LaserStar* star = new LaserStar(m_scene->document(), mapToScene(event->pos()).toPoint(), 5500, false, QTransform(), m_curLayerIndex);
+            LaserStar* star = new LaserStar(m_scene->document(), mapToScene(event->pos()).toPoint(), 5500, false, QTransform(), layerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(star);
             emit LaserApplication::mainWindow->isIdle();
@@ -2798,7 +2826,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
             LaserPrimitive* cursorIn = nullptr;
             cursorIn = cursorInLaserPrimitive(mapToScene(event->pos()));
             //create
-            LaserPartyEmblem* pe = new LaserPartyEmblem(m_scene->document(), mapToScene(event->pos()).toPoint(), 5500,false,  QTransform(), m_curLayerIndex);
+            LaserPartyEmblem* pe = new LaserPartyEmblem(m_scene->document(), mapToScene(event->pos()).toPoint(), 5500,false,  QTransform(), layerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(pe);
             emit LaserApplication::mainWindow->isIdle();
@@ -2814,7 +2842,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
             QPointF point = mapToScene(event->pos());
             //create
             QRect rect(point.x(), point.y(), 40 * 1000, 40 * 1000);
-            LaserFrame* frame = new LaserFrame(m_scene->document(), rect, 2000,3000 ,false,  QTransform(), m_curLayerIndex);
+            LaserFrame* frame = new LaserFrame(m_scene->document(), rect, 2000,3000 ,false,  QTransform(), layerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(frame);
             emit LaserApplication::mainWindow->isIdle();
@@ -2824,7 +2852,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         if (event->button() == Qt::LeftButton) {
             QPointF point = mapToScene(event->pos());
             QRect rect(point.x(), point.y(), 40 * 1000, 40 * 1000);
-            LaserRing* ring = new LaserRing(m_scene->document(), rect, 2000, false, QTransform(), m_curLayerIndex);
+            LaserRing* ring = new LaserRing(m_scene->document(), rect, 2000, false, QTransform(), layerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(ring);
             emit LaserApplication::mainWindow->isIdle();
@@ -2834,7 +2862,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         if (event->button() == Qt::LeftButton) {
             QPointF point = mapToScene(event->pos());
             QRect rect(point.x(), point.y(), 50 * 1000, 35 * 1000);
-            LaserRing* ring = new LaserRing(m_scene->document(), rect, 2000, false, QTransform(), m_curLayerIndex);
+            LaserRing* ring = new LaserRing(m_scene->document(), rect, 2000, false, QTransform(), layerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(ring);
             emit LaserApplication::mainWindow->isIdle();
@@ -2861,7 +2889,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                 transform = cursorIn->sceneTransform();
             }
             //create
-            LaserCircleText* text = new LaserCircleText(m_scene->document(), tr("stampContent"), rect,160, false, false, false, false,"Times New Roman",0, true, 0, 0, QSize(), transform, m_curLayerIndex);
+            LaserCircleText* text = new LaserCircleText(m_scene->document(), tr("stampContent"), rect,160, false, false, false, false,"Times New Roman",0, true, 0, 0, QSize(), transform, layerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(text);
             emit LaserApplication::mainWindow->isIdle();
@@ -2879,7 +2907,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                 transform = cursorIn->sceneTransform();
             }
             //create
-            LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), tr("stampContent"), QSize(3.2*1000, 6*1000), point, false, false, false,false, "Times New Roman", 550, transform, m_curLayerIndex);
+            LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), tr("stampContent"), QSize(3.2*1000, 6*1000), point, false, false, false,false, "Times New Roman", 550, transform, layerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(text);
             emit LaserApplication::mainWindow->isIdle();
@@ -2900,7 +2928,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
             if (cursorIn) {
                 transform = cursorIn->sceneTransform();
             }
-            LaserVerticalText* text = new LaserVerticalText(m_scene->document(), tr("stampContent"), QSize(3.2 * 1000, 3.2 * 1000), point, false, false,false,false, "Times New Roman", 550, transform, m_curLayerIndex);
+            LaserVerticalText* text = new LaserVerticalText(m_scene->document(), tr("stampContent"), QSize(3.2 * 1000, 3.2 * 1000), point, false, false,false,false, "Times New Roman", 550, transform, layerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(text);
             emit LaserApplication::mainWindow->isIdle();
@@ -3888,7 +3916,7 @@ bool LaserViewer::detectLine(QList<QLineF> lines, QPointF startPoint, QPointF po
 bool LaserViewer::isRepeatPoint()
 {
 	bool bl = true;
-	if (m_creatingPolygonPoints[m_creatingPolygonPoints.size() - 1] != m_creatingPolygonEndPoint) {
+	if (m_creatingPolygonPoints.last().toPoint() != m_creatingPolygonEndPoint.toPoint()) {
 		bl = false;
 	}
 	if (bl) {
@@ -3899,7 +3927,7 @@ bool LaserViewer::isRepeatPoint()
 
 bool LaserViewer::isStartPoint()
 {
-	if (m_creatingPolygonStartPoint != m_creatingPolygonEndPoint) {
+	if (m_creatingPolygonStartPoint.toPoint() != m_creatingPolygonEndPoint.toPoint()) {
 		return false;
 	}
 	return true;
@@ -4509,17 +4537,17 @@ void LaserViewer::addText(QString str)
 {
     if (!m_editingText) 
     {
-        m_insertIndex = 0;
-        qreal spaceY = qRound(LaserApplication::mainWindow->textSpaceYSpinBox()->value() * 25400.0 / logicalDpiY());
-        m_editingText = new LaserText(m_scene->document(), mapToScene(m_textMousePressPos.toPoint()),
-            m_textFont, spaceY, m_textAlighH, m_textAlighV,
-            QTransform(),  m_curLayerIndex);
-        
-        m_editingText->addPath(str, m_insertIndex);
-        m_insertIndex += str.size();
-        if (!m_scene->document()->addPrimitive(m_editingText))
+        LaserLayer* layer = m_scene->document()->findCapableLayer(LPT_TEXT);
+        if (layer)
         {
-
+            m_insertIndex = 0;
+            qreal spaceY = qRound(LaserApplication::mainWindow->textSpaceYSpinBox()->value() * 25400.0 / logicalDpiY());
+            m_editingText = new LaserText(m_scene->document(), mapToScene(m_textMousePressPos.toPoint()),
+                m_textFont, spaceY, m_textAlighH, m_textAlighV,
+                QTransform(),  layer->index());
+            m_editingText->addPath(str, m_insertIndex);
+            m_insertIndex += str.size();
+            m_scene->document()->addPrimitive(m_editingText);
         }
     }
     else 
@@ -5121,7 +5149,7 @@ void LaserViewer::createSpline()
         path.lineTo(nodeStruct.node.toPoint());
     }
 
-    LaserPath* laserPath = new LaserPath(path, m_scene->document(), QTransform(), m_curLayerIndex);
+    LaserPath* laserPath = new LaserPath(path, m_scene->document(), QTransform(), m_scene->document()->currentLayerIndex());
     m_scene->document()->addPrimitive(laserPath);
     m_handlingSpline.objectName = laserPath->objectName();
     m_splineList.append(m_handlingSpline);

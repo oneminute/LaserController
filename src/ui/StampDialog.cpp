@@ -1,10 +1,16 @@
 #include "StampDialog.h"
-#include "scene/LaserScene.h"
-#include "scene/LaserPrimitiveGroup.h"
 
-StampDialog::StampDialog(LaserScene* scene, QWidget* parent) 
-    :QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint),
-    m_scene(scene)
+#include "QGraphicsView"
+
+#include "scene/LaserLayer.h"
+#include "scene/LaserPrimitiveGroup.h"
+#include "scene/LaserScene.h"
+#include "widget/LaserViewer.h"
+
+StampDialog::StampDialog(LaserScene* scene, LaserLayer* layer, QWidget* parent) 
+    : QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint)
+    , m_scene(scene)
+    , m_layer(layer)
 {
     m_viewer = qobject_cast<LaserViewer*>( m_scene->views()[0]);
 }

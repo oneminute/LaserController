@@ -548,10 +548,7 @@ bool LaserPrimitive::isShape() const
         d->primitiveType == LPT_POLYLINE ||
         d->primitiveType == LPT_POLYGON ||
         d->primitiveType == LPT_PATH ||
-        d->primitiveType == LPT_STAR ||
-        d->primitiveType == LPT_PARTYEMBLEM ||
-        d->primitiveType == LPT_FRAME ||
-        d->primitiveType == LPT_RING;
+        d->primitiveType == LPT_NURBS;
 }
 
 bool LaserPrimitive::isBitmap() const 
@@ -563,10 +560,7 @@ bool LaserPrimitive::isBitmap() const
 bool LaserPrimitive::isText() const
 {
     Q_D(const LaserPrimitive);
-    return d->primitiveType == LPT_TEXT ||
-        d->primitiveType == LPT_CIRCLETEXT ||
-        d->primitiveType == LPT_HORIZONTALTEXT ||
-        d->primitiveType == LPT_VERTICALTEXT;
+    return d->primitiveType == LPT_TEXT;
 }
 
 bool LaserPrimitive::isStamp() const

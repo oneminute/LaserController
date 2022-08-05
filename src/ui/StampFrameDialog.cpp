@@ -1,25 +1,28 @@
 #include "StampFrameDialog.h"
 #include "ui_StampFrameDialog.h"
-#include<QAbstractItemView>
-#include<QListView>
-#include<QStyledItemDelegate>
-#include<QComboBox>
-#include<QPushButton>
-#include"scene/LaserPrimitive.h"
-#include "scene/LaserDocument.h"
-#include"scene/LaserDocument.h"
-#include "scene/LaserLayer.h"
-#include "ui/StampDialog.h"
 
-StampFrameDialog::StampFrameDialog(LaserScene* scene, QWidget* parent) 
-   : StampDialog(scene, parent),
-    m_ui(new Ui::StampFrameDialog), m_scene(scene)
+#include <QAbstractItemView>
+#include <QListView>
+#include <QStyledItemDelegate>
+#include <QComboBox>
+#include <QPushButton>
+
+#include "scene/LaserPrimitive.h"
+#include "scene/LaserDocument.h"
+#include "scene/LaserDocument.h"
+#include "scene/LaserLayer.h"
+#include "scene/LaserScene.h"
+#include "ui/StampDialog.h"
+#include "widget/LaserViewer.h"
+
+StampFrameDialog::StampFrameDialog(LaserScene* scene, LaserLayer* layer, QWidget* parent) 
+    : StampDialog(scene, layer, parent)
+    , m_ui(new Ui::StampFrameDialog)
+    , m_scene(scene)
 {
     m_viewer = qobject_cast<LaserViewer*> (scene->views()[0]);
     m_ui->setupUi(this);
-    LaserLayer* layer = m_scene->document()->idleLayer();
     layer->setType(LLT_STAMP);
-    m_layerIndex = layer->index();
     m_preview = m_ui->graphicsView;
     //LayoutComboBox
     QPixmap fourPm(":/ui/icons/images/frameFour.png");
@@ -201,7 +204,7 @@ QList<LaserPrimitive*> StampFrameDialog::createStampPrimitive() {
     QPointF point = allBounds.topRight();
     QRect rect(point.x(), point.y(), frameW, frameH);
     bool needAuxiliary = true;
-    LaserFrame* frame = new LaserFrame(m_scene->document(), rect, frameBorder, cornerRadius, stampIntaglio, QTransform(), m_layerIndex, frameType);
+    LaserFrame* frame = new LaserFrame(m_scene->document(), rect, frameBorder, cornerRadius, stampIntaglio, QTransform(), m_layer->index(), frameType);
     frame->setNeedAuxiliaryLine(needAuxiliary);
     stampList.append(frame);
     LaserFrame* innerFrame = nullptr;;
@@ -213,7 +216,7 @@ QList<LaserPrimitive*> StampFrameDialog::createStampPrimitive() {
         qreal innerW = frameW - innderMargin * 2 - frameBorder * 2;
         qreal innerH = frameH - innderMargin * 2 - frameBorder * 2;
         innerRect = QRect(point.x() + innderMargin + frameBorder, point.y() + innderMargin + frameBorder, innerW, innerH);
-        innerFrame = new LaserFrame(m_scene->document(), innerRect, innerBorder, cornerRadius, stampIntaglio, QTransform(), m_layerIndex, frameType);
+        innerFrame = new LaserFrame(m_scene->document(), innerRect, innerBorder, cornerRadius, stampIntaglio, QTransform(), m_layer->index(), frameType);
         innerFrame->setNeedAuxiliaryLine(needAuxiliary);
         innerFrame->setInner(true);
         stampList.append(innerFrame);
@@ -415,7 +418,7 @@ QList<LaserPrimitive*> StampFrameDialog::createStampPrimitive() {
             }
         }
         LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), signalText, textSize, center,
-            bold, itatic, false, stampIntaglio, family, 0.0, QTransform(), m_layerIndex);
+            bold, itatic, false, stampIntaglio, family, 0.0, QTransform(), m_layer->index());
         stampList.append(text);
     }
     return stampList;

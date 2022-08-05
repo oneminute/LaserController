@@ -1,25 +1,26 @@
 #include "StampStripDialog.h"
 #include "ui_StampStripDialog.h"
-#include<QAbstractItemView>
-#include<QListView>
-#include<QStyledItemDelegate>
-#include<QComboBox>
-#include<QStringList>
-#include<QHeaderView>
-#include<QPushButton>
-#include "ui/StampDialog.h"
-#include"scene/LaserPrimitive.h"
-#include"scene/LaserDocument.h"
-#include "scene/LaserLayer.h"
 
-StampStripDialog::StampStripDialog(LaserScene* scene, QWidget* parent) 
-   : StampDialog(scene, parent),
-    m_ui(new Ui::StampStripDialog)
+#include <QAbstractItemView>
+#include <QComboBox>
+#include <QHeaderView>
+#include <QListView>
+#include <QPushButton>
+#include <QStringList>
+#include <QStyledItemDelegate>
+
+#include "scene/LaserPrimitive.h"
+#include "scene/LaserDocument.h"
+#include "scene/LaserLayer.h"
+#include "scene/LaserScene.h"
+#include "widget/LaserViewer.h"
+
+StampStripDialog::StampStripDialog(LaserScene* scene, LaserLayer* layer, QWidget* parent) 
+    : StampDialog(scene, layer, parent)
+    , m_ui(new Ui::StampStripDialog)
 {
     m_ui->setupUi(this);
-    LaserLayer* layer = m_scene->document()->idleLayer();
     layer->setType(LLT_STAMP);
-    m_layerIndex = layer->index();
     m_preview = m_ui->graphicsView;
     //LayoutComboBox
     QPixmap fourPm(":/ui/icons/images/signalLine.png");
@@ -318,7 +319,7 @@ QList<LaserPrimitive*> StampStripDialog::createStampPrimitive()
     QPointF point = allBounds.topRight();
     QRect rect(point.x(), point.y(), frameW, frameH);
     bool needAuxiliary = false;
-    LaserFrame* frame = new LaserFrame(m_scene->document(), rect, frameBorder, cornerRadius, stampIntaglio, QTransform(), m_layerIndex, frameType);
+    LaserFrame* frame = new LaserFrame(m_scene->document(), rect, frameBorder, cornerRadius, stampIntaglio, QTransform(), m_layer->index(), frameType);
     frame->setNeedAuxiliaryLine(needAuxiliary);
     stampList.append(frame);
     LaserFrame* innerFrame = nullptr;;
@@ -330,7 +331,7 @@ QList<LaserPrimitive*> StampStripDialog::createStampPrimitive()
         qreal innerW = frameW - innderMargin * 2 - frameBorder * 2;
         qreal innerH = frameH - innderMargin * 2 - frameBorder * 2;
         innerRect = QRect(point.x() + innderMargin + frameBorder, point.y() + innderMargin + frameBorder, innerW, innerH);
-        innerFrame = new LaserFrame(m_scene->document(), innerRect, innerBorder, cornerRadius, stampIntaglio, QTransform(), m_layerIndex, frameType);
+        innerFrame = new LaserFrame(m_scene->document(), innerRect, innerBorder, cornerRadius, stampIntaglio, QTransform(), m_layer->index(), frameType);
         innerFrame->setNeedAuxiliaryLine(false);
         innerFrame->setInner(true);
         stampList.append(innerFrame);
@@ -372,7 +373,7 @@ QList<LaserPrimitive*> StampStripDialog::createStampPrimitive()
         if (layoutIndex == 0) {
             textSize = QSize((textRect.width() - (contentSize - 1) * textHSpace) / contentSize, textH);
             LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), content, textSize, center,
-                bold, itatic, false, stampIntaglio, family, textHSpace, QTransform(), m_layerIndex);
+                bold, itatic, false, stampIntaglio, family, textHSpace, QTransform(), m_layer->index());
 
             rectifyTextSize(textRect.width(), textRect.height(), text);
             stampList.append(text);
@@ -382,7 +383,7 @@ QList<LaserPrimitive*> StampStripDialog::createStampPrimitive()
             center = QPointF(center.x(), (textH + textVSpace) * r + textH * 0.5 + textRect.top());
 
             LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), content, textSize, center,
-                bold, itatic, false, stampIntaglio, family, textHSpace, QTransform(), m_layerIndex);
+                bold, itatic, false, stampIntaglio, family, textHSpace, QTransform(), m_layer->index());
             rectifyTextSize(textRect.width(), textH, text);
             stampList.append(text);
         }
@@ -393,7 +394,7 @@ QList<LaserPrimitive*> StampStripDialog::createStampPrimitive()
             center = QPointF(textRect.left() + textSize.width() * 0.5 + textSize.width() * r, center.y());
 
             LaserVerticalText* text = new LaserVerticalText(m_scene->document(), content, textSize, center,
-                bold, itatic, false, stampIntaglio, family, textVSpace, QTransform(), m_layerIndex);
+                bold, itatic, false, stampIntaglio, family, textVSpace, QTransform(), m_layer->index());
             rectifyTextSize(textW, textRect.height(), text);
             stampList.append(text);
         }
