@@ -6,7 +6,7 @@
 #include "algorithm/OptimizeNode.h"
 #include "algorithm/OptimizeEdge.h"
 #include "scene/LaserLayer.h"
-#include "scene/LaserPrimitive.h"
+#include "primitive/LaserPrimitiveHeaders.h"
 #include "laser/LaserPoint.h"
 #include "laser/LaserPointList.h"
 #include "laser/LaserDevice.h"

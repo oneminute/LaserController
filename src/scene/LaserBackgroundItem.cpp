@@ -1,4 +1,5 @@
 #include "LaserBackgroundItem.h"
+
 #include <QPainter>
 #include <QDebug>
 #include <QList>
@@ -6,13 +7,13 @@
 #include <QtCore/qmath.h>  
 #include <QTransform>
 #include <QStyleOptionGraphicsItem>
-#include "scene/LaserPrimitive.h"
 
 #include "LaserApplication.h"
-#include "widget//LaserViewer.h"
 #include "common/common.h"
 #include "common/Config.h"
 #include "laser/LaserDevice.h"
+#include "primitive/LaserPrimitiveHeaders.h"
+#include "widget//LaserViewer.h"
 
 LaserBackgroundItem::LaserBackgroundItem(QGraphicsItem * parent)
 	: QGraphicsItemGroup(parent)

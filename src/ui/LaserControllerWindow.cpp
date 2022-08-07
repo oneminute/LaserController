@@ -1,9 +1,5 @@
 ﻿#include "LaserControllerWindow.h"
 #include "ui_LaserControllerWindow.h"
-#include "widget/UndoCommand.h"
-#include "util/Utils.h"
-#include "widget/OverstepMessageBoxWarn.h"
-#include "scene/LaserPrimitive.h"
 
 #include <DockAreaTabBar.h>
 #include <DockAreaTitleBar.h>
@@ -12,9 +8,9 @@
 #include <DockContainerWidget.h>
 #include <DockSplitter.h>
 #include <DockWidgetTab.h>
-#include <QFileDialog> 
 #include <FloatingDockContainer.h>
 #include <QCheckBox>
+#include <QFileDialog> 
 #include <QTextCodec>
 #include <QComboBox>
 #include <QDesktopServices>
@@ -58,14 +54,16 @@
 #include "common/Config.h"
 #include "import/Importer.h"
 #include "laser/LaserDevice.h"
+#include "primitive/LaserPrimitiveHeaders.h"
 #include "scene/LaserDocument.h"
 #include "scene/LaserLayer.h"
-#include "scene/LaserPrimitive.h"
-#include "scene/LaserPrimitiveGroup.h"
 #include "scene/LaserScene.h"
-#include "scene/LaserPrimitive.h"
 #include "state/StateController.h"
 #include "task/ProgressModel.h"
+#include "ui/StampFrameDialog.h"
+#include "ui/StampCircleDialog.h"
+#include "ui/StampStripDialog.h"
+#include "ui/SplashScreen.h"
 #include "ui/ConfigDialog.h"
 #include "ui/HalftoneDialog.h"
 #include "ui/LaserLayerDialog.h"
@@ -83,6 +81,8 @@
 #include "util/Utils.h"
 #include "util/MachiningUtils.h"
 #include "util/WidgetUtils.h"
+#include "widget/UndoCommand.h"
+#include "widget/OverstepMessageBoxWarn.h"
 #include "widget/FloatEditDualSlider.h"
 #include "widget/FloatEditSlider.h"
 #include "widget/ImageViewer.h"
@@ -101,10 +101,6 @@
 
 #include "opencv2/features2d.hpp"
 #include "opencv2/xfeatures2d.hpp"
-#include <ui/StampFrameDialog.h>
-#include <ui/StampCircleDialog.h>
-#include <ui/StampStripDialog.h>
-#include <ui/SplashScreen.h>
 
 using namespace ads;
 

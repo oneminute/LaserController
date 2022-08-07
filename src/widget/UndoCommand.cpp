@@ -1,15 +1,17 @@
 #include "UndoCommand.h"
+
 #include <QAction>
 #include <QMessageBox>
-#include "scene/LaserPrimitiveGroup.h"
-#include "scene/LaserPrimitive.h"
+
+#include "LaserApplication.h"
+#include "primitive/LaserPrimitiveGroup.h"
+#include "primitive/LaserPrimitiveHeaders.h"
 #include "state/StateController.h"
 #include "scene/LaserScene.h"
 #include "scene/LaserDocument.h"
-#include  "util/Utils.h"
 #include "scene/LaserLayer.h"
-#include "LaserApplication.h"
 #include "ui/LaserControllerWindow.h"
+#include  "util/Utils.h"
 
 SelectionUndoCommand::SelectionUndoCommand(
 	LaserViewer * viewer, 

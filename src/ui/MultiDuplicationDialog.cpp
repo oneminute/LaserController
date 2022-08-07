@@ -1,12 +1,14 @@
 #include "MultiDuplicationDialog.h"
 #include "ui_MultiDuplicationDialog.h"
+
+#include <QSpinBox>
+
 #include "LaserApplication.h"
 #include "common/common.h"
-#include "widget/LaserViewer.h"
+#include "primitive/LaserPrimitiveHeaders.h"
 #include "scene/LaserScene.h"
-#include "scene/LaserPrimitiveGroup.h"
+#include "widget/LaserViewer.h"
 #include "widget/UndoCommand.h"
-#include <QSpinBox>
 
 MultiDuplicationDialog::MultiDuplicationDialog(
     LaserViewer* view, 

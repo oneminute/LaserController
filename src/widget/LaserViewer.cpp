@@ -19,19 +19,18 @@
 #include <QLineEdit>
 
 #include <LaserApplication.h>
+#include "common/Config.h"
 #include "laser/LaserDevice.h"
-#include "scene/LaserPrimitiveGroup.h"
-#include "scene/LaserPrimitive.h"
+#include "primitive/LaserPrimitiveGroup.h"
+#include "primitive/LaserPrimitiveHeaders.h"
 #include "scene/LaserLayer.h"
 #include "scene/LaserScene.h"
 #include "scene/LaserDocument.h"
-#include "ui/LaserControllerWindow.h"
-
 #include "state/StateController.h"
 #include "widget/RulerWidget.h"
-#include "common/Config.h"
 #include "widget/OverstepMessageBoxWarn.h"
 #include "widget/UndoCommand.h";
+#include "ui/LaserControllerWindow.h"
 #include "util/utils.h"
 #include "util/WidgetUtils.h"
 

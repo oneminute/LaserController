@@ -10,7 +10,7 @@
 #include "LaserApplication.h"
 #include "ui/LaserControllerWindow.h"
 #include "laser/LaserDevice.h"
-#include "scene/LaserPrimitive.h"
+#include "primitive/LaserPrimitiveHeaders.h"
 #include "scene/LaserLayer.h"
 
 QString utils::createUUID(const QString& prefix)

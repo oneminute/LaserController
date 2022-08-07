@@ -18,23 +18,23 @@
 #include <QPainterPath>
 #include <opencv2/opencv.hpp>
 
-#include <LaserApplication.h>
-#include <laser/LaserDevice.h>
-#include "LaserPrimitive.h"
+#include "LaserApplication.h"
+#include "LaserScene.h"
+#include "LaserLayer.h"
 #include "PageInformation.h"
 #include "common/Config.h"
+#include "laser/LaserDevice.h"
 #include "laser/LaserDriver.h"
+#include "laser/LaserPointList.h"
+#include "primitive/LaserPrimitiveHeaders.h"
+#include "state/StateController.h"
+#include "svg/qsvgtinydocument.h"
+#include "task/ProgressModel.h"
 #include "util/MachiningUtils.h"
 #include "util/TypeUtils.h"
 #include "util/Utils.h"
 #include "util/WidgetUtils.h"
-#include "LaserLayer.h"
-#include "state/StateController.h"
-#include "svg/qsvgtinydocument.h"
-#include "LaserScene.h"
-#include "laser/LaserPointList.h"
 #include "ui/LaserControllerWindow.h"
-#include "task/ProgressModel.h"
 
 class LaserDocumentPrivate : public ILaserDocumentItemPrivate
 {

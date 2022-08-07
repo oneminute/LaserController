@@ -2,8 +2,8 @@
 
 #include "LaserApplication.h"
 #include "common/common.h"
+#include "primitive/LaserPrimitiveHeaders.h"
 #include "scene/LaserDocument.h"
-#include "scene/LaserPrimitive.h"
 #include "task/ProgressItem.h"
 #include "task/ProgressModel.h"
 

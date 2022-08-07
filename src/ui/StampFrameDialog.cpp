@@ -7,8 +7,7 @@
 #include <QComboBox>
 #include <QPushButton>
 
-#include "scene/LaserPrimitive.h"
-#include "scene/LaserDocument.h"
+#include "primitive/LaserPrimitiveHeaders.h"
 #include "scene/LaserDocument.h"
 #include "scene/LaserLayer.h"
 #include "scene/LaserScene.h"

@@ -2,19 +2,18 @@
 
 #include <QMessageBox>
 #include <QJsonArray>
-#include<QList>
+#include <QList>
 
-#include "common/Config.h"
 #include "LaserApplication.h"
-#include "laser/LaserDevice.h"
 #include "LaserDocument.h"
-#include "LaserPrimitive.h"
 #include "LaserScene.h"
-#include "scene/LaserPrimitiveGroup.h"
-#include "widget/LayerButton.h"
+#include "common/Config.h"
+#include "laser/LaserDevice.h"
+#include "primitive/LaserPrimitiveHeaders.h"
 #include "ui/LaserControllerWindow.h"
 #include "util/Utils.h"
 #include "util/WidgetUtils.h"
+#include "widget/LayerButton.h"
 
 class LaserLayerPrivate: public ILaserDocumentItemPrivate
 {

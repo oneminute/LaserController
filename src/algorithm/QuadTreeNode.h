@@ -1,8 +1,13 @@
 #ifndef QUADTREENODE_H
 #define QUADTREENODE_H
+
 #include <QList>
-#include "scene/LaserPrimitive.h"
-class QuadTreeNode {
+#include <QRect>
+
+#include "primitive/LaserPrimitiveDeclaration.h"
+
+class QuadTreeNode 
+{
 private:
     QRectF m_region;
     QList<LaserPrimitive*> m_primitiveList;
@@ -15,8 +20,9 @@ private:
     QRectF m_bottomLeftRegion;
     QRectF m_bottomRightRegion;
     QList<QuadTreeNode*> m_targetNodes;
-    int m_depth;//Ϊ0˵��Ϊ�ӽڵ�
+    int m_depth;//为0说明为子节点
     int m_maxDepth = 7;
+
 public:
     QuadTreeNode(QRectF region, int depth = 0);
     ~QuadTreeNode();
@@ -24,7 +30,7 @@ public:
     void createPrimitiveTreeNode(LaserPrimitive* primitive);
     void createNode(int type);
     QList<QuadTreeNode*>& search(QRectF selection);
-    bool isLeaf();//�Ƿ���Ҷ�ӽڵ�
+    bool isLeaf();//是否是叶子节点
     void setPrimitiveList(QList<LaserPrimitive*> list);
     QList<LaserPrimitive*> primitiveList();
     void addPrimitive(LaserPrimitive* primitive);

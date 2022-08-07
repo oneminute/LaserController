@@ -5,7 +5,9 @@
 #include <QThread>
 #include <QVector>
 #include <QVector2D>
-#include "scene/LaserPrimitive.h"
+
+#include "laser/LaserPointList.h"
+#include "primitive/LaserPrimitiveDeclaration.h"
 #include "ui/PreviewWindow.h"
 
 class PathOptimizer;

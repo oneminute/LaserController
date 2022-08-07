@@ -1,9 +1,9 @@
 #include "StampDialog.h"
 
-#include "QGraphicsView"
+#include <QGraphicsView>
 
+#include "primitive/LaserPrimitiveHeaders.h"
 #include "scene/LaserLayer.h"
-#include "scene/LaserPrimitiveGroup.h"
 #include "scene/LaserScene.h"
 #include "widget/LaserViewer.h"
 

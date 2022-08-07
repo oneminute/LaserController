@@ -1,7 +1,10 @@
 #include "QuadTreeNode.h"
+
 #include <QList>
 #include <QRectF>
 #include <QStack>
+
+#include "primitive/LaserPrimitiveHeaders.h"
 #include "util/utils.h"
 
 QuadTreeNode::QuadTreeNode(QRectF region, int depth)
@@ -34,6 +37,7 @@ QuadTreeNode::~QuadTreeNode()
     m_nodeBottomLeft = nullptr;
     m_nodeBottomRight = nullptr;
 }
+
 bool QuadTreeNode::createChildrenNodes(LaserPrimitive* primitive)
 {
     if (m_depth > m_maxDepth) {
@@ -44,6 +48,7 @@ bool QuadTreeNode::createChildrenNodes(LaserPrimitive* primitive)
     createPrimitiveTreeNode(primitive);
     return true;
 }
+
 void QuadTreeNode::createPrimitiveTreeNode(LaserPrimitive* primitive)
 {
     QRectF bound = primitive->sceneBoundingRect();

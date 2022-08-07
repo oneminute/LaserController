@@ -1,24 +1,27 @@
-#include "LaserApplication.h"
-#include "common/common.h"
 #include "CorelDrawImporter.h"
-#include "task/ProgressItem.h"
-#include "task/ProgressModel.h"
-#include "ui/LaserControllerWindow.h"
-#include "util/Utils.h"
-#include "util/TypeUtils.h"
-#include "scene/LaserDocument.h"
-#include "scene/LaserScene.h"
-#include "scene/LaserPrimitive.h"
-#include <VGCoreAuto.tlh>
-#include <ObjIdl.h>
 
-#include <system_error>
 #include <QCoreApplication>
 #include <QDialog>
 #include <QDir>
 #include <QMessageBox>
 #include <QWidget>
 #include <QWindow>
+
+#include <VGCoreAuto.tlh>
+#include <ObjIdl.h>
+#include <system_error>
+
+#include "LaserApplication.h"
+#include "common/common.h"
+#include "primitive/LaserPrimitiveHeaders.h"
+#include "scene/LaserDocument.h"
+#include "scene/LaserScene.h"
+#include "task/ProgressItem.h"
+#include "task/ProgressModel.h"
+#include "ui/LaserControllerWindow.h"
+#include "util/Utils.h"
+#include "util/TypeUtils.h"
+
 
 //#import "libid:95E23C91-BC5A-49F3-8CD1-1FC515597048" version("12.0") \
       //rename("GetCommandLine", "VGGetCommandLine") \

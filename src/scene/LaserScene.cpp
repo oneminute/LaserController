@@ -1,22 +1,21 @@
 #include "LaserScene.h"
 
-#include "LaserDocument.h"
-#include "LaserPrimitive.h"
-#include "LaserLayer.h"
-#include "LaserPrimitiveGroup.h"
-#include "widget/LaserViewer.h"
-#include "laser/LaserDevice.h"
-#include "LaserApplication.h"
-#include "ui/LaserControllerWindow.h"
-
-#include<QGraphicsSceneMouseEvent>
-#include<QGraphicsSceneWheelEvent>
-#include <QScrollBar>
+#include <QGraphicsSceneMouseEvent>
+#include <QGraphicsSceneWheelEvent>
 #include <QInputMethodEvent>
-#include <qmath.h>
 #include <QMessageBox>
-#include "util/Utils.h"
+#include <QScrollBar>
+#include <QtMath>
+
+#include "LaserApplication.h"
 #include "common/Config.h"
+#include "LaserDocument.h"
+#include "LaserLayer.h"
+#include "laser/LaserDevice.h"
+#include "primitive/LaserPrimitiveHeaders.h"
+#include "ui/LaserControllerWindow.h"
+#include "util/Utils.h"
+#include "widget/LaserViewer.h"
 
 LaserScene::LaserScene(QObject* parent)
     : QGraphicsScene(parent)
