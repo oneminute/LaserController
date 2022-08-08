@@ -60,11 +60,30 @@ void LaserPolyline::setPolyline(const QPolygon& poly)
     }
 }
 
-//QRect LaserPolyline::sceneBoundingRect() const
-//{
-//    Q_D(const LaserPolyline);
-//    return sceneTransform().map(d->path).boundingRect().toRect();
-//}
+int LaserPolyline::appendPoint(const QPoint& point)
+{
+    Q_D(LaserPolyline);
+    d->poly.append(point);
+    return d->poly.size() - 1;
+}
+
+void LaserPolyline::removeLastPoint()
+{
+    Q_D(LaserPolyline);
+    d->poly.removeLast();
+}
+
+void LaserPolyline::removePoint(int pointIndex)
+{
+    Q_D(LaserPolyline);
+    d->poly.remove(pointIndex);
+}
+
+QPoint LaserPolyline::pointAt(int pointIndex)
+{
+    Q_D(LaserPolyline);
+    return d->poly[pointIndex];
+}
 
 LaserPointListList LaserPolyline::updateMachiningPoints(ProgressItem* parentProgress)
 {

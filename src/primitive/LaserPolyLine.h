@@ -12,7 +12,10 @@ public:
 
     QPolygon polyline() const;
     void setPolyline(const QPolygon& poly);
-    //virtual QRect sceneBoundingRect() const;
+    int appendPoint(const QPoint& point);
+    void removeLastPoint();
+    void removePoint(int pointIndex);
+    QPoint pointAt(int pointIndex);
 
     virtual LaserPointListList updateMachiningPoints(ProgressItem* parentProgress);
     virtual void draw(QPainter* painter);
