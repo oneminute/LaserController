@@ -115,6 +115,9 @@ FILE(GLOB UI_HEADERS src/ui/*.h)
 FILE(GLOB UI_SOURCES src/ui/*.cpp)
 FILE(GLOB UI_FILES src/ui/*.ui)
 
+FILE(GLOB UNDO_HEADERS src/undo/*.h)
+FILE(GLOB UNDO_SOURCES src/undo/*.cpp)
+
 FILE(GLOB UTIL_HEADERS src/util/*.h)
 FILE(GLOB UTIL_SOURCES src/util/*.cpp)
 
@@ -167,6 +170,7 @@ set(HEADER_FILES
     ${SVG_HEADERS}
     ${TASK_HEADERS}
     ${UI_HEADERS}
+    ${UNDO_HEADERS}
     ${UTIL_HEADERS}
     ${WIDGET_HEADERS}
 )
@@ -191,6 +195,7 @@ set(SRC_FILES
     ${TASK_SOURCES}
     ${UI_SOURCES}
     ${UI_FILES}
+    ${UNDO_SOURCES}
     ${UTIL_SOURCES}
     ${WIDGET_SOURCES}
 )
@@ -226,6 +231,8 @@ IF(MSVC)
     source_group("header\\task" FILES ${TASK_HEADERS})
     source_group("source\\ui" FILES ${UI_SOURCES} ${UI_FILES})
     source_group("header\\ui" FILES ${UI_HEADERS})
+    source_group("source\\undo" FILES ${UNDO_SOURCES})
+    source_group("header\\undo" FILES ${UNDO_HEADERS})
     source_group("source\\util" FILES ${UTIL_SOURCES})
     source_group("header\\util" FILES ${UTIL_HEADERS})
     source_group("header\\widget" FILES ${WIDGET_HEADERS})
