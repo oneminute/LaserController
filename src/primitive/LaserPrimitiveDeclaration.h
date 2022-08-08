@@ -12,7 +12,7 @@ class LaserNurbs;
 class LaserPartyEmlem;
 class LaserPath;
 class LaserPolygon;
-class LaserPolyLine;
+class LaserPolyline;
 class LaserRect;
 class LaserRing;
 class LaserShape;

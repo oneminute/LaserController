@@ -52,13 +52,9 @@ LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, 
     Q_D(LaserPrimitive);
     d->doc = doc;
     d->primitiveType = type;
-    //Q_ASSERT(doc);
     QObject::setParent(doc);
 
-    //this->setFlag(ItemIsMovable, true);
     this->setFlag(ItemIsSelectable, true);
-    //this->setFlag(ItemIsFocusable, true);
-    //this->setAcceptHoverEvents(true);
     d->name = doc->newPrimitiveName(this);
 	d->allTransform = saveTransform;
 	d->layerIndex = layerIndex;
