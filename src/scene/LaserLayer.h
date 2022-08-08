@@ -104,6 +104,7 @@ public:
     void addPrimitive(LaserPrimitive* item);
     const QList<LaserPrimitive*>& primitives();
     void removePrimitive(LaserPrimitive* item, bool itemKeepLayer = true);
+    void removePrimitiveById(const QString& id);
     bool isEmpty() const;
 
     QColor color() const;

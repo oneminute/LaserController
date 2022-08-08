@@ -479,6 +479,16 @@ void LaserLayer::removePrimitive(LaserPrimitive * item, bool itemKeepLayer)
     d->doc->updateLayersStructure();
 }
 
+void LaserLayer::removePrimitiveById(const QString& id)
+{
+    Q_D(LaserLayer);
+    if (d->primitiveMap.contains(id))
+    {
+        LaserPrimitive* primitive = d->primitiveMap[id];
+        removePrimitive(primitive);
+    }
+}
+
 bool LaserLayer::isEmpty() const
 {
     Q_D(const LaserLayer);
