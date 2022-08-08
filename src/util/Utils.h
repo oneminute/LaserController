@@ -21,6 +21,8 @@ namespace utils
 {
     QString createUUID(const QString& prefix = "");
 
+    qint64 hash(const QByteArray& data);
+
     int parsePortName(const QString& name);
 
     QFrame* createSeparator(int width = 0, int height = 0, QFrame::Shape shape = QFrame::VLine, QFrame::Shadow shadow = QFrame::Sunken);

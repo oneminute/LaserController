@@ -1,7 +1,10 @@
 #include "Utils.h"
-#include <QUuid>
-#include <QtMath>
+
+#include <QCryptographicHash>
 #include <QMessageBox>
+#include <QtMath>
+#include <QUuid>
+
 #include "Eigen/Core"
 #include "Eigen/Dense"
 #include "opencv2/features2d.hpp"
@@ -18,6 +21,15 @@ QString utils::createUUID(const QString& prefix)
     QString ret = prefix;
     ret.append(QUuid::createUuid().toString());
     return ret;
+}
+
+qint64 utils::hash(const QByteArray& data)
+{
+    QByteArray hash = QCryptographicHash::hash(data, QCryptographicHash::Md5);
+    QDataStream stream(hash);
+    qint64 a, b;
+    stream >> a >> b;
+    return a ^ b;
 }
 
 int utils::parsePortName(const QString & name)
