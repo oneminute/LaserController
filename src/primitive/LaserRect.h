@@ -26,7 +26,7 @@ public:
 	//virtual void reShape();
 	virtual QJsonObject toJson();
 	QVector<QLineF> edges();
-	virtual LaserPrimitive* clone(QTransform t);
+	virtual LaserPrimitive* clone();
     virtual void setBoundingRectWidth(qreal width);
     virtual void setBoundingRectHeight(qreal height);
     virtual bool isClosed() const;

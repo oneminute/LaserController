@@ -119,11 +119,11 @@ void LaserStampBitmap::setStampIntaglio(bool bl)
 
 }
 
-LaserPrimitive* LaserStampBitmap::clone(QTransform t)
+LaserPrimitive* LaserStampBitmap::clone()
 {
     Q_D(LaserStampBitmap);
     LaserStampBitmap* p = new LaserStampBitmap(d->originalImage, d->boundingRect, 
-        d->stampIntaglio, d->doc, t, d->layerIndex);
+        d->stampIntaglio, d->doc, QTransform(), d->layerIndex);
     stampBaseClone(p);
     p->setAntiFakeImage(d->antiFakeImage);
     p->setFingerprint();

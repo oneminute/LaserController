@@ -22,7 +22,7 @@ public:
 
 	virtual QJsonObject toJson();
 	QVector<QLineF> edges();
-	LaserPrimitive * clone(QTransform t);
+	LaserPrimitive * clone();
 
     virtual bool isClosed() const;
     virtual QPointF position() const;

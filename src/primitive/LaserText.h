@@ -46,7 +46,7 @@ public:
 	virtual void draw(QPainter* painter);
 	virtual LaserPrimitiveType type() { return LPT_TEXT; }
 	virtual QString typeName() { return tr("Text"); }
-	LaserPrimitive * clone(QTransform t);
+	LaserPrimitive * clone();
     virtual QJsonObject toJson();
 
     virtual bool isClosed() const;

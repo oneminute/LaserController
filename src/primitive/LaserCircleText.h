@@ -36,7 +36,7 @@ public:
     virtual void draw(QPainter* painter);
     virtual LaserPrimitiveType type() { return LPT_CIRCLETEXT; }
     virtual QString typeName() { return tr("CircleText"); }
-    LaserPrimitive * clone(QTransform t);
+    LaserPrimitive * clone();
     virtual QJsonObject toJson();
     QVector<QLineF> edges();
 

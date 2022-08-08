@@ -79,10 +79,10 @@ QJsonObject LaserPartyEmblem::toJson()
     return object;
 }
 
-LaserPrimitive* LaserPartyEmblem::clone(QTransform t)
+LaserPrimitive* LaserPartyEmblem::clone()
 {
     Q_D(LaserPartyEmblem);
-    LaserPartyEmblem* p = new LaserPartyEmblem(d->doc, d->centerPoint, d->radius, d->stampIntaglio, t, d->layerIndex);
+    LaserPartyEmblem* p = new LaserPartyEmblem(d->doc, d->centerPoint, d->radius, d->stampIntaglio, QTransform(), d->layerIndex);
     stampBaseClone(p);
     return p;
 }

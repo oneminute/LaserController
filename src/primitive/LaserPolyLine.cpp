@@ -173,10 +173,10 @@ QVector<QLineF> LaserPolyline::edges()
 	return LaserPrimitive::edges(path, true);
 }
 
-LaserPrimitive * LaserPolyline::clone(QTransform t)
+LaserPrimitive * LaserPolyline::clone()
 {
 	Q_D(LaserPolyline);
-	LaserPolyline* polyline = new LaserPolyline(d->poly, document(), t, d->layerIndex);
+	LaserPolyline* polyline = new LaserPolyline(d->poly, document(), QTransform(), d->layerIndex);
 	return polyline;
 }
 

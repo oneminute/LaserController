@@ -141,11 +141,11 @@ QJsonObject LaserFrame::toJson()
     stampBaseToJson(object);
     return object;
 }
-LaserPrimitive * LaserFrame::clone(QTransform t)
+LaserPrimitive * LaserFrame::clone()
 {
     Q_D(LaserFrame);
     LaserFrame* frame = new LaserFrame(document(), d->outerRect, d->width, d->cornerRadius, d->stampIntaglio,
-        t, d->layerIndex);
+        QTransform(), d->layerIndex);
     stampBaseClone(frame);
     return frame;
 }

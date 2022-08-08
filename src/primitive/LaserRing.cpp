@@ -134,10 +134,10 @@ QJsonObject LaserRing::toJson()
     stampBaseToJson(object);
     return object;
 }
-LaserPrimitive * LaserRing::clone(QTransform t)
+LaserPrimitive * LaserRing::clone()
 {
     Q_D(LaserRing);
-    LaserRing* ring = new LaserRing(document(), d->outerBounds, d->width,d->stampIntaglio, t, d->layerIndex);
+    LaserRing* ring = new LaserRing(document(), d->outerBounds, d->width,d->stampIntaglio, QTransform(), d->layerIndex);
     stampBaseClone(ring);
     return ring;
 }

@@ -18,7 +18,7 @@ public:
     virtual void draw(QPainter* painter);
     virtual LaserPrimitiveType type() { return LPT_HORIZONTALTEXT; }
     virtual QString typeName() { return tr("HorizontalText"); }
-    LaserPrimitive * clone(QTransform t);
+    LaserPrimitive * clone();
     virtual QJsonObject toJson();
     QVector<QLineF> edges();
     virtual void recompute();

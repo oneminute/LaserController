@@ -96,10 +96,10 @@ QJsonObject LaserStar::toJson()
     return object;
 }
 
-LaserPrimitive * LaserStar::clone(QTransform t)
+LaserPrimitive * LaserStar::clone()
 {
     Q_D(LaserStar);
-    LaserStar* star = new LaserStar(document(),d->centerPoint, d->radius, d->stampIntaglio, t, d->layerIndex);
+    LaserStar* star = new LaserStar(document(),d->centerPoint, d->radius, d->stampIntaglio, QTransform(), d->layerIndex);
     stampBaseClone(star);
     return star;
 }

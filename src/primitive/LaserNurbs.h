@@ -23,7 +23,7 @@ public:
 
     void updateCurve();
 
-	LaserPrimitive * clone(QTransform t);
+	LaserPrimitive * clone();
 
     virtual bool isClosed() const;
     virtual QPointF position() const;

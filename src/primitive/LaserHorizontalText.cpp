@@ -131,10 +131,10 @@ void LaserHorizontalText::draw(QPainter * painter)
     LaserStampText::draw(painter);
 }
 
-LaserPrimitive * LaserHorizontalText::clone(QTransform t)
+LaserPrimitive * LaserHorizontalText::clone()
 {
     Q_D(LaserHorizontalText);
-    LaserHorizontalText* hText = new LaserHorizontalText(document(), d->content, d->size, d->center,d->bold,d->italic,d->uppercase,d->stampIntaglio,d->family, d->space, t, d->layerIndex);
+    LaserHorizontalText* hText = new LaserHorizontalText(document(), d->content, d->size, d->center,d->bold,d->italic,d->uppercase,d->stampIntaglio,d->family, d->space, QTransform(), d->layerIndex);
     stampBaseClone(hText);
     return hText;
 }

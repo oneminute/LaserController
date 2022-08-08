@@ -295,10 +295,10 @@ void LaserNurbs::updateCurve()
     d->updateDrawingPoints();
 }
 
-LaserPrimitive * LaserNurbs::clone(QTransform t)
+LaserPrimitive * LaserNurbs::clone()
 {
 	Q_D(LaserNurbs);
-	LaserNurbs* nurbs = new LaserNurbs(d->controlPoints, d->knots, d->weights, d->basisType, document(), t, d->layerIndex);
+	LaserNurbs* nurbs = new LaserNurbs(d->controlPoints, d->knots, d->weights, d->basisType, document(), QTransform(), d->layerIndex);
 	return nurbs;
 }
 

@@ -147,10 +147,10 @@ QVector<QLineF> LaserEllipse::edges()
 	return LaserPrimitive::edges(sceneTransform().map(d->path));
 }
 
-LaserPrimitive * LaserEllipse::clone(QTransform t)
+LaserPrimitive * LaserEllipse::clone()
 {
 	Q_D(LaserEllipse);
-	LaserEllipse* ellipse = new LaserEllipse(d->boundingRect, document(), t, d->layerIndex);
+	LaserEllipse* ellipse = new LaserEllipse(d->boundingRect, document(), QTransform(), d->layerIndex);
 	return ellipse;
 }
 

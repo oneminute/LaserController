@@ -16,7 +16,7 @@ public:
     virtual LaserPrimitiveType type() { return LPT_FRAME; }
     virtual QString typeName() { return tr("Frame"); }
     virtual QJsonObject toJson();
-    LaserPrimitive * clone(QTransform t);
+    LaserPrimitive * clone();
     QVector<QLineF> edges();
     void setInner(bool bl);
     bool isInner();

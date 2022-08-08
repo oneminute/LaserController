@@ -102,7 +102,7 @@ public:
 	virtual QJsonObject toJson();
 	virtual QVector<QLineF> edges(QPainterPath path, bool isPolyline = false);
 	virtual QVector<QLineF> edges();
-	virtual LaserPrimitive* clone(QTransform t) = 0;
+	virtual LaserPrimitive* clone() = 0;
 
     virtual QPointF position() const;
 

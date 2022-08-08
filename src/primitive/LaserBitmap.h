@@ -32,7 +32,7 @@ public:
     virtual void setBoundingRectHeight(qreal height);
 
 	QVector<QLineF> edges();
-	LaserPrimitive * clone(QTransform t);
+	virtual LaserPrimitive * clone() override;
 
     virtual bool isClosed() const;
     virtual QPointF position() const;

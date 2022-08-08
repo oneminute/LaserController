@@ -12,7 +12,7 @@ public:
     void computeImage(bool generateStamp = false);
     virtual void setStampIntaglio(bool bl);
     virtual bool isClosed() const { return true; };
-    virtual LaserPrimitive* clone(QTransform t);
+    virtual LaserPrimitive* clone();
     virtual QJsonObject toJson();
     virtual void draw(QPainter* painter);
     void setOriginalImage(QImage image);

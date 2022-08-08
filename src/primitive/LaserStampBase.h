@@ -34,7 +34,7 @@ public:
     bool randomMove();
     void setRandomMove(bool bl);
     void createAntiFakePath(int antiFakeType, int antiFakeLine, bool isAverageDistribute, qreal lineWidth,
-        bool surpassOuter = false, bool surpassInner = false, bool randomMove = false);
+    bool surpassOuter = false, bool surpassInner = false, bool randomMove = false);
     void createAntifakeLineByBounds();
     void createAntifakeLineByArc(qreal lineWidthRate);
     QPainterPath createBasePathByArc(qreal borderWidth, QLineF& baseLine);

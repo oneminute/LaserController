@@ -1,8 +1,11 @@
 #pragma once
 
+#include "LaserPrimitive.h"
 #include "scene/LaserDocument.h"
+#include "scene/LaserDocumentItem.h"
 
 class QuadTreeNode;
+class LaserPrimitive;
 
 class LaserPrimitivePrivate: public ILaserDocumentItemPrivate
 {
