@@ -2,6 +2,8 @@
 
 #include "scene/LaserDocument.h"
 
+class QuadTreeNode;
+
 class LaserPrimitivePrivate: public ILaserDocumentItemPrivate
 {
     Q_DECLARE_PUBLIC(LaserPrimitive)

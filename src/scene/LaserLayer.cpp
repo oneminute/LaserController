@@ -100,7 +100,8 @@ public:
     bool visible;
 	bool isDefault;
 
-    QList<LaserPrimitive*> primitives;   
+    QList<LaserPrimitive*> primitives;
+    QMap<QString, LaserPrimitive*> primitiveMap;
 };
 
 LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document, bool isDefault, QCheckBox* box)
@@ -449,10 +450,16 @@ void LaserLayer::setErrorX(int errorX)
 void LaserLayer::addPrimitive(LaserPrimitive * item)
 {
     Q_D(LaserLayer);
+    if (item->layer()) {
+        item->layer()->removePrimitive(item);
+    }
     item->setLayer(this);
+    d->primitives.append(item);
+    d->primitiveMap.insert(item->id(), item);
+    d->doc->updateLayersStructure();
 }
 
-QList<LaserPrimitive*>& LaserLayer::primitives()
+const QList<LaserPrimitive*>& LaserLayer::primitives()
 {
     Q_D(LaserLayer);
     return d->primitives;
@@ -461,8 +468,10 @@ QList<LaserPrimitive*>& LaserLayer::primitives()
 void LaserLayer::removePrimitive(LaserPrimitive * item, bool itemKeepLayer)
 {
     Q_D(LaserLayer);
-    if (itemKeepLayer) {
+    if (itemKeepLayer)
+    {
         d->primitives.removeOne(item);
+        d->primitiveMap.remove(item->id());
     }
     else {
         item->setLayer(nullptr);

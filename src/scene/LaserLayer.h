@@ -102,7 +102,7 @@ public:
     void setErrorX(int errorX);
 
     void addPrimitive(LaserPrimitive* item);
-    QList<LaserPrimitive*>& primitives();
+    const QList<LaserPrimitive*>& primitives();
     void removePrimitive(LaserPrimitive* item, bool itemKeepLayer = true);
     bool isEmpty() const;
 

@@ -88,7 +88,6 @@ public:
     void setAlignTarget(bool value);
 
     LaserLayer* layer() const;
-    void setLayer(LaserLayer* layer, bool whenNullLayerKeepIndex = true);
 
     QString toString() const;
 
@@ -126,6 +125,7 @@ public:
     virtual int smallCircleIndex() const;
 
 protected:
+    void setLayer(LaserLayer* layer);
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
@@ -141,6 +141,7 @@ protected:
     Q_DISABLE_COPY(LaserPrimitive)
 
     friend class LaserDocument;
+    friend class LaserLayer;
 };
 
 //Q_DECLARE_METATYPE(LaserPrimitive)

@@ -11,7 +11,7 @@
 #include "scene/LaserDocument.h"
 #include "scene/LaserLayer.h"
 #include "ui/LaserControllerWindow.h"
-#include  "util/Utils.h"
+#include "util/Utils.h"
 
 SelectionUndoCommand::SelectionUndoCommand(
 	LaserViewer * viewer, 
@@ -1890,7 +1890,8 @@ void WeldShapesUndoCommand::createNewPath()
                 sP->setJoinedGroup(nullptr);
 
             }
-            sP->setLayer(m_minLayer);
+            //sP->setLayer(m_minLayer);
+            m_minLayer->addPrimitive(sP);
             sP->setJoinedGroup(m_weldJoinedGroup);
             m_weldJoinedGroup->insert(sP);
             m_viewer->group()->addToGroup(sP);
@@ -1938,7 +1939,8 @@ void WeldShapesUndoCommand::handleRedo()
     //clear joined group,remove from selection group
     for (QMap<LaserPrimitive*, bool>::iterator pMap = m_traversedMap.begin();
         pMap != m_traversedMap.end(); pMap++) {
-        pMap.key()->setLayer(m_minLayer);
+        //pMap.key()->setLayer(m_minLayer);
+        m_minLayer->addPrimitive(pMap.key());
         if (pMap.key()->isJoinedGroup()) {
             deleteJoinedGroup(pMap.key()->joinedGroupList());
             pMap.key()->setJoinedGroup(nullptr);
@@ -2011,7 +2013,8 @@ void WeldShapesUndoCommand::undo()
     //restore layer
     for (QMap<LaserPrimitive*, LaserLayer*>::iterator lMap = m_layerMap.begin();
         lMap != m_layerMap.end(); lMap++) {
-        lMap.key()->setLayer(lMap.value());
+        //lMap.key()->setLayer(lMap.value());
+        lMap.value()->addPrimitive(lMap.key());
         m_viewer->group()->addToGroup(lMap.key());
     }
     m_scene->document()->updateDocumentBounding();
