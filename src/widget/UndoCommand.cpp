@@ -437,14 +437,15 @@ void PasteCommand::redo()
         if (!m_isDuplication) {
             for (QMap<LaserPrimitive*, QTransform>::Iterator i = m_viewer->copyedList().begin();
                 i != m_viewer->copyedList().end(); i++) {
-                LaserPrimitive* copyP = i.key()->clone(i.value());
+                LaserPrimitive* copyP = i.key()->clone();
+                copyP->setAllTransform(i.value());
                 m_pasteList.append(copyP);
             }
         }
         else {
             for each(QGraphicsItem* item in m_group->childItems()) {
                 LaserPrimitive* primitive = qgraphicsitem_cast<LaserPrimitive*>(item);
-                LaserPrimitive* copyP = primitive->clone(primitive->sceneTransform());
+                LaserPrimitive* copyP = primitive->clone();
                 m_pasteList.append(copyP);
             }
         }

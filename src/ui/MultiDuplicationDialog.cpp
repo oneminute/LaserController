@@ -188,7 +188,8 @@ void MultiDuplicationDialog::accept()
             QTransform t = primitive->sceneTransform();
             QTransform t1;
             t1 = t1.translate(count * translateX, count * translateY);      
-            LaserPrimitive* newPrimitive = primitive->clone(t * t1);
+            LaserPrimitive* newPrimitive = primitive->clone();
+            newPrimitive->setAllTransform(t * t1);
             if (!m_viewer->detectBoundsInMaxRegion(newPrimitive->sceneBoundingRect())) {
                 return;
             }
