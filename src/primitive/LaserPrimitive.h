@@ -34,26 +34,31 @@ public:
     virtual ~LaserPrimitive();
 
     LaserDocument* document() const;
+    LaserLayer* layer() const;
+	int layerIndex();
+
+    bool isShape() const;
+    bool isBitmap() const;
+    bool isText() const;
+    bool isStamp() const;
+
+	virtual LaserPrimitive* clone() = 0;
+
+    virtual bool isClosed() const = 0;
 
     void paint(QPainter* painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
-	int layerIndex();
+    virtual void draw(QPainter* painter) {};
+
     QPainterPath getPath();
-    virtual QPainterPath getPathForStamp();
 	QPainterPath getScenePath();
+    virtual QPainterPath getPathForStamp();
     
-	/// <summary>
-	/// [obsolete]
-	/// </summary>
-	/// <param name="extendPixel"></param>
-	/// <returns></returns>
-	QRectF originalBoundingRect(qreal extendPixel = 0) const;
 	QPolygonF sceneOriginalBoundingPolygon(qreal extendPixel = 0);
     virtual QRectF boundingRect() const override;
-    //virtual QPainterPath shape() const override;
     virtual QRect sceneBoundingRect() const;
-	void sceneTransformToItemTransform(QTransform sceneTransform);
 
-    virtual void draw(QPainter* painter) {};
+	void sceneTransformToItemTransform(QTransform sceneTransform);
+    void setAllTransform(const QTransform& t);
 
     virtual LaserPointListList updateMachiningPoints(ProgressItem* parentProgress) { return LaserPointListList(); }
     LaserPointListList machiningPoints() const;
@@ -69,16 +74,12 @@ public:
     QPointF centerMachiningPoint() const;
     virtual QByteArray engravingImage(ProgressItem* parentProgress, QPoint& lastPoint) { return QByteArray(); }
     virtual QByteArray filling(ProgressItem* parentProgress, QPoint& lastPoint) { return QByteArray(); }
-    virtual bool isClosed() const = 0;
+
     virtual void setBoundingRectWidth(qreal width);
     virtual void setBoundingRectHeight(qreal height);
     LaserPrimitiveType primitiveType() const;
     QString typeName() const;
     QString typeLatinName() const;
-    bool isShape() const;
-    bool isBitmap() const;
-    bool isText() const;
-    bool isStamp() const;
 
     bool exportable() const;
     void setExportable(bool value);
@@ -87,22 +88,14 @@ public:
     bool isAlignTarget();
     void setAlignTarget(bool value);
 
-    LaserLayer* layer() const;
 
     QString toString() const;
 
     virtual QPainterPath outline() const;
 
-	//virtual void reShape();
-	void setData(QPainterPath path,
-		QTransform allTransform,
-		QTransform transform,
-		QRect boundingRect);
-
 	virtual QJsonObject toJson();
 	virtual QVector<QLineF> edges(QPainterPath path, bool isPolyline = false);
 	virtual QVector<QLineF> edges();
-	virtual LaserPrimitive* clone() = 0;
 
     virtual QPointF position() const;
 
@@ -147,4 +140,4 @@ protected:
 //Q_DECLARE_METATYPE(LaserPrimitive)
 
 QDebug operator<<(QDebug debug, const LaserPrimitive& item);
-QDebug operator<<(QDebug debug, const QRect& rect);
+

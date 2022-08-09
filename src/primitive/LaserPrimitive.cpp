@@ -46,7 +46,8 @@ void setSelectedInGroup(bool selected) {
 
 }
 
-LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, LaserPrimitiveType type, QTransform saveTransform, int layerIndex)
+LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc, 
+    LaserPrimitiveType type, QTransform saveTransform, int layerIndex)
     : ILaserDocumentItem(LNT_PRIMITIVE, data)
 {
     Q_D(LaserPrimitive);
@@ -246,17 +247,6 @@ QPainterPath LaserPrimitive::getScenePath()
     return sceneTransform().map(d->path);
 }
 
-QRectF LaserPrimitive::originalBoundingRect(qreal extendPixel) const
-{
-	Q_D(const LaserPrimitive);
-    qreal x = d->boundingRect.topLeft().x() - extendPixel;
-    qreal y = d->boundingRect.topLeft().y() - extendPixel;
-    qreal width = d->boundingRect.width() + 2 * extendPixel;
-    qreal height = d->boundingRect.height() + 2 * extendPixel;
-    QRectF rect = QRectF(x, y, width, height);
-	return rect;
-}
-
 QPolygonF LaserPrimitive::sceneOriginalBoundingPolygon(qreal extendPixel)
 {
 	QPolygonF bounding = sceneTransform().map(boundingRect());
@@ -298,6 +288,12 @@ void LaserPrimitive::sceneTransformToItemTransform(QTransform sceneTransform)
 {
 	setTransform(sceneTransform);
 	setPos(0, 0);
+}
+
+void LaserPrimitive::setAllTransform(const QTransform& t)
+{
+    Q_D(LaserPrimitive);
+    d->allTransform = t;
 }
 
 LaserPointListList LaserPrimitive::machiningPoints() const
@@ -615,23 +611,6 @@ QPainterPath LaserPrimitive::outline() const
     return d->outline;
 }
 
-/*void LaserPrimitive::reShape()
-{
-
-}*/
-
-void LaserPrimitive::setData(QPainterPath path,
-	QTransform allTransform,
-	QTransform transform,
-	QRect boundingRect)
-{
-	Q_D(LaserPrimitive);
-	d->path = path;
-	d->allTransform = transform;
-	d->boundingRect = boundingRect;
-	setTransform(transform);
-}
-
 QJsonObject LaserPrimitive::toJson()
 {
 	return QJsonObject();
@@ -886,12 +865,6 @@ void LaserPrimitive::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     //update();
 }
 
-/*QRect LaserPrimitive::variableBounds()
-{
-    Q_D(LaserPrimitive);
-    return d->variableBounds;
-}*/
-
 QDebug operator<<(QDebug debug, const LaserPrimitive & item)
 {
     QDebugStateSaver saver(debug);
@@ -899,13 +872,6 @@ QDebug operator<<(QDebug debug, const LaserPrimitive & item)
     return debug;
 }
 
-QDebug operator<<(QDebug debug, const QRect& rect)
-{
-    QDebugStateSaver saver(debug);
-    debug.nospace() << '[' << rect.topLeft() << ", " << rect.bottomRight()
-        << ", " << rect.width() << "x" << rect.height() << "]";
-    return debug;
-}
 
 
 
