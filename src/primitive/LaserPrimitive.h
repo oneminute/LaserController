@@ -42,7 +42,7 @@ public:
     bool isText() const;
     bool isStamp() const;
 
-	virtual LaserPrimitive* clone() = 0;
+    LaserPrimitive* clone();
 
     virtual bool isClosed() const = 0;
 
@@ -118,6 +118,7 @@ public:
     virtual int smallCircleIndex() const;
 
 protected:
+	virtual LaserPrimitive* cloneImplement() = 0;
     void setLayer(LaserLayer* layer);
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;

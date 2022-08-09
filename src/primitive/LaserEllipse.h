@@ -21,13 +21,14 @@ public:
 	//virtual void reShape();
 	virtual QJsonObject toJson();
 	QVector<QLineF> edges();
-	LaserPrimitive * clone();
     virtual void setBoundingRectWidth(qreal width);
     virtual void setBoundingRectHeight(qreal height);
     virtual bool isClosed() const;
     virtual QPointF position() const;
 
 private:
+	virtual LaserPrimitive * cloneImplement() override;
+
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserEllipse)
     Q_DISABLE_COPY(LaserEllipse)
 };

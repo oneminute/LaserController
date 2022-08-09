@@ -109,7 +109,7 @@ void LaserVerticalText::draw(QPainter * painter)
     
 }
 
-LaserPrimitive * LaserVerticalText::clone()
+LaserPrimitive * LaserVerticalText::cloneImplement()
 {
     Q_D(LaserVerticalText);
     LaserVerticalText* text = new LaserVerticalText(document(), d->content, 

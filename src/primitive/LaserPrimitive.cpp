@@ -526,6 +526,14 @@ bool LaserPrimitive::isStamp() const
         d->primitiveType == LPT_VERTICALTEXT;
 }
 
+LaserPrimitive* LaserPrimitive::clone()
+{
+    LaserPrimitive* primitive = cloneImplement();
+    primitive->setId(this->id());
+    primitive->setName(this->name());
+    return primitive;
+}
+
 bool LaserPrimitive::exportable() const
 {
     Q_D(const LaserPrimitive);

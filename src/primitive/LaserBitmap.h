@@ -32,11 +32,13 @@ public:
     virtual void setBoundingRectHeight(qreal height);
 
 	QVector<QLineF> edges();
-	virtual LaserPrimitive * clone() override;
 
     virtual bool isClosed() const;
     virtual QPointF position() const;
+
 private:
+	virtual LaserPrimitive * cloneImplement() override;
+
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserBitmap)
     Q_DISABLE_COPY(LaserBitmap)
 };

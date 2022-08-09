@@ -96,7 +96,7 @@ QJsonObject LaserStar::toJson()
     return object;
 }
 
-LaserPrimitive * LaserStar::clone()
+LaserPrimitive * LaserStar::cloneImplement()
 {
     Q_D(LaserStar);
     LaserStar* star = new LaserStar(document(),d->centerPoint, d->radius, 

@@ -16,7 +16,6 @@ public:
     virtual LaserPrimitiveType type() { return LPT_FRAME; }
     virtual QString typeName() { return tr("Frame"); }
     virtual QJsonObject toJson();
-    LaserPrimitive * clone();
     QVector<QLineF> edges();
     void setInner(bool bl);
     bool isInner();
@@ -40,6 +39,8 @@ public:
     virtual void setBoundingRectHeight(qreal height);
 
 private:
+    virtual LaserPrimitive * cloneImplement() override;
+
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserFrame)
     Q_DISABLE_COPY(LaserFrame)
 };

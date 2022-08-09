@@ -13,7 +13,6 @@ public:
     virtual LaserPrimitiveType type() { return LPT_STAR; }
     virtual QString typeName() { return tr("Star"); }
     virtual QJsonObject toJson();
-    LaserPrimitive * clone();
     QVector<QLineF> edges();
     void computePath();
     qreal radius();
@@ -27,6 +26,8 @@ public:
     virtual void setBoundingRectWidth(qreal width);
     virtual void setBoundingRectHeight(qreal height);
 private:
+    virtual LaserPrimitive * cloneImplement() override;
+
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserStar)
     Q_DISABLE_COPY(LaserStar)
 };

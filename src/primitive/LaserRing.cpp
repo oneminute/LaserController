@@ -134,7 +134,7 @@ QJsonObject LaserRing::toJson()
     stampBaseToJson(object);
     return object;
 }
-LaserPrimitive * LaserRing::clone()
+LaserPrimitive * LaserRing::cloneImplement()
 {
     Q_D(LaserRing);
     LaserRing* ring = new LaserRing(document(), d->outerBounds, d->width, 

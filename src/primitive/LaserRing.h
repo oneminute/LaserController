@@ -13,7 +13,6 @@ public:
     virtual LaserPrimitiveType type() { return LPT_RING; }
     virtual QString typeName() { return tr("Ring"); }
     virtual QJsonObject toJson();
-    LaserPrimitive * clone();
     QVector<QLineF> edges();
     virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
@@ -32,6 +31,8 @@ public:
     virtual void setBoundingRectWidth(qreal width);
     virtual void setBoundingRectHeight(qreal height);
 private:
+    virtual LaserPrimitive * cloneImplement() override;
+
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserRing)
     Q_DISABLE_COPY(LaserRing)
 };

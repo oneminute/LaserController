@@ -20,11 +20,12 @@ public:
 	//virtual void reShape();
 	virtual QJsonObject toJson();
 	QVector<QLineF> edges();
-	LaserPrimitive * clone();
 
     virtual bool isClosed() const;
     virtual QPointF position() const;
 private:
+	virtual LaserPrimitive * cloneImplement() override;
+
     Q_DISABLE_COPY(LaserLine);
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserLine);
 };

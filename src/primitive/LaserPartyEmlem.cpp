@@ -79,7 +79,7 @@ QJsonObject LaserPartyEmblem::toJson()
     return object;
 }
 
-LaserPrimitive* LaserPartyEmblem::clone()
+LaserPrimitive* LaserPartyEmblem::cloneImplement()
 {
     Q_D(LaserPartyEmblem);
     LaserPartyEmblem* p = new LaserPartyEmblem(d->doc, d->centerPoint, d->radius, 

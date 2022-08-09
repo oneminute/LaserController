@@ -286,7 +286,7 @@ QVector<QLineF> LaserBitmap::edges()
 	return LaserPrimitive::edges(path);
 }
 
-LaserPrimitive * LaserBitmap::clone()
+LaserPrimitive * LaserBitmap::cloneImplement()
 {
 	Q_D(LaserBitmap);
 	LaserBitmap* bitmap = new LaserBitmap(d->image, d->boundingRect, 

@@ -23,11 +23,11 @@ public:
 
 	//virtual void reShape();
 	QVector<QLineF> edges();
-	LaserPrimitive * clone();
-
     virtual bool isClosed() const;
     virtual QPointF position() const;
 private:
+	virtual LaserPrimitive * cloneImplement() override;
+
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserPath);
     Q_DISABLE_COPY(LaserPath);
 };

@@ -119,7 +119,7 @@ void LaserStampBitmap::setStampIntaglio(bool bl)
 
 }
 
-LaserPrimitive* LaserStampBitmap::clone()
+LaserPrimitive* LaserStampBitmap::cloneImplement()
 {
     Q_D(LaserStampBitmap);
     LaserStampBitmap* p = new LaserStampBitmap(d->originalImage, d->boundingRect, 

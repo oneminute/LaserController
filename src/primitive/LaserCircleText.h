@@ -36,7 +36,6 @@ public:
     virtual void draw(QPainter* painter);
     virtual LaserPrimitiveType type() { return LPT_CIRCLETEXT; }
     virtual QString typeName() { return tr("CircleText"); }
-    LaserPrimitive * clone();
     virtual QJsonObject toJson();
     QVector<QLineF> edges();
 
@@ -51,7 +50,9 @@ public:
     void setTextWidth(qreal width);
     
 private:
+    virtual LaserPrimitive * cloneImplement() override;
+
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserCircleText)
-        Q_DISABLE_COPY(LaserCircleText)
+    Q_DISABLE_COPY(LaserCircleText)
 };
 

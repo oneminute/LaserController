@@ -12,7 +12,6 @@ public:
     void computeImage(bool generateStamp = false);
     virtual void setStampIntaglio(bool bl);
     virtual bool isClosed() const { return true; };
-    virtual LaserPrimitive* clone();
     virtual QJsonObject toJson();
     virtual void draw(QPainter* painter);
     void setOriginalImage(QImage image);
@@ -30,6 +29,8 @@ public:
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
 
 private:
+    virtual LaserPrimitive* cloneImplement() override;
+
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserStampBitmap)
-        Q_DISABLE_COPY(LaserStampBitmap)
+    Q_DISABLE_COPY(LaserStampBitmap)
 };

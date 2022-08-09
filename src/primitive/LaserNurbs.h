@@ -23,11 +23,11 @@ public:
 
     void updateCurve();
 
-	LaserPrimitive * clone();
-
     virtual bool isClosed() const;
     virtual QPointF position() const;
 private:
+	virtual LaserPrimitive * cloneImplement() override;
+
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserNurbs)
     Q_DISABLE_COPY(LaserNurbs)
 };

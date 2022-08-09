@@ -22,11 +22,11 @@ public:
 
 	virtual QJsonObject toJson();
 	QVector<QLineF> edges();
-	LaserPrimitive * clone();
-
     virtual bool isClosed() const;
     virtual QPointF position() const;
 private:
+	virtual LaserPrimitive * cloneImplement() override;
+
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserPolyline)
     Q_DISABLE_COPY(LaserPolyline)
 };

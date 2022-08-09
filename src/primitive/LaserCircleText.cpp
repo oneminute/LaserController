@@ -590,7 +590,7 @@ void LaserCircleText::draw(QPainter * painter)
     LaserStampText::draw(painter);
 }
 
-LaserPrimitive * LaserCircleText::clone()
+LaserPrimitive * LaserCircleText::cloneImplement()
 {
     Q_D(LaserCircleText);
     LaserCircleText* circleText = new LaserCircleText(d->doc, d->content, 

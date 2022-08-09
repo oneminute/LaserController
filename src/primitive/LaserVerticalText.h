@@ -16,7 +16,6 @@ public:
     virtual void draw(QPainter* painter);
     virtual LaserPrimitiveType type() { return LPT_VERTICALTEXT; }
     virtual QString typeName() { return tr("VerticalText"); }
-    LaserPrimitive * clone();
     virtual QJsonObject toJson();
     QVector<QLineF> edges();
     virtual void recompute();
@@ -27,6 +26,8 @@ public:
     void setTextHeight(qreal height);
     void setTextWidth(qreal width);
 private:
+    virtual LaserPrimitive * cloneImplement() override;
+
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserVerticalText)
     Q_DISABLE_COPY(LaserVerticalText)
 };

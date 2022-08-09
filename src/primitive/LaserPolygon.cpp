@@ -129,7 +129,7 @@ QVector<QLineF> LaserPolygon::edges()
 	return LaserPrimitive::edges(path);
 }
 
-LaserPrimitive * LaserPolygon::clone()
+LaserPrimitive * LaserPolygon::cloneImplement()
 {
 	Q_D(const LaserPolygon);
 	LaserPolygon* polygon = new LaserPolygon(d->poly, document(), sceneTransform(),

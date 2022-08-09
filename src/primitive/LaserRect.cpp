@@ -125,7 +125,7 @@ QVector<QLineF> LaserRect::edges()
 	return LaserPrimitive::edges(sceneTransform().map(d->path));
 }
 
-LaserPrimitive * LaserRect::clone()
+LaserPrimitive * LaserRect::cloneImplement()
 {
 	Q_D(const LaserRect);
 	LaserRect* cloneRect = new LaserRect(this->rect(), this->cornerRadius(), 

@@ -438,7 +438,7 @@ void LaserText::draw(QPainter * painter)
     //painter->drawRect(d->boundingRect);
 }
 
-LaserPrimitive * LaserText::clone()
+LaserPrimitive * LaserText::cloneImplement()
 {
 	Q_D(LaserText);
 	LaserText* text = new LaserText(document(), d->startPos, d->font, d->spaceY, 

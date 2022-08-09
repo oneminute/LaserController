@@ -46,7 +46,6 @@ public:
 	virtual void draw(QPainter* painter);
 	virtual LaserPrimitiveType type() { return LPT_TEXT; }
 	virtual QString typeName() { return tr("Text"); }
-	LaserPrimitive * clone();
     virtual QJsonObject toJson();
 
     virtual bool isClosed() const;
@@ -55,6 +54,8 @@ public:
     virtual LaserLineListList generateFillData(QPointF& lastPoint);
 
 private:
+	virtual LaserPrimitive * cloneImplement() override;
+
     Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserText)
 	Q_DISABLE_COPY(LaserText)
 };

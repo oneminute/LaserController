@@ -131,7 +131,7 @@ void LaserHorizontalText::draw(QPainter * painter)
     LaserStampText::draw(painter);
 }
 
-LaserPrimitive * LaserHorizontalText::clone()
+LaserPrimitive * LaserHorizontalText::cloneImplement()
 {
     Q_D(LaserHorizontalText);
     LaserHorizontalText* hText = new LaserHorizontalText(document(), d->content, 
