@@ -128,7 +128,8 @@ QVector<QLineF> LaserRect::edges()
 LaserPrimitive * LaserRect::clone()
 {
 	Q_D(const LaserRect);
-	LaserRect* cloneRect = new LaserRect(this->rect(), this->cornerRadius(), this->document(), QTransform(), d->layerIndex);
+	LaserRect* cloneRect = new LaserRect(this->rect(), this->cornerRadius(), 
+        this->document(), sceneTransform(), d->layerIndex);
 	return cloneRect;
 }
 

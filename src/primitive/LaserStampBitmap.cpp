@@ -123,7 +123,7 @@ LaserPrimitive* LaserStampBitmap::clone()
 {
     Q_D(LaserStampBitmap);
     LaserStampBitmap* p = new LaserStampBitmap(d->originalImage, d->boundingRect, 
-        d->stampIntaglio, d->doc, QTransform(), d->layerIndex);
+        d->stampIntaglio, d->doc, sceneTransform(), d->layerIndex);
     stampBaseClone(p);
     p->setAntiFakeImage(d->antiFakeImage);
     p->setFingerprint();

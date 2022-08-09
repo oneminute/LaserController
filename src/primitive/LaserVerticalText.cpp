@@ -112,7 +112,9 @@ void LaserVerticalText::draw(QPainter * painter)
 LaserPrimitive * LaserVerticalText::clone()
 {
     Q_D(LaserVerticalText);
-    LaserVerticalText* text = new LaserVerticalText(document(), d->content, d->size, d->center,d->bold, d->italic,d->uppercase, d->stampIntaglio, d->family, d->space, QTransform(), d->layerIndex);
+    LaserVerticalText* text = new LaserVerticalText(document(), d->content, 
+        d->size, d->center,d->bold, d->italic,d->uppercase, d->stampIntaglio, 
+        d->family, d->space, sceneTransform(), d->layerIndex);
     stampBaseClone(text);
     return text;
 }

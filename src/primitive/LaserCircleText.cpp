@@ -593,7 +593,10 @@ void LaserCircleText::draw(QPainter * painter)
 LaserPrimitive * LaserCircleText::clone()
 {
     Q_D(LaserCircleText);
-    LaserCircleText* circleText = new LaserCircleText(d->doc, d->content, d->circleBounds, d->angle, d->bold, d->italic, d->uppercase, d->stampIntaglio, d->family,d->space, false, d->maxRadian, d->minRadian, d->size, transform(), layerIndex());
+    LaserCircleText* circleText = new LaserCircleText(d->doc, d->content, 
+        d->circleBounds, d->angle, d->bold, d->italic, d->uppercase, 
+        d->stampIntaglio, d->family,d->space, false, d->maxRadian, d->minRadian, 
+        d->size, sceneTransform(), layerIndex());
     stampBaseClone(circleText);
     return circleText;
 }

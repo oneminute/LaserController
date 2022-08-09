@@ -82,7 +82,8 @@ QJsonObject LaserPartyEmblem::toJson()
 LaserPrimitive* LaserPartyEmblem::clone()
 {
     Q_D(LaserPartyEmblem);
-    LaserPartyEmblem* p = new LaserPartyEmblem(d->doc, d->centerPoint, d->radius, d->stampIntaglio, QTransform(), d->layerIndex);
+    LaserPartyEmblem* p = new LaserPartyEmblem(d->doc, d->centerPoint, d->radius, 
+        d->stampIntaglio, sceneTransform(), d->layerIndex);
     stampBaseClone(p);
     return p;
 }

@@ -132,7 +132,8 @@ QVector<QLineF> LaserPolygon::edges()
 LaserPrimitive * LaserPolygon::clone()
 {
 	Q_D(const LaserPolygon);
-	LaserPolygon* polygon = new LaserPolygon(d->poly, document(), QTransform(), d->layerIndex);
+	LaserPolygon* polygon = new LaserPolygon(d->poly, document(), sceneTransform(),
+		d->layerIndex);
 	return polygon;
 }
 

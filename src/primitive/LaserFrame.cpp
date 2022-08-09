@@ -144,8 +144,8 @@ QJsonObject LaserFrame::toJson()
 LaserPrimitive * LaserFrame::clone()
 {
     Q_D(LaserFrame);
-    LaserFrame* frame = new LaserFrame(document(), d->outerRect, d->width, d->cornerRadius, d->stampIntaglio,
-        QTransform(), d->layerIndex);
+    LaserFrame* frame = new LaserFrame(document(), d->outerRect, d->width, 
+        d->cornerRadius, d->stampIntaglio, sceneTransform(), d->layerIndex);
     stampBaseClone(frame);
     return frame;
 }

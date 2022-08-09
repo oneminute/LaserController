@@ -150,14 +150,16 @@ QVector<QLineF> LaserEllipse::edges()
 LaserPrimitive * LaserEllipse::clone()
 {
 	Q_D(LaserEllipse);
-	LaserEllipse* ellipse = new LaserEllipse(d->boundingRect, document(), QTransform(), d->layerIndex);
+	LaserEllipse* ellipse = new LaserEllipse(d->boundingRect, document(), 
+        sceneTransform(), d->layerIndex);
 	return ellipse;
 }
 
 void LaserEllipse::setBoundingRectWidth(qreal width)
 {
     Q_D(LaserEllipse);
-    setBounds(QRect(d->boundingRect.left(), d->boundingRect.top(), width, d->boundingRect.height()));
+    setBounds(QRect(d->boundingRect.left(), d->boundingRect.top(), width, 
+        d->boundingRect.height()));
 }
 
 void LaserEllipse::setBoundingRectHeight(qreal height)

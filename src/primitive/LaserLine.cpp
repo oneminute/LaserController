@@ -94,7 +94,8 @@ QVector<QLineF> LaserLine::edges()
 LaserPrimitive * LaserLine::clone()
 {
 	Q_D(const LaserLine);
-	LaserLine* line = new LaserLine(this->line(), document(), QTransform(), d->layerIndex);
+	LaserLine* line = new LaserLine(this->line(), document(), sceneTransform(),
+        d->layerIndex);
 	return line;
 }
 

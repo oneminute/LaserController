@@ -298,7 +298,8 @@ void LaserNurbs::updateCurve()
 LaserPrimitive * LaserNurbs::clone()
 {
 	Q_D(LaserNurbs);
-	LaserNurbs* nurbs = new LaserNurbs(d->controlPoints, d->knots, d->weights, d->basisType, document(), QTransform(), d->layerIndex);
+	LaserNurbs* nurbs = new LaserNurbs(d->controlPoints, d->knots, d->weights, 
+        d->basisType, document(), sceneTransform(), d->layerIndex);
 	return nurbs;
 }
 

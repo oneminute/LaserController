@@ -441,7 +441,8 @@ void LaserText::draw(QPainter * painter)
 LaserPrimitive * LaserText::clone()
 {
 	Q_D(LaserText);
-	LaserText* text = new LaserText(document(), d->startPos, d->font,d->spaceY, d->alignHType, d->alignVType, QTransform(), d->layerIndex);
+	LaserText* text = new LaserText(document(), d->startPos, d->font, d->spaceY, 
+        d->alignHType, d->alignVType, sceneTransform(), d->layerIndex);
     text->setContent(d->content);
     text->modifyPathList();
 	return text;

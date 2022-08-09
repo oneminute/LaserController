@@ -289,7 +289,8 @@ QVector<QLineF> LaserBitmap::edges()
 LaserPrimitive * LaserBitmap::clone()
 {
 	Q_D(LaserBitmap);
-	LaserBitmap* bitmap = new LaserBitmap(d->image, d->boundingRect, document(), QTransform(), d->layerIndex);
+	LaserBitmap* bitmap = new LaserBitmap(d->image, d->boundingRect, 
+        document(), sceneTransform(), d->layerIndex);
 	return bitmap;
 }
 

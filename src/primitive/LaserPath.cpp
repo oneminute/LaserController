@@ -141,7 +141,8 @@ QVector<QLineF> LaserPath::edges()
 LaserPrimitive * LaserPath::clone()
 {
 	Q_D(LaserPath);
-	LaserPath* path = new LaserPath(this->path(), document(), QTransform(), d->layerIndex);
+	LaserPath* path = new LaserPath(this->path(), document(), sceneTransform(),
+        d->layerIndex);
 	return path;
 }
 
