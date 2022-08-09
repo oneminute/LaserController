@@ -49,3 +49,9 @@ OptimizeNode* ILaserDocumentItem::optimizeNode() const
     Q_D(const ILaserDocumentItem);
     return d->optimizeNode;
 }
+
+void ILaserDocumentItem::setId(const QString& id)
+{
+    Q_D(ILaserDocumentItem);
+    d->id = id;
+}
