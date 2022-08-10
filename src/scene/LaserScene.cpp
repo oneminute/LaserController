@@ -70,10 +70,9 @@ void LaserScene::setDocument(LaserDocument * doc)
         m_maxRegion = QRect(rect.left() + left, rect.top() + top, maxSize, maxSize);
         m_quadTree = new QuadTreeNode(m_maxRegion);
     }
-    QMap<QString, LaserPrimitive*> items = m_doc->primitives();
-    for (QMap<QString, LaserPrimitive*>::iterator i = items.begin(); i != items.end(); i++)
+    for (LaserPrimitive* primitive: m_doc->primitives())
     {
-        this->addItem(i.value());
+        this->addItem(primitive);
     }
 }
 
@@ -499,7 +498,7 @@ void LaserScene::selectedByRegion(QRectF selection, LaserPrimitive * primitive)
 
     }
 }
-QRect LaserScene::maxRegion()
+QRect LaserScene::maxRegion() const
 {
     return m_maxRegion;
 }
@@ -651,6 +650,16 @@ QImage LaserScene::thumbnail()
     image.save("tmp/thumbnail.png", "PNG");
 
     return image;
+}
+
+bool LaserScene::pointInAvailableArea(const QPoint& point) const
+{
+    return maxRegion().contains(point);
+}
+
+bool LaserScene::pointInAvailableArea(const QPointF& point) const
+{
+    return pointInAvailableArea(point.toPoint());
 }
 
 

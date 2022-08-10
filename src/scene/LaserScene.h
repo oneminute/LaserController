@@ -50,7 +50,7 @@ public:
     void selectedByBounds(QRectF bounds, QRectF selection, LaserPrimitive* primitive);
     void selectedByLine(QList<QLineF> selectionEdges, QRectF selection, LaserPrimitive* primitive);
     void selectedByRegion(QRectF selection, LaserPrimitive* primitive);
-    QRect maxRegion();
+    QRect maxRegion() const;
     QuadTreeNode* quadTreeNode();
     void updateValidMaxRegionRect();
     void updataValidMaxRegion();
@@ -61,6 +61,9 @@ public:
     void clearImage();
 
     QImage thumbnail();
+
+    bool pointInAvailableArea(const QPoint& point) const;
+    bool pointInAvailableArea(const QPointF& point) const;
 
 private:
     LaserDocument* m_doc;
