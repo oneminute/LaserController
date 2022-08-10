@@ -450,42 +450,52 @@ void LaserLayer::setErrorX(int errorX)
 void LaserLayer::addPrimitive(LaserPrimitive * item)
 {
     Q_D(LaserLayer);
-    if (item->layer()) {
-        item->layer()->removePrimitive(item);
+    if (item->layer() && item->layer() != this) {
+        item->layer()->removePrimitive(item, false);
     }
     item->setLayer(this);
     d->primitives.append(item);
     d->primitiveMap.insert(item->id(), item);
-    d->doc->updateLayersStructure();
 }
 
-const QList<LaserPrimitive*>& LaserLayer::primitives()
+QList<LaserPrimitive*> LaserLayer::primitives()
 {
     Q_D(LaserLayer);
     return d->primitives;
 }
 
-void LaserLayer::removePrimitive(LaserPrimitive * item, bool itemKeepLayer)
+LaserPrimitive* LaserLayer::primitiveById(const QString& id) const
 {
-    Q_D(LaserLayer);
-    if (itemKeepLayer)
+    Q_D(const LaserLayer);
+    if (d->primitiveMap.contains(id))
     {
-        d->primitives.removeOne(item);
-        d->primitiveMap.remove(item->id());
+        return d->primitiveMap[id];
     }
-    else {
-        item->setLayer(nullptr);
-    }
-    d->doc->updateLayersStructure();
+    return nullptr;
 }
 
-void LaserLayer::removePrimitiveById(const QString& id)
+void LaserLayer::removePrimitive(LaserPrimitive * item, bool release)
+{
+    Q_D(LaserLayer);
+    d->primitives.removeOne(item);
+    d->primitiveMap.remove(item->id());
+    if (release)
+    {
+        item->deleteLater();
+    }
+    else 
+    {
+        item->setLayer(nullptr);
+    }
+}
+
+void LaserLayer::removePrimitiveById(const QString& id, bool release)
 {
     Q_D(LaserLayer);
     if (d->primitiveMap.contains(id))
     {
         LaserPrimitive* primitive = d->primitiveMap[id];
-        removePrimitive(primitive);
+        removePrimitive(primitive, release);
     }
 }
 
@@ -493,6 +503,23 @@ bool LaserLayer::isEmpty() const
 {
     Q_D(const LaserLayer);
     return d->primitives.isEmpty();
+}
+
+int LaserLayer::count() const
+{
+    Q_D(const LaserLayer);
+    return d->primitives.count();
+}
+
+bool LaserLayer::contains(const QString& id) const
+{
+    Q_D(const LaserLayer);
+    return d->primitiveMap.contains(id);
+}
+
+bool LaserLayer::contains(LaserPrimitive* primitive) const
+{
+    return contains(primitive->id());
 }
 
 QColor LaserLayer::color() const 

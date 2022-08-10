@@ -101,11 +101,12 @@ public:
     int errorX() const;
     void setErrorX(int errorX);
 
-    void addPrimitive(LaserPrimitive* item);
-    const QList<LaserPrimitive*>& primitives();
-    void removePrimitive(LaserPrimitive* item, bool itemKeepLayer = true);
-    void removePrimitiveById(const QString& id);
+    QList<LaserPrimitive*> primitives();
+    LaserPrimitive* primitiveById(const QString& id) const;
     bool isEmpty() const;
+    int count() const;
+    bool contains(const QString& id) const;
+    bool contains(LaserPrimitive* primitive) const;
 
     QColor color() const;
     void setColor(const QColor& value);
@@ -156,11 +157,18 @@ public:
     bool capabaleOf(LaserPrimitiveType primitiveType) const;
 
 protected:
-    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserLayer);
-    Q_DISABLE_COPY(LaserLayer)
+    void addPrimitive(LaserPrimitive* item);
+    void removePrimitive(LaserPrimitive* item, bool release);
+    void removePrimitiveById(const QString& id, bool release);
+
 private:
 	int m_index;
     QCheckBox* m_checkBox;
+
+    Q_DECLARE_PRIVATE_D(ILaserDocumentItem::d_ptr, LaserLayer);
+    Q_DISABLE_COPY(LaserLayer)
+
+    friend class LaserDocument;
 };
 
 #endif // LASERLAYER_H
