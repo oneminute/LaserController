@@ -37,15 +37,18 @@ public:
     explicit LaserDocument(LaserScene* scene, int layersCount, bool backend, QObject* parent = nullptr);
     ~LaserDocument();
 
-    QMap<QString, LaserPrimitive*> primitives() const;
-    LaserPrimitive* laserPrimitive(const QString& id) const;
+    QList<LaserPrimitive*> primitives() const;
+    LaserPrimitive* primitiveById(const QString& id) const;
 	QList<LaserPrimitive*> selectedPrimitives() const;
 
-    bool useSpecifiedOrigin() const;
-    void setUseSpecifiedOrigin(bool value);
-
-    int specifiedOriginIndex() const;
-    void setSpecifiedOriginIndex(int value);
+    bool addPrimitive(LaserPrimitive* item, bool addToQuadTree = true, bool updateDocBounding = true);
+    bool addPrimitive(LaserPrimitive* item, LaserLayer* layer, bool addToQuadTree = true, bool updateDocBounding = true);
+    bool addPrimitives(const QList<LaserPrimitive*>& primitives);
+    void removePrimitive(LaserPrimitive* item, bool keepLayer, bool updateDocBounding, bool release);
+    void removePrimitive(const QString& primitiveId, bool keepLayer, bool updateDocBounding, bool release);
+    int primitiveCount() const;
+    bool containsPrimitive(const QString& primitiveId) const;
+    bool containsPrimitive(LaserPrimitive* primitive) const;
 
     QList<LaserLayer*> layers() const;
     void addLayer(LaserLayer* layer);
@@ -55,11 +58,18 @@ public:
     void setCurrentLayer(LaserLayer* layer);
     void setCurrentLayer(int layerIndex);
     LaserLayer* layerByIndex(int layerIndex) const;
+    LaserLayer* layerById(const QString& id) const;
     LaserLayer* findCapableLayer(LaserPrimitiveType type) const;
     LaserLayer* findCapableLayer(LaserPrimitive* primitive) const;
     LaserLayer* findCapableLayer(LaserLayerType type) const;
     LaserLayer* getCurrentOrCapableLayer(LaserPrimitiveType type) const;
     static QList<LaserLayerType> capableLayerTypeOf(LaserPrimitiveType primitiveType);
+
+    bool useSpecifiedOrigin() const;
+    void setUseSpecifiedOrigin(bool value);
+
+    int specifiedOriginIndex() const;
+    void setSpecifiedOriginIndex(int value);
 
     QString newLayerName() const;
 
@@ -143,11 +153,6 @@ public:
     void transform(const QTransform& trans);
 
     LaserLayer* idleLayer() const;
-
-    bool addPrimitive(LaserPrimitive* item, bool addToQuadTree = true, bool updateDocBounding = true);
-    bool addPrimitive(LaserPrimitive* item, LaserLayer* layer, bool addToQuadTree = true, bool updateDocBounding = true);
-    bool addPrimitives(const QList<LaserPrimitive*>& primitives);
-    void removePrimitive(LaserPrimitive* item, bool keepLayer = true, bool updateDocBounding = true);
 
     QImage thumbnail() const;
     void setThumbnail(const QImage& image);

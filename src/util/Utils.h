@@ -47,11 +47,11 @@ namespace utils
 
     LaserPoint center(const LaserPointList& points);
 
-    void boundingRect(const QList<QGraphicsItem*>& primitives, QRect& bounding, QRect& boundingAcc = QRect(), bool exludeUnexport = true);
+    void boundingRect(const QList<QGraphicsItem*> primitives, QRect& bounding, QRect& boundingAcc = QRect(), bool exludeUnexport = true);
 
-    void boundingRect(const QList<LaserPrimitive*>& primitives, QRect& bounding, QRect& boundingAcc = QRect(), bool exludeUnexport = true);
+    void boundingRect(const QList<LaserPrimitive*> primitives, QRect& bounding, QRect& boundingAcc = QRect(), bool exludeUnexport = true);
 
-    void boundingRect(const QSet<LaserPrimitive*>& primitives, QRect& bounding, QRect& boundingAcc = QRect(), bool exludeUnexport = true);
+    void boundingRect(const QSet<LaserPrimitive*> primitives, QRect& bounding, QRect& boundingAcc = QRect(), bool exludeUnexport = true);
 
     bool computeBoundingRect(LaserPrimitive* primitive, QRect& bounding, QRect& boundingAcc, int& count, int& accCount, bool exludeUnexport = true);
 

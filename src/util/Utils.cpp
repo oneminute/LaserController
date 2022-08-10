@@ -197,7 +197,7 @@ LaserPoint utils::center(const LaserPointList& points)
     return center;
 }
 
-void utils::boundingRect(const QList<QGraphicsItem*>& primitives, QRect& bounding, QRect& boundingAcc, bool exludeUnexport)
+void utils::boundingRect(const QList<QGraphicsItem*> primitives, QRect& bounding, QRect& boundingAcc, bool exludeUnexport)
 {
     int count = 0;
     int accCount = 0;
@@ -214,7 +214,7 @@ void utils::boundingRect(const QList<QGraphicsItem*>& primitives, QRect& boundin
     }
 }
 
-void utils::boundingRect(const QList<LaserPrimitive*>& primitives, QRect& bounding, QRect& boundingAcc, bool exludeUnexport)
+void utils::boundingRect(const QList<LaserPrimitive*> primitives, QRect& bounding, QRect& boundingAcc, bool exludeUnexport)
 {
     int count = 0;
     int accCount = 0;
@@ -230,7 +230,7 @@ void utils::boundingRect(const QList<LaserPrimitive*>& primitives, QRect& boundi
     }
 }
 
-void utils::boundingRect(const QSet<LaserPrimitive*>& primitives, QRect & bounding, QRect & boundingAcc, bool exludeUnexport)
+void utils::boundingRect(const QSet<LaserPrimitive*> primitives, QRect & bounding, QRect & boundingAcc, bool exludeUnexport)
 {
     int count = 0;
     int accCount = 0;

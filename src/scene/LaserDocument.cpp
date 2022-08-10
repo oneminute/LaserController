@@ -51,7 +51,7 @@ public:
         , layersCount(16)
         , backend(false)
     {}
-    QMap<QString, LaserPrimitive*> primitives;
+    //QMap<QString, LaserPrimitive*> primitives;
     QList<LaserLayer*> layers;
     LaserLayer* currentLayer;
     bool isOpened;
@@ -148,13 +148,9 @@ bool LaserDocument::addPrimitive(LaserPrimitive* item, LaserLayer* layer, bool a
         if (item->layer()) 
         {
             // remove the adding primitive from it's previouse layer
-            item->layer()->removePrimitive(item);
+            item->layer()->removePrimitive(item, false);
         }
-        else
-        {
-            //not in d->primitives
-            d->primitives.insert(item->id(), item);
-        }
+        
         layer->addPrimitive(item);
         if (d->scene)
             d->scene->addLaserPrimitive(item, addToQuadTree);
@@ -170,22 +166,26 @@ bool LaserDocument::addPrimitives(const QList<LaserPrimitive*>& primitives)
     return false;
 }
 
-void LaserDocument::removePrimitive(LaserPrimitive* item, bool keepLayer, bool updateDocBounding)
+void LaserDocument::removePrimitive(LaserPrimitive* item, bool keepLayer, bool updateDocBounding, bool release)
 {
     Q_D(LaserDocument);
-    if (keepLayer) {
-        item->layer()->removePrimitive(item, true);
-    }
-    else {
-        item->layer()->removePrimitive(item, false);
-    }
-    
-    d->primitives.remove(item->id());
     if (d->scene)
         d->scene->removeLaserPrimitive(item);
     if (updateDocBounding)
         updateDocumentBounding();
+    // because of the risk of releasing memory of the primitive, 
+    // removePrimitive must be called after other cleaning operations.
+    item->layer()->removePrimitive(item, release);
     updateLayersStructure();
+}
+
+void LaserDocument::removePrimitive(const QString& primitiveId, bool keepLayer, bool updateDocBounding, bool release)
+{
+    LaserPrimitive* primitive = primitiveById(primitiveId);
+    if (primitive)
+    {
+        removePrimitive(primitive, keepLayer, updateDocBounding, release);
+    }
 }
 
 QImage LaserDocument::thumbnail() const
@@ -316,28 +316,41 @@ void LaserDocument::jsonBounding(QRect& bounding, QRect& boundingAcc, int& devic
     boundingAcc = docBoundingAcc;
 }
 
-QMap<QString, LaserPrimitive*> LaserDocument::primitives() const
+QList<LaserPrimitive*> LaserDocument::primitives() const
 {
     Q_D(const LaserDocument);
-    return d->primitives;
+    QList<LaserPrimitive*> list;
+    for (LaserLayer* layer : d->layers)
+    {
+        list.append(layer->primitives());
+    }
+    return list;
 }
 
-LaserPrimitive* LaserDocument::laserPrimitive(const QString& id) const
+LaserPrimitive* LaserDocument::primitiveById(const QString& id) const
 {
     Q_D(const LaserDocument);
-    return d->primitives[id];
+    for (LaserLayer* layer : d->layers)
+    {
+        LaserPrimitive* primitive = layer->primitiveById(id);
+        if (primitive)
+            return primitive;
+    }
+    return nullptr;
 }
 
 QList<LaserPrimitive*> LaserDocument::selectedPrimitives() const
 {
 	Q_D(const LaserDocument);
 	QList<LaserPrimitive*>list;
-	for each(LaserPrimitive* item in d->primitives) {
-		if (item->isSelected()) {
-			list.append(item);
-		}
-
-	}
+    for (LaserLayer* layer : d->layers)
+    {
+        for (LaserPrimitive * item: layer->primitives()) {
+            if (item->isSelected()) {
+                list.append(item);
+            }
+        }
+    }
 	return list;
 }
 
@@ -430,6 +443,17 @@ LaserLayer* LaserDocument::layerByIndex(int layerIndex) const
                 return layer;
         }
     }
+}
+
+LaserLayer* LaserDocument::layerById(const QString& id) const
+{
+    Q_D(const LaserDocument);
+    for (LaserLayer* layer : d->layers)
+    {
+        if (layer->id() == id)
+            return layer;
+    }
+    return nullptr;
 }
 
 LaserLayer* LaserDocument::findCapableLayer(LaserPrimitiveType type) const
@@ -525,6 +549,34 @@ QList<LaserLayerType> LaserDocument::capableLayerTypeOf(LaserPrimitiveType primi
     }
     return layerTypes;
 }
+
+int LaserDocument::primitiveCount() const
+{
+    Q_D(const LaserDocument);
+    int total = 0;
+    for (LaserLayer* layer : d->layers)
+    {
+        total += layer->count();
+    }
+    return total;
+}
+
+bool LaserDocument::containsPrimitive(const QString& primitiveId) const
+{
+    Q_D(const LaserDocument);
+    for (LaserLayer* layer : d->layers)
+    {
+        if (layer->contains(primitiveId))
+            return true;
+    }
+    return false;
+}
+
+bool LaserDocument::containsPrimitive(LaserPrimitive* primitive) const
+{
+    return containsPrimitive(primitive->id());
+}
+
 
 QString LaserDocument::newLayerName() const
 {
@@ -882,7 +934,12 @@ int LaserDocument::maxEngravingSpeed() const
 bool LaserDocument::isEmpty() const
 {
     Q_D(const LaserDocument);
-    return d->primitives.isEmpty();
+    for (LaserLayer* layer : d->layers)
+    {
+        if (!layer->isEmpty())
+            return false;
+    }
+    return true;
 }
 
 QPoint LaserDocument::reletiveJobOrigin() const
@@ -1047,10 +1104,13 @@ void LaserDocument::setPrintAndCutPointPairs(const PointPairList& pairs)
 void LaserDocument::transform(const QTransform& trans)
 {
     Q_D(LaserDocument);
-    for (LaserPrimitive* primitive : d->primitives)
+    for (LaserLayer* layer : d->layers)
     {
-        QTransform t = primitive->transform() * trans;
-        primitive->setTransform(t);
+        for (LaserPrimitive* primitive : layer->primitives())
+        {
+            QTransform t = primitive->transform() * trans;
+            primitive->setTransform(t);
+        }
     }
 }
 
@@ -1105,7 +1165,6 @@ void LaserDocument::close()
     Q_D(LaserDocument);
     if (d->isOpened)
     {
-        d->primitives.clear();
         destroy();
         d->isOpened = false;
         emit closed();
@@ -1660,7 +1719,7 @@ int LaserDocument::totalNodes()
 void LaserDocument::updateDocumentBounding()
 {
     Q_D(LaserDocument);
-    utils::boundingRect(d->primitives.values(), d->bounding, d->engravingBounding);
+    utils::boundingRect(primitives(), d->bounding, d->engravingBounding);
 }
 
 QList<LaserDocument::StampItem> LaserDocument::generateStampImages()
@@ -1910,7 +1969,7 @@ void LaserDocument::init()
 void LaserDocument::outlineByLayers(OptimizeNode* node, ProgressItem* progress)
 {
     Q_D(LaserDocument);
-    progress->setMaximum(d->primitives.count());
+    progress->setMaximum(primitiveCount());
     for (LaserLayer* layer : d->layers)
     {
         if (layer->isEmpty())
@@ -1943,7 +2002,7 @@ void LaserDocument::clearTree(OptimizeNode* node, ProgressItem* progress)
     QStack<OptimizeNode*> stack;
     stack.push(node);
     QList<OptimizeNode*> deletingNodes;
-    progress->setMaximum(d->primitives.count());
+    progress->setMaximum(primitiveCount());
     while (!stack.isEmpty())
     {
         OptimizeNode* topNode = stack.pop();
