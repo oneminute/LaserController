@@ -5266,11 +5266,13 @@ void LaserControllerWindow::onActionUndo(bool checked) {
 	}
 	m_viewer->undoStack()->setIndex(index - 1);*/
     m_viewer->undoStack()->undo();
+
 }
 
 void LaserControllerWindow::onActionRedo(bool checked) {
-	int index = m_viewer->undoStack()->index();	
-	m_viewer->undoStack()->setIndex(index + 1);
+	//int index = m_viewer->undoStack()->index();	
+	//m_viewer->undoStack()->setIndex(index + 1);
+    m_viewer->undoStack()->redo();
 }
 
 void LaserControllerWindow::onActionImport(bool checked)
