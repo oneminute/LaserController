@@ -1,36 +1,47 @@
-#include "PolyLineAddPointCommand.h"
+#include "PolylineAddPointCommand.h"
 
-#include "primitive/LaserPolyLine.h"
+#include "primitive/LaserPolyline.h"
+#include "scene/LaserDocument.h"
 
-PolyLineAddPointCommand::PolyLineAddPointCommand(const QString& text, 
-    QObject* target, 
+PolylineAddPointCommand::PolylineAddPointCommand(
+    const QString& text, 
+    LaserDocument* document,
+    const QString& primitiveId,
     const QPoint& point,
-    int pointIndex, 
+    int pointIndex,
     QUndoCommand* parent)
-    : BaseUndoCommand(text, target, parent)
+    : BaseUndoCommand(text, parent)
+    , m_doc(document)
+    , m_primitiveId(primitiveId)
     , m_point(point)
     , m_pointIndex(pointIndex)
 {
 }
 
-PolyLineAddPointCommand::~PolyLineAddPointCommand()
+PolylineAddPointCommand::~PolylineAddPointCommand()
 {
 }
 
-void PolyLineAddPointCommand::undo()
+void PolylineAddPointCommand::undo()
 {
-    LaserPolyline* polyline = qobject_cast<LaserPolyline*>(target());
-    if (polyline == nullptr)
+    LaserPolyline* target = qgraphicsitem_cast<LaserPolyline*>(m_doc->primitiveById(m_primitiveId));
+    if (!target)
+    {
+        qLogW << "Undo adding Polyline point failure because of there's no primitive with id " << m_primitiveId;
         return;
-
-    polyline->removePoint(m_pointIndex);
+    }
+    target->setEditing(true);
+    target->removePoint(m_pointIndex);
 }
 
-void PolyLineAddPointCommand::redo()
+void PolylineAddPointCommand::redo()
 {
-    LaserPolyline* polyline = qobject_cast<LaserPolyline*>(target());
-    if (polyline == nullptr)
+    LaserPolyline* target = qgraphicsitem_cast<LaserPolyline*>(m_doc->primitiveById(m_primitiveId));
+    if (!target)
+    {
+        qLogW << "Undo adding Polyline point failure because of there's no primitive with id " << m_primitiveId;
         return;
-
-    polyline->appendPoint(m_point);
+    }
+    target->setEditing(true);
+    target->appendPoint(m_point);
 }
