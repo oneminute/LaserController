@@ -1,6 +1,8 @@
 #include "LaserPolyLine.h"
 #include "LaserShapePrivate.h"
+#include "LaserPolygon.h"
 
+#include <QGraphicsSceneEvent>
 #include <QJsonArray>
 #include <QPainter>
 
@@ -9,8 +11,12 @@
 #include "scene/LaserLayer.h"
 #include "scene/LaserScene.h"
 #include "task/ProgressItem.h"
+#include "undo/PolylineAddPointCommand.h"
+#include "undo/PrimitiveAddingCommand.h"
+#include "undo/PrimitiveRemovingCommand.h"
 #include "util/MachiningUtils.h"
 #include "util/Utils.h"
+#include "widget/LaserViewer.h"
 
 class LaserPolylinePrivate : public LaserShapePrivate
 {
@@ -19,90 +25,134 @@ public:
     LaserPolylinePrivate(LaserPolyline* ptr)
         : LaserShapePrivate(ptr)
     {}
-    QPolygon poly;
+    QPoint editingPoint;
+    QVector<QPoint> points;
 };
 
 LaserPolyline::LaserPolyline(const QPolygon & poly, LaserDocument * doc, QTransform saveTransform, int layerIndex)
     : LaserShape(new LaserPolylinePrivate(this), doc, LPT_POLYLINE, layerIndex, saveTransform)
 {
     Q_D(LaserPolyline);
-    d->poly = poly;
-	d->path.addPolygon(d->poly);
+    setPolyline(poly);
 	sceneTransformToItemTransform(saveTransform);
-    d->boundingRect = d->poly.boundingRect();
-	//d->originalBoundingRect = d->boundingRect;
-    d->outline.moveTo(*d->poly.begin());
-    for (int i = 1; i < d->poly.count(); i++)
-    {
-        d->outline.lineTo(d->poly[i]);
-    }
 }
 
 QPolygon LaserPolyline::polyline() const 
 {
     Q_D(const LaserPolyline);
-    return d->poly; 
+    QPolygon poly(d->points);
+    return poly; 
 }
 
 void LaserPolyline::setPolyline(const QPolygon& poly) 
 {
     Q_D(LaserPolyline);
-    d->poly = poly; 
-    d->path = QPainterPath();
-	d->path.addPolygon(d->poly);
-    d->boundingRect = d->poly.boundingRect();
-	//d->originalBoundingRect = d->boundingRect;
-    d->outline = QPainterPath();
-    d->outline.moveTo(*d->poly.begin());
-    for (int i = 1; i < d->poly.count(); i++)
+    d->points.clear();
+    d->path.clear();
+    d->outline.clear();
+    bool first = true;
+    for (const QPoint& point : poly)
     {
-        d->outline.lineTo(d->poly[i]);
+        d->points.append(point);
+        if (first)
+        {
+            d->editingPoint = point;
+            d->path.moveTo(point);
+            d->outline.moveTo(point);
+            first = false;
+        }
+        else
+        {
+            d->path.lineTo(point);
+            d->outline.lineTo(point);
+        }
     }
+    d->boundingRect = d->path.boundingRect().toRect();
+}
+
+void LaserPolyline::updatePath()
+{
+    Q_D(LaserPolyline);
+    d->path.clear();
+    d->outline.clear();
+    bool first = true;
+    for (const QPoint& point : d->points)
+    {
+        if (first)
+        {
+            d->path.moveTo(point);
+            d->outline.moveTo(point);
+            first = false;
+        }
+        else
+        {
+            d->path.lineTo(point);
+            d->outline.lineTo(point);
+        }
+    }
+    d->boundingRect = d->path.boundingRect().toRect();
+
 }
 
 int LaserPolyline::appendPoint(const QPoint& point)
 {
     Q_D(LaserPolyline);
-    d->poly.append(point);
-    return d->poly.size() - 1;
+    d->editingPoint = point;
+    d->points.append(point);
+    updatePath();
+    return d->points.size() - 1;
 }
 
 void LaserPolyline::removeLastPoint()
 {
     Q_D(LaserPolyline);
-    d->poly.removeLast();
+    d->points.removeLast();
+    updatePath();
 }
 
 void LaserPolyline::removePoint(int pointIndex)
 {
     Q_D(LaserPolyline);
-    d->poly.remove(pointIndex);
+    d->points.remove(pointIndex);
+    updatePath();
 }
 
 QPoint LaserPolyline::pointAt(int pointIndex)
 {
     Q_D(LaserPolyline);
-    return d->poly[pointIndex];
+    return d->points[pointIndex];
+}
+
+void LaserPolyline::setEditingPoint(const QPoint& point)
+{
+    Q_D(LaserPolyline);
+    d->editingPoint = point;
+}
+
+QPoint LaserPolyline::editingPoint() const
+{
+    Q_D(const LaserPolyline);
+    return d->editingPoint;
 }
 
 LaserPointListList LaserPolyline::updateMachiningPoints(ProgressItem* parentProgress)
 {
     Q_D(LaserPolyline);
     ProgressItem* progress = new ProgressItem(tr("%1 update machining points").arg(name()), ProgressItem::PT_Simple, parentProgress);
-    progress->setMaximum(d->poly.size());
+    progress->setMaximum(d->points.size());
     d->machiningPointsList.clear();
     d->startingIndices.clear();
     bool isClosed = this->isClosed();
     LaserPointList points;
     QTransform t = sceneTransform();
     d->machiningCenter = QPoint(0, 0);
-    for (int i = 0; i < d->poly.size(); i++)
+    for (int i = 0; i < d->points.size(); i++)
     {
-        QPoint pt = t.map(d->poly.at(i));
+        QPoint pt = t.map(d->points.at(i));
 
         QPoint cPt = pt;
-        QPoint nPt = (i == d->poly.size() - 1) ? pt + (pt - d->poly.at(i - 1)) : d->poly.at(i + 1);
-        QPoint lPt = (i == 0) ? pt + (pt - d->poly.at(1)) : d->poly.at(i - 1);
+        QPoint nPt = (i == d->points.size() - 1) ? pt + (pt - d->points.at(i - 1)) : d->points.at(i + 1);
+        QPoint lPt = (i == 0) ? pt + (pt - d->points.at(1)) : d->points.at(i - 1);
         QLineF line1(cPt, nPt);
         QLineF line2(cPt, lPt);
         qreal angle1 = line1.angle();
@@ -130,8 +180,16 @@ LaserPointListList LaserPolyline::updateMachiningPoints(ProgressItem* parentProg
 void LaserPolyline::draw(QPainter * painter)
 {
     Q_D(LaserPolyline);
-	painter->drawPath(d->path);
-    //painter->drawRect(boundingRect());
+    if (d->points.count() > 1)
+	    painter->drawPath(d->path);
+
+    if (isEditing())
+    {
+		//painter->setPen(QPen(Qt::black, 1, Qt::SolidLine));
+        //painter->drawPolygon(d->poly);
+        if (d->points.count() >= 1)
+		    painter->drawLine(d->points.last(), d->editingPoint);
+    }
 }
 
 QJsonObject LaserPolyline::toJson()
@@ -151,8 +209,8 @@ QJsonObject LaserPolyline::toJson()
 	object.insert("parentMatrix", parentMatrix);
 	qDebug() << parentTransform;
 	QJsonArray poly;
-	for (int pIndex = 0; pIndex < d->poly.size(); pIndex++) {
-		QPointF point = d->poly[pIndex];
+	for (int pIndex = 0; pIndex < d->points.size(); pIndex++) {
+		QPointF point = d->points[pIndex];
 		QJsonArray pointArray = {point.x(), point.y()};
 		poly.append(pointArray);
 	}
@@ -169,14 +227,92 @@ QVector<QLineF> LaserPolyline::edges()
 {
 	Q_D(const LaserPolyline);
 	QPainterPath path;
-	path.addPolygon(sceneTransform().map(d->poly));
+	path.addPolygon(sceneTransform().map(d->points));
 	return LaserPrimitive::edges(path, true);
+}
+
+void LaserPolyline::sceneMousePressEvent(
+    LaserViewer* viewer,
+    LaserScene* scene,
+    const QPoint& point,
+    QMouseEvent* event)
+{
+}
+
+void LaserPolyline::sceneMouseMoveEvent(
+    LaserViewer* viewer,
+    LaserScene* scene,
+    const QPoint& point,
+    QMouseEvent* event,
+    bool isPressed)
+{
+    Q_D(LaserPolyline);
+    if (isEditing())
+    {
+        setEditingPoint(point);
+    }
+}
+
+void LaserPolyline::sceneMouseReleaseEvent(
+    LaserViewer* viewer,
+    LaserScene* scene,
+    const QPoint& point,
+    QMouseEvent* event,
+    bool isPressed)
+{
+    Q_D(LaserPolyline);
+    if (event->button() == Qt::LeftButton)
+    {
+        if (d->editingPoint == d->points.last())
+            return;
+
+        if (d->editingPoint == d->points.first()) {
+            LaserLayer* layer = document()->findCapableLayer(LPT_POLYGON);
+            if (layer)
+            {
+                LaserPolygon* polygon = new LaserPolygon(QPolygon(d->points), document(),
+                    QTransform(), layer->index());
+                PrimitiveAddingCommand* cmd = new PrimitiveAddingCommand(
+                    tr("Add Polygon"), polygon->id(), layer->id(), document(), polygon
+                );
+                document()->removePrimitive(this, false, true, true);
+                viewer->addUndoCommand(cmd);
+                emit viewer->readyPolygon();
+                setCursor(Qt::ArrowCursor);
+                setEditing(false);
+            }
+        }
+        else
+        {
+            PolylineAddPointCommand* cmd = new PolylineAddPointCommand(
+                tr("Add Point to Polyline"), document(), this->id(), d->editingPoint, d->points.size()
+            );
+            viewer->addUndoCommand(cmd);
+        }
+    }
+    else if (event->button() == Qt::RightButton)
+    {
+        emit viewer->readyPolygon();
+        setEditing(false);
+    }
+}
+
+void LaserPolyline::sceneKeyPressEvent(
+    LaserViewer* viewer,
+    QKeyEvent* event)
+{
+}
+
+void LaserPolyline::sceneKeyReleaseEvent(
+    LaserViewer* viewer,
+    QKeyEvent* event)
+{
 }
 
 LaserPrimitive * LaserPolyline::cloneImplement()
 {
 	Q_D(LaserPolyline);
-	LaserPolyline* polyline = new LaserPolyline(d->poly, document(), 
+	LaserPolyline* polyline = new LaserPolyline(d->points, document(), 
         sceneTransform(), d->layerIndex);
 	return polyline;
 }
@@ -184,12 +320,12 @@ LaserPrimitive * LaserPolyline::cloneImplement()
 bool LaserPolyline::isClosed() const
 {
     Q_D(const LaserPolyline);
-    return utils::fuzzyEquals(d->poly.first(), d->poly.last());
+    return utils::fuzzyEquals(d->points.first(), d->points.last());
 }
 
 QPointF LaserPolyline::position() const
 {
     Q_D(const LaserPolyline);
-    return sceneTransform().map(d->poly.first());
+    return sceneTransform().map(d->points.first());
 }
 
