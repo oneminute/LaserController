@@ -2,20 +2,16 @@
 
 #include <QUndoCommand>
 
+class LaserDocument;
+
 class BaseUndoCommand : public QUndoCommand
 {
 public:
-    explicit BaseUndoCommand(const QString& text, QObject* target, QUndoCommand* parent = nullptr)
-        : QUndoCommand(text, parent)
-        , m_target(target)
-    {
-        Q_ASSERT(target);
-    }
+    explicit BaseUndoCommand(
+        const QString& text, 
+        QUndoCommand* parent = nullptr);
     
-    ~BaseUndoCommand() {}
-
-    QObject* target() { return m_target; }
+    ~BaseUndoCommand();
 
 private:
-    QObject* m_target;
 };
