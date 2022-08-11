@@ -5260,11 +5260,12 @@ LaserDocument* LaserControllerWindow::getMachiningDocument(bool& stamp)
 }
 
 void LaserControllerWindow::onActionUndo(bool checked) {
-	int index = m_viewer->undoStack()->index();
+	/*int index = m_viewer->undoStack()->index();
 	if (index <= 0) {
 		return;
 	}
-	m_viewer->undoStack()->setIndex(index - 1);
+	m_viewer->undoStack()->setIndex(index - 1);*/
+    m_viewer->undoStack()->undo();
 }
 
 void LaserControllerWindow::onActionRedo(bool checked) {
@@ -6430,7 +6431,7 @@ void LaserControllerWindow::onActionPrintAndCutFetchCanvas(bool checked)
 
     QRect bounding = laserRect->sceneBoundingRect();
     //QRectF boundingViewer = m_viewer->mapFromScene(bounding).boundingRect();
-    m_scene->document()->removePrimitive(rectPrimitive);
+    m_scene->document()->removePrimitive(rectPrimitive, true, true, false);
 
     m_printAndCutCandidatePoints = findCanvasPointsWithinRect(bounding);
     
