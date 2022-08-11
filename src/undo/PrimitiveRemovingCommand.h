@@ -7,6 +7,9 @@ class PrimitiveRemovingCommand : public BaseUndoCommand
 public:
     explicit PrimitiveRemovingCommand(
         const QString& text,
+        LaserViewer* viewer,
+        LaserScene* scene,
+        LaserDocument* doc,
         QObject* target,
         QUndoCommand* parent
     );

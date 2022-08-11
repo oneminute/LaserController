@@ -7,6 +7,8 @@
 #include <QTextEdit>
 #include <QState>
 #include <QUndoStack>
+
+class BaseUndoCommand;
 class RulerWidget;
 class LaserScene;
 class LaserPrimitiveGroup;
@@ -15,8 +17,8 @@ class LaserBitmap;
 class LaserLayer;
 class LaserText;
 class LaserPolyline;
-struct LaserTextRowPath;
 class LaserControllerWindow;
+struct LaserTextRowPath;
 
 //Spline Node Struct
 struct SplineNodeStruct {
@@ -49,6 +51,10 @@ public:
     qreal adapterViewScale();
     LaserPrimitive* mirrorLine();
     void setMirrorLine(LaserPrimitive* l);
+
+	void beginEditing(LaserPrimitive* primitive);
+	void endEditing();
+	LaserPrimitive* editingPrimitive() const { return m_editingPrimitive; };
 
 	void createSpline();
 	LaserScene* scene();
@@ -102,9 +108,12 @@ public:
 
 	bool addPrimitiveAndExamRegionByBounds(LaserPrimitive* primitive);
 	bool addPrimitiveAndExamRegionByBounds(QList<LaserPrimitive*>& primitives, LaserPrimitive* parent = nullptr);
+
+	void addUndoCommand(BaseUndoCommand* cmd);
 	
-private:
+protected:
     void init();
+
 	void initSpline();
 	//void creatTextEdit();
 	void addText(QString str);
@@ -118,8 +127,8 @@ private:
 	void detectRect(LaserPrimitive& item, int i, int& left, int& right, int& top, int& bottom);
 	//bool detectPoint(QVector<QPointF> points, QList<QLineF> lines, QPointF& point);
 	//bool detectLine(QList<QLineF> lines, QPointF startPoint, QPointF point);
-	bool isRepeatPoint();
-	bool isStartPoint();
+	//bool isRepeatPoint();
+	//bool isStartPoint();
 	qreal leftScaleMirror(qreal rate, qreal x);
 	qreal rightScaleMirror(qreal rate, qreal x);
 	qreal topScaleMirror(qreal rate, qreal y);
@@ -136,7 +145,6 @@ private:
 	//ReshapeUndoCommand* reshapeUndoStackPush();
 	void transformUndoStackPushBefore(LaserPrimitive* item = nullptr);
 	void transformUndoStackPush(LaserPrimitive* item = nullptr);
-    
     
 public slots:
     void zoomIn();
@@ -155,6 +163,7 @@ public slots:
 	void onReplaceGroup(QList<LaserPrimitive*> primitives);
     //text
     void onEndText();
+
 signals:
     void zoomChanged(const QPointF& topleft);
 	void scaleChanged(qreal scale);
@@ -219,8 +228,6 @@ protected:
 
 	virtual void scrollContentsBy(int dx, int dy) override;
 	bool isOnControllHandlers(const QPoint& point, int& handlerIndex, QRectF& handlerRect = QRectF());
-	
-	
 
 private:
 	//QPointF testPoint;
@@ -253,15 +260,17 @@ private:
 
 	QPointF m_creatingLineStartPoint;
 	QPointF m_creatingLineEndPoint;
+
+	LaserPrimitive* m_editingPrimitive;
+
 	//Polygon
-	QPointF m_creatingPolygonStartPoint;
-	QPointF m_creatingPolygonEndPoint;
-	QVector<QPointF> m_creatingPolygonPoints;
-	QList<QLineF> m_creatingPolygonLines;
-	LaserPrimitive* m_lastPolygon;
-	LaserPolyline* m_currentPolyline;
-	/*QRectF m_polygonStartRect;
-	bool m_isMouseInStartRect;*/
+	//QPointF m_creatingPolygonStartPoint;
+	//QPointF m_creatingPolygonEndPoint;
+	//QVector<QPointF> m_creatingPolygonPoints;
+	//QList<QLineF> m_creatingPolygonLines;
+	//LaserPrimitive* m_lastPolygon;
+	//LaserPolyline* m_currentPolyline;
+
 	//Spline
 	SplineStruct m_handlingSpline;//creating and editing
 	QList<SplineStruct> m_splineList;

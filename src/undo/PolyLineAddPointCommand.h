@@ -10,6 +10,8 @@ class PolylineAddPointCommand : public BaseUndoCommand
 public:
     explicit PolylineAddPointCommand(
         const QString& text, 
+        LaserViewer* viewer,
+        LaserScene* scene,
         LaserDocument* document,
         const QString& primitiveId,
         const QPoint& point,
@@ -21,7 +23,6 @@ public:
     virtual void redo() override;
 
 private:
-    LaserDocument* m_doc;
     QString m_primitiveId;
     QPoint m_point;
     int m_pointIndex;

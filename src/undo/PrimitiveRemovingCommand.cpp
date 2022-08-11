@@ -2,9 +2,12 @@
 
 PrimitiveRemovingCommand::PrimitiveRemovingCommand(
     const QString& text, 
+    LaserViewer* viewer,
+    LaserScene* scene,
+    LaserDocument* doc,
     QObject* target, 
     QUndoCommand* parent)
-    : BaseUndoCommand(text, parent)
+    : BaseUndoCommand(text, viewer, scene, doc, parent)
 {
 }
 

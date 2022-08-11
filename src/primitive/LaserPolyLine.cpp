@@ -273,7 +273,7 @@ void LaserPolyline::sceneMouseReleaseEvent(
                 LaserPolygon* polygon = new LaserPolygon(QPolygon(d->points), document(),
                     QTransform(), layer->index());
                 PrimitiveAddingCommand* cmd = new PrimitiveAddingCommand(
-                    tr("Add Polygon"), polygon->id(), layer->id(), document(), polygon
+                    tr("Add Polygon"), viewer, scene, document(), polygon->id(), layer->id(), polygon
                 );
                 document()->removePrimitive(this, false, true, true);
                 viewer->addUndoCommand(cmd);
@@ -285,7 +285,7 @@ void LaserPolyline::sceneMouseReleaseEvent(
         else
         {
             PolylineAddPointCommand* cmd = new PolylineAddPointCommand(
-                tr("Add Point to Polyline"), document(), this->id(), d->editingPoint, d->points.size()
+                tr("Add Point to Polyline"), viewer, scene, document(), this->id(), d->editingPoint, d->points.size()
             );
             viewer->addUndoCommand(cmd);
         }

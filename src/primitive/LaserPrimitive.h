@@ -163,6 +163,7 @@ protected:
 
     friend class LaserDocument;
     friend class LaserLayer;
+    friend class LaserViewer;
 };
 
 //Q_DECLARE_METATYPE(LaserPrimitive)
