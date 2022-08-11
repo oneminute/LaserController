@@ -187,6 +187,17 @@ void LaserPolyline::draw(QPainter * painter)
     {
         if (d->points.count() >= 1)
 		    painter->drawLine(d->points.last(), d->editingPoint);
+
+        QPen oldPen = painter->pen();
+        QPen newPen(Qt::red, 1);
+        newPen.setCosmetic(true);
+        painter->setPen(newPen);
+        for (const QPoint& point : d->points)
+        {
+            painter->drawLine(point + QPoint(-1000, -1000), point + QPoint(1000, 1000));
+            painter->drawLine(point + QPoint(1000, -1000), point + QPoint(-1000, 1000));
+        }
+        painter->setPen(oldPen);
     }
 }
 
