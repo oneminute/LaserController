@@ -2,6 +2,7 @@
 
 #include "primitive/LaserPolyline.h"
 #include "scene/LaserDocument.h"
+#include "widget/LaserViewer.h"
 
 PolylineAddPointCommand::PolylineAddPointCommand(
     const QString& text, 
@@ -33,6 +34,11 @@ void PolylineAddPointCommand::undo()
     }
     target->setEditing(true);
     target->removePoint(m_pointIndex);
+    if (!viewer()->isEditing())
+    {
+        viewer()->beginEditing(target);
+        emit viewer()->creatingPolygon();
+    }
 }
 
 void PolylineAddPointCommand::redo()
@@ -44,5 +50,10 @@ void PolylineAddPointCommand::redo()
         return;
     }
     target->setEditing(true);
+    if (!viewer()->isEditing())
+    {
+        viewer()->beginEditing(target);
+        emit viewer()->creatingPolygon();
+    }
     target->appendPoint(m_point);
 }

@@ -15,3 +15,15 @@ BaseUndoCommand::BaseUndoCommand(
 
 BaseUndoCommand::~BaseUndoCommand() {}
 
+void BaseUndoCommand::callUndoCallback()
+{
+    if (m_undoCallback)
+        m_undoCallback();
+}
+
+void BaseUndoCommand::callRedoCallback()
+{
+    if (m_redoCallback)
+        m_redoCallback();
+}
+

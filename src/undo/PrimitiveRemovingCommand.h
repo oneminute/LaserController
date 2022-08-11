@@ -2,6 +2,8 @@
 
 #include "BaseUndoCommand.h"
 
+class LaserPrimitive;
+
 class PrimitiveRemovingCommand : public BaseUndoCommand
 {
 public:
@@ -10,7 +12,9 @@ public:
         LaserViewer* viewer,
         LaserScene* scene,
         LaserDocument* doc,
-        QObject* target,
+        const QString& primitiveId,
+        const QString& layerId,
+        LaserPrimitive* target,
         QUndoCommand* parent
     );
     ~PrimitiveRemovingCommand();
@@ -19,4 +23,8 @@ public:
     virtual void redo() override;
 
 private:
+    QString m_primitiveId;
+    QString m_layerId;
+    LaserPrimitive* m_cloned;
+    LaserPrimitive* m_added;
 };

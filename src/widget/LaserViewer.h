@@ -55,6 +55,7 @@ public:
 	void beginEditing(LaserPrimitive* primitive);
 	void endEditing();
 	LaserPrimitive* editingPrimitive() const { return m_editingPrimitive; };
+	bool isEditing() const { return m_editingPrimitive != nullptr; }
 
 	void createSpline();
 	LaserScene* scene();
@@ -109,7 +110,7 @@ public:
 	bool addPrimitiveAndExamRegionByBounds(LaserPrimitive* primitive);
 	bool addPrimitiveAndExamRegionByBounds(QList<LaserPrimitive*>& primitives, LaserPrimitive* parent = nullptr);
 
-	void addUndoCommand(BaseUndoCommand* cmd);
+	void addUndoCommand(QUndoCommand* cmd);
 	
 protected:
     void init();

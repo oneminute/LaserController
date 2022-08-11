@@ -3,6 +3,7 @@
 #include "primitive/LaserPrimitiveHeaders.h"
 #include "scene/LaserDocument.h"
 #include "scene/LaserLayer.h"
+#include "widget/LaserViewer.h"
 
 PrimitiveAddingCommand::PrimitiveAddingCommand(
     const QString& text, 
@@ -19,12 +20,11 @@ PrimitiveAddingCommand::PrimitiveAddingCommand(
     , m_cloned(target)
     , m_added(nullptr)
 {
-    //m_cloned = target->clone();
 }
 
 PrimitiveAddingCommand::~PrimitiveAddingCommand()
 {
-    delete m_cloned;
+    m_cloned->deleteLater();
 }
 
 void PrimitiveAddingCommand::undo()
@@ -43,6 +43,7 @@ void PrimitiveAddingCommand::undo()
     }
     document()->removePrimitive(primitive, false, true, true);
     m_added = nullptr;
+    callUndoCallback();
 }
 
 void PrimitiveAddingCommand::redo()
@@ -55,6 +56,7 @@ void PrimitiveAddingCommand::redo()
     }
     m_added = m_cloned->clone();
     document()->addPrimitive(m_added, layer);
+    callRedoCallback();
 }
 
 LaserPrimitive* PrimitiveAddingCommand::added() const

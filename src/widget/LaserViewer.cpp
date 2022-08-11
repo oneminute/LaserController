@@ -2672,6 +2672,17 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 
                         PrimitiveAddingCommand* undoCmd = new PrimitiveAddingCommand(
                             tr("Add Polyline"), this, m_scene.data(), m_scene->document(), polyline->id(), layer->id(), polyline);
+                        undoCmd->setUndoCallback([=]()
+                            {
+                                endEditing();
+                            }
+                        );
+                        undoCmd->setRedoCallback([=]()
+                            {
+                                beginEditing(undoCmd->added());
+                                emit creatingPolygon();
+                            }
+                        );
                         m_undoStack->push(undoCmd);
                         m_editingPrimitive = undoCmd->added();
                         beginEditing(m_editingPrimitive);
@@ -2686,55 +2697,12 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonCreatingState()))
     {
-    if (m_editingPrimitive)
-    {
-        QPointF point = mapToScene(event->pos());
-        m_editingPrimitive->sceneMouseReleaseEvent(this, m_scene.data(), 
-            point.toPoint(), event, this->m_mousePressed);
-        if (!m_editingPrimitive->isEditing())
-            endEditing();
+        if (m_editingPrimitive)
+        {
+            QPointF point = mapToScene(event->pos());
+            m_editingPrimitive->sceneMouseReleaseEvent(this, m_scene.data(),
+                point.toPoint(), event, this->m_mousePressed);
         }
-        //判断是否在4叉树的有效区域内
-        //if (m_scene->pointInAvailableArea(m_creatingPolygonEndPoint))
-        //{
-        //    if (event->button() == Qt::LeftButton)
-        //    {
-        //        
-        //    }
-        //    else if (event->button() == Qt::RightButton) {
-        //        if (m_creatingPolygonPoints.size() > 0) {
-        //            LaserLayer* layer = m_scene->document()->findCapableLayer(LPT_POLYGON);
-        //            if (layer)
-        //            {
-        //                LaserPolyline* polyLine = new LaserPolyline(QPolygonF(m_creatingPolygonPoints).toPolygon(), m_scene->document(),
-        //                    QTransform(), layer->index());
-        //                //m_scene->addLaserPrimitive(polyLine);
-        //                //onReplaceGroup(polyLine);
-        //                //undo
-        //                //判断是否在4叉树的有效区域内
-        //                if (m_scene->maxRegion().contains(m_creatingPolygonEndPoint.toPoint())) {
-        //                    //undo
-        //                    PolygonUndoCommand* polyCmd = new PolygonUndoCommand(m_scene.data(), m_lastPolygon, polyLine);
-        //                    m_undoStack->push(polyCmd);
-        //                    m_lastPolygon = polyLine;
-        //                }
-        //                else {
-        //                    QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
-        //                    m_creatingPolygonPoints.removeLast();
-        //                }
-        //                //m_undoStack->push(polyCmd);
-        //            }
-        //        }
-        //        m_currentPolyline = nullptr;
-        //        m_creatingPolygonPoints.clear();
-        //        setCursor(Qt::ArrowCursor);
-        //        emit readyPolygon();
-        //    }
-        //}
-        //else {
-        //    QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
-        //    m_creatingPolygonPoints.removeLast();
-        //}
     }
     //text
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextReadyState())) {
@@ -4294,10 +4262,11 @@ bool LaserViewer::addPrimitiveAndExamRegionByBounds(QList<LaserPrimitive*>& prim
     return true;
 }
 
-void LaserViewer::addUndoCommand(BaseUndoCommand* cmd)
+void LaserViewer::addUndoCommand(QUndoCommand* cmd)
 {
     Q_ASSERT(cmd);
     m_undoStack->push(cmd);
+    qLogD << "undo list size is " << m_undoStack->count();
 }
 
 int LaserViewer::textAlignH()

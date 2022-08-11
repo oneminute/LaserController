@@ -185,8 +185,6 @@ void LaserPolyline::draw(QPainter * painter)
 
     if (isEditing())
     {
-		//painter->setPen(QPen(Qt::black, 1, Qt::SolidLine));
-        //painter->drawPolygon(d->poly);
         if (d->points.count() >= 1)
 		    painter->drawLine(d->points.last(), d->editingPoint);
     }
@@ -267,19 +265,33 @@ void LaserPolyline::sceneMouseReleaseEvent(
             return;
 
         if (d->editingPoint == d->points.first()) {
-            LaserLayer* layer = document()->findCapableLayer(LPT_POLYGON);
+            LaserLayer* layer = document()->getCurrentOrCapableLayer(LPT_POLYGON);
             if (layer)
             {
+                QUndoCommand* cmd = new QUndoCommand(tr("Add Polygon"));
+
+                PrimitiveRemovingCommand* cmdRemoving = new PrimitiveRemovingCommand(
+                    tr("Remove Polyline"), viewer, scene, document(), 
+                    this->id(), this->layer()->id(), this, cmd
+                );
+                cmdRemoving->setUndoCallback([=]()
+                    {
+                        emit viewer->creatingPolygon();
+                    }
+                );
+
                 LaserPolygon* polygon = new LaserPolygon(QPolygon(d->points), document(),
                     QTransform(), layer->index());
-                PrimitiveAddingCommand* cmd = new PrimitiveAddingCommand(
-                    tr("Add Polygon"), viewer, scene, document(), polygon->id(), layer->id(), polygon
+                PrimitiveAddingCommand* cmdAdding = new PrimitiveAddingCommand(
+                    tr("Convert to Polygon"), viewer, scene, document(), 
+                    polygon->id(), layer->id(), polygon, cmd
                 );
-                document()->removePrimitive(this, false, true, true);
+
                 viewer->addUndoCommand(cmd);
-                emit viewer->readyPolygon();
                 setCursor(Qt::ArrowCursor);
                 setEditing(false);
+                viewer->endEditing();
+                emit viewer->readyPolygon();
             }
         }
         else
@@ -292,8 +304,9 @@ void LaserPolyline::sceneMouseReleaseEvent(
     }
     else if (event->button() == Qt::RightButton)
     {
-        emit viewer->readyPolygon();
+        viewer->endEditing();
         setEditing(false);
+        emit viewer->readyPolygon();
     }
 }
 
