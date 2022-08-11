@@ -1,45 +1,46 @@
 #include "LaserPrimitive.h"
 #include "LaserPrimitivePrivate.h"
+#include "LaserPrimitiveGroup.h"
 
 #include <iostream>
-#include <QPainterPath>
-#include <QSharedData>
-#include <QPaintEvent>
+
+#include <QBitmap>
 #include <QBuffer>
-#include <QtMath>
 #include <QGraphicsTextItem> 
-#include <opencv2/opencv.hpp>
-#include <QTextEdit>
 #include <QGraphicsSceneMouseEvent>
+#include <QImageReader>
 #include <QJsonArray>
 #include <QJsonObject>
-#include <QImageReader>
+#include <QPainterPath>
+#include <QPaintEvent>
+#include <QSharedData>
 #include <QStack>
-#include <QBitmap>
+#include <QTextEdit>
+#include <QtMath>
+
+#include <opencv2/opencv.hpp>
 
 #include "LaserApplication.h"
-#include "scene/LaserScene.h"
+#include "algorithm/QuadTreeNode.h"
+#include "common/common.h"
+#include "common/Config.h"
 #include "laser/LaserDriver.h"
 #include "laser/LaserDevice.h"
-#include "common/Config.h"
+#include "laser/LaserLineList.h"
+#include "scene/LaserDocument.h"
+#include "scene/LaserLayer.h"
+#include "scene/LaserScene.h"
+#include "state/StateController.h"
+#include "task/ProgressItem.h"
+#include "task/ProgressModel.h"
+#include "ui/LaserControllerWindow.h"
 #include "util/ImageUtils.h"
 #include "util/MachiningUtils.h"
 #include "util/TypeUtils.h"
 #include "util/UnitUtils.h"
 #include "util/Utils.h"
-#include "widget/LaserViewer.h"
-#include "scene/LaserDocument.h"
-#include "scene/LaserLayer.h"
-#include "LaserPrimitiveGroup.h"
-#include "laser/LaserLineList.h"
-#include "ui/LaserControllerWindow.h"
 #include "widget/LaserDoubleSpinBox.h"
-#include "algorithm/QuadTreeNode.h"
-#include "task/ProgressItem.h"
-#include "task/ProgressModel.h"
-#include "state/StateController.h"
-#include "common/common.h"
-
+#include "widget/LaserViewer.h"
 
 
 void setSelectedInGroup(bool selected) {
@@ -59,11 +60,14 @@ LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc,
     d->name = doc->newPrimitiveName(this);
 	d->allTransform = saveTransform;
 	d->layerIndex = layerIndex;
+
+    qLogD << "primitive " << id() << "created";
 }
 
 LaserPrimitive::~LaserPrimitive()
 {
     Q_D(LaserPrimitive);
+    qLogD << "primitive " << id() << "deleted";
 }
 
 LaserDocument* LaserPrimitive::document() const 
@@ -217,6 +221,18 @@ int LaserPrimitive::layerIndex()
 {
 	Q_D(const LaserPrimitive);
 	return d->layerIndex;
+}
+
+bool LaserPrimitive::isEditing() const
+{
+    Q_D(const LaserPrimitive);
+    return d->isEditing;
+}
+
+void LaserPrimitive::setEditing(bool editing)
+{
+    Q_D(LaserPrimitive);
+    d->isEditing = editing;
 }
 
 QPainterPath LaserPrimitive::getPath()
@@ -531,6 +547,7 @@ LaserPrimitive* LaserPrimitive::clone()
     LaserPrimitive* primitive = cloneImplement();
     primitive->setId(this->id());
     primitive->setName(this->name());
+    primitive->setEditing(this->isEditing());
     return primitive;
 }
 
@@ -871,6 +888,44 @@ void LaserPrimitive::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
 	//QGraphicsObject::mouseReleaseEvent(event);
     //update();
+}
+
+void LaserPrimitive::sceneMousePressEvent(
+    LaserViewer* viewer,
+    LaserScene* scene, 
+    const QPoint& point,
+    QMouseEvent* event)
+{
+}
+
+void LaserPrimitive::sceneMouseMoveEvent(
+    LaserViewer* viewer,
+    LaserScene* scene, 
+    const QPoint& point,
+    QMouseEvent* event,
+    bool isPressed)
+{
+}
+
+void LaserPrimitive::sceneMouseReleaseEvent(
+    LaserViewer* viewer,
+    LaserScene* scene, 
+    const QPoint& point,
+    QMouseEvent* event,
+    bool isPressed)
+{
+}
+
+void LaserPrimitive::sceneKeyPressEvent(
+    LaserViewer* viewer,
+    QKeyEvent* event)
+{
+}
+
+void LaserPrimitive::sceneKeyReleaseEvent(
+    LaserViewer* viewer,
+    QKeyEvent* event)
+{
 }
 
 QDebug operator<<(QDebug debug, const LaserPrimitive & item)

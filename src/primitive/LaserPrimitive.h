@@ -37,6 +37,9 @@ public:
     LaserLayer* layer() const;
 	int layerIndex();
 
+    bool isEditing() const;
+    void setEditing(bool editing);
+
     bool isShape() const;
     bool isBitmap() const;
     bool isText() const;
@@ -88,7 +91,6 @@ public:
     bool isAlignTarget();
     void setAlignTarget(bool value);
 
-
     QString toString() const;
 
     virtual QPainterPath outline() const;
@@ -125,6 +127,31 @@ protected:
     virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 	virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;
+
+    // the following functions only used in editing mode.
+    virtual void sceneMousePressEvent(
+        LaserViewer* viewer,
+        LaserScene* scene, 
+        const QPoint& point,
+        QMouseEvent* event);
+    virtual void sceneMouseMoveEvent(
+        LaserViewer* viewer,
+        LaserScene* scene,
+        const QPoint& point,
+        QMouseEvent* event,
+        bool isPressed);
+    virtual void sceneMouseReleaseEvent(
+        LaserViewer* viewer,
+        LaserScene* scene,
+        const QPoint& point,
+        QMouseEvent* event,
+        bool isPressed);
+	virtual void sceneKeyPressEvent(
+        LaserViewer* viewer,
+        QKeyEvent *event);
+	virtual void sceneKeyReleaseEvent(
+        LaserViewer* viewer,
+        QKeyEvent *event);
     
 private:
     QRect m_joinedGroupSceneBoundingRect;

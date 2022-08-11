@@ -15,6 +15,7 @@ public:
         : ILaserDocumentItemPrivate(ptr, LNT_PRIMITIVE)
         , doc(nullptr)
         , layer(nullptr)
+        , isEditing(false)
         , isHover(false)
         , primitiveType(LPT_UNKNOWN)
         , machiningCenter(0, 0)
@@ -31,6 +32,7 @@ public:
 	int layerIndex;
     QRect boundingRect;
     LaserPrimitiveType primitiveType;
+    bool isEditing;
     bool isHover;
     QPainterPath outline;
     LaserPointListList machiningPointsList;
