@@ -205,7 +205,6 @@ QJsonObject LaserPolyline::toJson()
 {
 	Q_D(const LaserPolyline);
 	QJsonObject object;
-	//QJsonArray position = { pos().x(), pos().y() };
 	QTransform t = QTransform();
 	
 	QJsonArray matrix = {
@@ -225,7 +224,6 @@ QJsonObject LaserPolyline::toJson()
 	}
 	object.insert("name", name());
 	object.insert("className", this->metaObject()->className());
-	//object.insert("position", position);
 	object.insert("matrix", matrix);
 	object.insert("poly", poly);
 	object.insert("layerIndex", layerIndex());

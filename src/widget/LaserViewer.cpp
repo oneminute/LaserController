@@ -2372,6 +2372,19 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         return;
     }
 
+    QPointF scenePoint = mapToScene(event->pos());
+    QPointF ajustedPoint = scenePoint;
+    if (m_isPrimitiveInteractPoint) {
+        ajustedPoint = m_primitiveInteractPoint;
+    }
+    //是否网格点
+    if (m_isGridNode) {
+        ajustedPoint = m_gridNode;
+    }
+    //判断是否在4叉树的有效区域内
+    bool scenePointInAvailableArea = m_scene->pointInAvailableArea(scenePoint);
+    bool ajustedPointInAvailableArea = m_scene->pointInAvailableArea(ajustedPoint);
+
     int layerIndex = m_scene->document()->currentLayerIndex();
     if (StateControllerInst.isInState(StateControllerInst.documentPrintAndCutSelectingState()))
     {
@@ -2529,9 +2542,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
             return;
         }
 
-        /*QRectF rect(backgroundItem->QGraphicsItemGroup::mapFromScene(m_creatingRectStartPoint),
-            backgroundItem->QGraphicsItemGroup::mapFromScene(m_creatingRectEndPoint));*/
-            //防止宽高为负值
+        //防止宽高为负值
         QPointF p1 = backgroundItem->QGraphicsItemGroup::mapFromScene(m_creatingRectStartPoint);
         QPointF p2 = backgroundItem->QGraphicsItemGroup::mapFromScene(m_creatingRectEndPoint);
         qreal left = 0, top = 0, right = 0, bottom = 0;
@@ -2631,7 +2642,6 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                     AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene.data(), list);
                     m_undoStack->push(addCmd);
                     onReplaceGroup(lineItem);
-
                 }
                 else {
                     QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
@@ -2646,16 +2656,8 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
     //Polygon
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonReadyState())) {
         if (event->button() == Qt::LeftButton) {
-            QPointF point = mapToScene(event->pos());
-            if (m_isPrimitiveInteractPoint) {
-                point = m_primitiveInteractPoint;
-            }
-            //是否网格点
-            if (m_isGridNode) {
-                point = m_gridNode;
-            }
             //判断是否在4叉树的有效区域内
-            if (m_scene->pointInAvailableArea(point))
+            if (ajustedPointInAvailableArea)
             {
                 LaserLayer* layer = nullptr;
                 if (m_editingPrimitive == nullptr)
@@ -2665,7 +2667,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                     if (layer)
                     {
                         QPolygonF polygon;
-                        polygon.append(point);
+                        polygon.append(ajustedPoint);
                         LaserPolyline* polyline = new LaserPolyline(polygon.toPolygon(), m_scene->document(),
                             QTransform(), layerIndex);
                         polyline->setEditing(true);
@@ -2699,9 +2701,8 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
     {
         if (m_editingPrimitive)
         {
-            QPointF point = mapToScene(event->pos());
             m_editingPrimitive->sceneMouseReleaseEvent(this, m_scene.data(),
-                point.toPoint(), event, this->m_mousePressed);
+                ajustedPoint.toPoint(), event, this->m_mousePressed);
         }
     }
     //text
