@@ -13,6 +13,8 @@ public:
         BT_BSPLINE
     };
 
+    LaserNurbs(LaserDocument* doc, QTransform transform = QTransform(),
+        int layerIndex = 1);
     LaserNurbs(const QList<QPointF> controlPoints, const QList<qreal> knots, const QList<qreal> weights, BasisType basisType, LaserDocument* doc, 
 		QTransform transform = QTransform(), int layerIndex = 1);
     ~LaserNurbs() {}

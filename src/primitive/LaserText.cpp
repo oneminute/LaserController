@@ -40,6 +40,11 @@ public:
     qreal spaceY;
 };
 
+LaserText::LaserText(LaserDocument* doc, QTransform transform, int layerIndex)
+    : LaserText(doc, QPointF(), QFont(), 1000, Qt::AlignHCenter, Qt::AlignVCenter, transform, layerIndex)
+{
+}
+
 LaserText::LaserText(LaserDocument* doc, QPointF startPos, QFont font, qreal spaceY, int alighHType, int alighVType, QTransform saveTransform, int layerIndex)
 	: LaserShape(new LaserTextPrivate(this),  doc,  LPT_TEXT, layerIndex, saveTransform)
 {

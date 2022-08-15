@@ -244,7 +244,13 @@ public:
     int steps;
 };
 
-LaserNurbs::LaserNurbs(const QList<QPointF> controlPoints, const QList<qreal> knots, const QList<qreal> weights, 
+LaserNurbs::LaserNurbs(LaserDocument* doc, QTransform transform, int layerIndex)
+    : LaserNurbs(QList<QPointF>(), QList<qreal>(), QList<qreal>(),
+        BasisType::BT_BSPLINE, doc, transform, layerIndex)
+{
+}
+
+LaserNurbs::LaserNurbs(const QList<QPointF> controlPoints, const QList<qreal> knots, const QList<qreal> weights,
 	BasisType basisType, LaserDocument* doc, QTransform transform, int layerIndex)
     : LaserShape(new LaserNurbsPrivate(this, basisType), doc, LPT_NURBS, layerIndex, transform)
 {

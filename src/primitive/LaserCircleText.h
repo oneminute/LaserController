@@ -6,9 +6,15 @@ class LaserCircleTextPrivate;
 class LaserCircleText : public LaserStampText {
     Q_OBJECT
 public:
-    LaserCircleText(LaserDocument* doc, QString content, QRectF bounds, qreal angle,
-        bool bold = false, bool italic = false, bool uppercase = false, bool stampIntaglio = false, QString family = "Times New Roman",qreal space = 0,
-        bool isInit = true, qreal maxRadian = 0, qreal minRadian = 0, QSize size = QSize(), QTransform transform = QTransform(), int layerIndex = 0, qreal weight = 0);
+    LaserCircleText(LaserDocument* doc, QTransform transform = QTransform(),
+        int layerIndex = 0);
+    LaserCircleText(LaserDocument* doc, QString content, QRectF bounds, 
+        qreal angle, bool bold = false, bool italic = false, 
+        bool uppercase = false, bool stampIntaglio = false, 
+        QString family = "Times New Roman",qreal space = 0,
+        bool isInit = true, qreal maxRadian = 0, qreal minRadian = 0, 
+        QSize size = QSize(), QTransform transform = QTransform(), 
+        int layerIndex = 0, qreal weight = 0);
     virtual ~LaserCircleText();
     void computeTextPath(qreal angle, QSize textSize,  bool needInit = true);
     //QPointF computeEllipsePoint(qreal rRadian);

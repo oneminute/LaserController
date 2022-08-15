@@ -37,10 +37,22 @@ public:
     //bool uppercase;
 };
 
-LaserCircleText::LaserCircleText(LaserDocument* doc, QString content, QRectF bounds, qreal angle,
-    bool bold, bool italic,bool uppercase, bool stampIntaglio, QString family, qreal sapce,
-    bool isInit, qreal maxRadian, qreal minRadian, QSize size, QTransform transform, int layerIndex, qreal weight)
-    :LaserStampText(new LaserCircleTextPrivate(this), doc, LPT_CIRCLETEXT, content, transform, layerIndex, size, sapce, bold, italic, uppercase, stampIntaglio, family, weight)
+LaserCircleText::LaserCircleText(LaserDocument* doc, QTransform transform,
+    int layerIndex)
+    :LaserStampText(new LaserCircleTextPrivate(this), doc, LPT_CIRCLETEXT, 
+        QString(), transform, layerIndex, QSize(), 0.0f, false, false,
+        false, false, QString(), 0)
+{
+}
+
+LaserCircleText::LaserCircleText(LaserDocument* doc, QString content, 
+    QRectF bounds, qreal angle, bool bold, bool italic,bool uppercase,
+    bool stampIntaglio, QString family, qreal space, bool isInit, 
+    qreal maxRadian, qreal minRadian, QSize size, QTransform transform, 
+    int layerIndex, qreal weight)
+    :LaserStampText(new LaserCircleTextPrivate(this), doc, LPT_CIRCLETEXT,
+        content, transform, layerIndex, size, space, bold, italic, uppercase, 
+        stampIntaglio, family, weight)
 {
     Q_D(LaserCircleText);
     //d->content = content;

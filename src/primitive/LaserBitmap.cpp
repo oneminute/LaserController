@@ -24,18 +24,28 @@ public:
     QImage image;
 };
 
-LaserBitmap::LaserBitmap(const QImage & image, const QRect& bounds, LaserDocument * doc, QTransform saveTransform, int layerIndex)
+LaserBitmap::LaserBitmap(LaserDocument* doc, QTransform transform, int layerIndex)
+    : LaserPrimitive(new LaserBitmapPrivate(this), doc,  LPT_BITMAP, 
+        transform, layerIndex)
+{
+    Q_D(LaserBitmap);
+    d->primitiveType = LPT_BITMAP;
+	sceneTransformToItemTransform(transform);
+	setFlags(ItemIsSelectable | ItemIsMovable);
+	installEventFilter(doc->scene());
+}
+
+LaserBitmap::LaserBitmap(const QImage & image, const QRect& bounds, 
+    LaserDocument * doc, QTransform saveTransform, int layerIndex)
     : LaserPrimitive(new LaserBitmapPrivate(this), doc,  LPT_BITMAP, saveTransform, layerIndex)
 {
     Q_D(LaserBitmap);
     d->image = image.convertToFormat(QImage::Format_Grayscale8);
     d->boundingRect = bounds;
     d->path.addRect(bounds);
-	//d->originalBoundingRect = d->boundingRect;
     d->primitiveType = LPT_BITMAP;
     d->outline.addRect(bounds);
 	sceneTransformToItemTransform(saveTransform);
-
 	setFlags(ItemIsSelectable | ItemIsMovable);
 	installEventFilter(doc->scene());
 }

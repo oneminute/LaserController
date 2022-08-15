@@ -24,7 +24,12 @@ public:
     int cornerRadius;
 };
 
-LaserRect::LaserRect(const QRect rect, int cornerRadius, LaserDocument * doc, 
+LaserRect::LaserRect(LaserDocument* doc, QTransform transform, int layerIndex)
+    : LaserRect(QRect(), 5000, doc, transform, layerIndex)
+{
+}
+
+LaserRect::LaserRect(const QRect rect, int cornerRadius, LaserDocument * doc,
     QTransform saveTransform, int layerIndex, int cornerRadiusType)
     : LaserShape(new LaserRectPrivate(this), doc, LPT_RECT, layerIndex, saveTransform)
 {

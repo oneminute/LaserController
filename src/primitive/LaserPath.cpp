@@ -21,6 +21,11 @@ public:
     {}
 };
 
+LaserPath::LaserPath(LaserDocument* doc, QTransform transform, int layerIndex)
+    : LaserPath(QPainterPath(), doc, transform, layerIndex)
+{
+}
+
 LaserPath::LaserPath(const QPainterPath & path, LaserDocument * doc, QTransform saveTransform, int layerIndex)
     : LaserShape(new LaserPathPrivate(this), doc,  LPT_PATH, layerIndex, saveTransform)
 {

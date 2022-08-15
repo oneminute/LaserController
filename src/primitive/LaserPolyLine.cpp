@@ -29,6 +29,11 @@ public:
     QVector<QPoint> points;
 };
 
+LaserPolyline::LaserPolyline(LaserDocument* doc, QTransform transform, int layerIndex)
+    : LaserPolyline(QPolygon(), doc, transform, layerIndex)
+{
+}
+
 LaserPolyline::LaserPolyline(const QPolygon & poly, LaserDocument * doc, QTransform saveTransform, int layerIndex)
     : LaserShape(new LaserPolylinePrivate(this), doc, LPT_POLYLINE, layerIndex, saveTransform)
 {
@@ -270,52 +275,92 @@ void LaserPolyline::sceneMouseReleaseEvent(
     Q_D(LaserPolyline);
     if (event->button() == Qt::LeftButton)
     {
-        if (d->editingPoint == d->points.last())
-            return;
+        if (d->points.isEmpty())
+        {
+            setEditing(true);
+            QUndoCommand* cmd = new QUndoCommand(tr("Add Polyline"));
+            PrimitiveAddingCommand* cmdAdding = new PrimitiveAddingCommand(
+                tr("Add Polyline"), viewer, scene, document(), id(), d->layer->id(), this, cmd);
+            cmdAdding->setUndoCallback([=]()
+                {
+                    viewer->endEditing();
+                }
+            );
+            cmdAdding->setRedoCallback([=]()
+                {
+                    viewer->setEditingPrimitiveId(id());
+                    emit viewer->creatingPolygon();
+                }
+            );
 
-        if (d->editingPoint == d->points.first()) {
-            LaserLayer* layer = document()->getCurrentOrCapableLayer(LPT_POLYGON);
-            if (layer)
-            {
-                QUndoCommand* cmd = new QUndoCommand(tr("Add Polygon"));
-
-                PrimitiveRemovingCommand* cmdRemoving = new PrimitiveRemovingCommand(
-                    tr("Remove Polyline"), viewer, scene, document(), 
-                    this->id(), this->layer()->id(), this, cmd
-                );
-                cmdRemoving->setUndoCallback([=]()
-                    {
-                        emit viewer->creatingPolygon();
-                    }
-                );
-
-                LaserPolygon* polygon = new LaserPolygon(QPolygon(d->points), document(),
-                    QTransform(), layer->index());
-                PrimitiveAddingCommand* cmdAdding = new PrimitiveAddingCommand(
-                    tr("Convert to Polygon"), viewer, scene, document(), 
-                    polygon->id(), layer->id(), polygon, cmd
-                );
-
-                viewer->addUndoCommand(cmd);
-                setCursor(Qt::ArrowCursor);
-                setEditing(false);
-                viewer->endEditing();
-                emit viewer->readyPolygon();
-            }
+            PolylineAddPointCommand* cmdAddPoint = new PolylineAddPointCommand(
+                tr("Add Point to Polyline"), viewer, scene, document(), 
+                id(), d->editingPoint, d->points.size(), cmd);
+            viewer->addUndoCommand(cmd);
         }
         else
         {
-            PolylineAddPointCommand* cmd = new PolylineAddPointCommand(
-                tr("Add Point to Polyline"), viewer, scene, document(), this->id(), d->editingPoint, d->points.size()
-            );
-            viewer->addUndoCommand(cmd);
+            if (d->editingPoint == d->points.last())
+                return;
+
+            if (d->editingPoint == d->points.first()) {
+                LaserLayer* layer = document()->getCurrentOrCapableLayer(LPT_POLYGON);
+                if (layer)
+                {
+                    QUndoCommand* cmd = new QUndoCommand(tr("Add Polygon"));
+
+                    PrimitiveRemovingCommand* cmdRemoving = new PrimitiveRemovingCommand(
+                        tr("Remove Polyline"), viewer, scene, document(),
+                        this->id(), this->layer()->id(), this, cmd
+                    );
+                    cmdRemoving->setUndoCallback([=]()
+                        {
+                            emit viewer->creatingPolygon();
+                        }
+                    );
+
+                    LaserPolygon* polygon = new LaserPolygon(QPolygon(d->points), document(),
+                        QTransform(), layer->index());
+                    PrimitiveAddingCommand* cmdAdding = new PrimitiveAddingCommand(
+                        tr("Convert to Polygon"), viewer, scene, document(),
+                        polygon->id(), layer->id(), polygon, cmd
+                    );
+
+                    viewer->addUndoCommand(cmd);
+                    setCursor(Qt::ArrowCursor);
+                    setEditing(false);
+                    viewer->endEditing();
+                    emit viewer->readyPolygon();
+                }
+            }
+            else
+            {
+                PolylineAddPointCommand* cmd = new PolylineAddPointCommand(
+                    tr("Add Point to Polyline"), viewer, scene, document(), 
+                    id(), d->editingPoint, d->points.size());
+                viewer->addUndoCommand(cmd);
+            }
         }
     }
     else if (event->button() == Qt::RightButton)
     {
-        viewer->endEditing();
-        setEditing(false);
-        emit viewer->readyPolygon();
+        if (d->points.size() <= 1)
+        {
+            PrimitiveRemovingCommand* cmdRemoving = new PrimitiveRemovingCommand(
+                tr("Remove Polyline"), viewer, scene, document(), id(), layer()->id(), this);
+            cmdRemoving->setUndoCallback([=]()
+                {
+                    emit viewer->creatingPolygon();
+                }
+            );
+            viewer->addUndoCommand(cmdRemoving);
+        }
+        else
+        {
+            viewer->endEditing();
+            setEditing(false);
+            emit viewer->readyPolygon();
+        }
     }
 }
 

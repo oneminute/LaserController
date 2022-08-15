@@ -23,6 +23,11 @@ public:
     QPolygon poly;
 };
 
+LaserPolygon::LaserPolygon(LaserDocument* doc, QTransform transform, int layerIndex)
+	: LaserPolygon(QPolygon(), doc, transform, layerIndex)
+{
+}
+
 LaserPolygon::LaserPolygon(const QPolygon & poly, LaserDocument * doc, QTransform saveTransform, int layerIndex)
     : LaserShape(new LaserPolygonPrivate(this), doc, LPT_POLYGON, layerIndex, saveTransform)
 {

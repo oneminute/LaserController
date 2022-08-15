@@ -8,6 +8,8 @@ class LaserText : public LaserShape
 {
 	Q_OBJECT
 public:
+	LaserText(LaserDocument* doc, QTransform transform = QTransform(),
+		int layerIndex = 0);
 	LaserText(LaserDocument* doc, QPointF startPos, QFont font, qreal spaceY, int alightHType, int alightVType, QTransform transform = QTransform(),
 		int layerIndex = 0);
     virtual ~LaserText();

@@ -7,6 +7,7 @@ class LaserPolygon : public LaserShape
 {
     Q_OBJECT
 public:
+    LaserPolygon(LaserDocument* doc, QTransform transform = QTransform(), int layerIndex = 1);
     LaserPolygon(const QPolygon& poly, LaserDocument* doc, QTransform transform = QTransform(), int layerIndex = 1);
     virtual ~LaserPolygon() {}
 

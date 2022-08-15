@@ -7,7 +7,10 @@ class LaserBitmap : public LaserPrimitive
 {
     Q_OBJECT
 public:
-    LaserBitmap(const QImage& image, const QRect& bounds, LaserDocument* doc, QTransform transform = QTransform(), 
+    LaserBitmap(LaserDocument* doc, QTransform transform = QTransform(),
+        int layerIndex = 0);
+    LaserBitmap(const QImage& image, const QRect& bounds, LaserDocument* doc, 
+        QTransform transform = QTransform(), 
 		int layerIndex = 0);
     virtual ~LaserBitmap() {}
 

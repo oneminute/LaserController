@@ -7,6 +7,7 @@ class LaserPath : public LaserShape
 {
     Q_OBJECT
 public:
+    LaserPath(LaserDocument* doc, QTransform transform = QTransform(), int layerIndex = 1);
     LaserPath(const QPainterPath& path, LaserDocument* doc, QTransform transform = QTransform(), int layerIndex = 1);
     virtual ~LaserPath() {}
 

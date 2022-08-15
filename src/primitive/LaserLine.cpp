@@ -20,7 +20,13 @@ public:
     {}
 
     QLine line;
+    QPoint editingPoint;
 };
+
+LaserLine::LaserLine(LaserDocument* doc, QTransform transform, int layerIndex)
+    : LaserLine(QLine(), doc, transform, layerIndex)
+{
+}
 
 LaserLine::LaserLine(const QLine & line, LaserDocument * doc, QTransform saveTransform, int layerIndex)
     : LaserShape(new LaserLinePrivate(this), doc, LPT_LINE, layerIndex, saveTransform)
@@ -31,7 +37,6 @@ LaserLine::LaserLine(const QLine & line, LaserDocument * doc, QTransform saveTra
     d->path.moveTo(d->line.p1());
     d->path.lineTo(d->line.p2());
     d->boundingRect = d->path.boundingRect().toRect();
-	//d->originalBoundingRect = d->boundingRect;
     d->outline.moveTo(d->line.p1());
     d->outline.lineTo(d->line.p2());
 }
@@ -51,17 +56,25 @@ void LaserLine::setLine(const QLine& line)
     d->path.moveTo(d->line.p1());
     d->path.lineTo(d->line.p2());
     d->boundingRect = d->path.boundingRect().toRect();
-	//d->originalBoundingRect = d->boundingRect;
     d->outline = QPainterPath();
     d->outline.moveTo(d->line.p1());
     d->outline.lineTo(d->line.p2());
+}
+
+void LaserLine::setEditingPoint(const QPoint& point)
+{
+    Q_D(LaserLine);
+}
+
+QPoint LaserLine::editingPoint() const
+{
+    return QPoint();
 }
 
 QJsonObject LaserLine::toJson()
 {
 	Q_D(const LaserLine);
 	QJsonObject object;
-	//QJsonArray position = { pos().x(), pos().y() };
 	QTransform transform = QTransform();
 	QJsonArray matrix = {
 		transform.m11(), transform.m12(), transform.m13(),
@@ -89,6 +102,29 @@ QVector<QLineF> LaserLine::edges()
 	QLineF line = sceneTransform().map(d->line);
 	list.append(line);
 	return list;
+}
+
+void LaserLine::sceneMousePressEvent(LaserViewer* viewer, LaserScene* scene, 
+    const QPoint& point, QMouseEvent* event)
+{
+}
+
+void LaserLine::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scene, 
+    const QPoint& point, QMouseEvent* event, bool isPressed)
+{
+}
+
+void LaserLine::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, 
+    const QPoint& point, QMouseEvent* event, bool isPressed)
+{
+}
+
+void LaserLine::sceneKeyPressEvent(LaserViewer* viewer, QKeyEvent* event)
+{
+}
+
+void LaserLine::sceneKeyReleaseEvent(LaserViewer* viewer, QKeyEvent* event)
+{
 }
 
 LaserPrimitive * LaserLine::cloneImplement()
@@ -138,8 +174,21 @@ LaserPointListList LaserLine::updateMachiningPoints(ProgressItem* parentProgress
 void LaserLine::draw(QPainter * painter)
 {
     Q_D(LaserLine);
-    painter->drawLine(d->line);
-	//painter->drawRect(d->boundingRect);
+    if (isEditing())
+    {
+        painter->drawLine(QLine(d->line.p1(), d->editingPoint));
+        QPen oldPen = painter->pen();
+        QPen newPen(Qt::red, 1);
+        newPen.setCosmetic(true);
+        painter->setPen(newPen);
+        painter->drawLine(d->line.p1() + QPoint(-1000, -1000), d->line.p1() + QPoint(1000, 1000));
+        painter->drawLine(d->line.p1() + QPoint(1000, -1000), d->line.p1() + QPoint(-1000, 1000));
+        painter->setPen(oldPen);
+    }
+    else
+    {
+        painter->drawLine(d->line);
+    }
 }
 
 //QRect LaserLine::sceneBoundingRect() const

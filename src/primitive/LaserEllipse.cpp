@@ -20,6 +20,11 @@ public:
     {}
 };
 
+LaserEllipse::LaserEllipse(LaserDocument* doc, QTransform transform, int layerIndex)
+    : LaserEllipse(QRect(), doc, transform, layerIndex)
+{
+}
+
 LaserEllipse::LaserEllipse(const QRect bounds, LaserDocument * doc, QTransform saveTransform, int layerIndex)
     : LaserShape(new LaserEllipsePrivate(this), doc, LPT_ELLIPSE, layerIndex, saveTransform)
 {

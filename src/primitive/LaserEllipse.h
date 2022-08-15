@@ -8,6 +8,7 @@ class LaserEllipse : public LaserShape
 {
     Q_OBJECT
 public:
+    LaserEllipse(LaserDocument* doc, QTransform transform = QTransform(), int layerIndex = 1);
     LaserEllipse(const QRect bounds, LaserDocument* doc, QTransform transform = QTransform(), int layerIndex = 1);
     virtual ~LaserEllipse() {}
 

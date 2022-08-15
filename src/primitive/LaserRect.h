@@ -7,6 +7,7 @@ class LaserRect : public LaserShape
 {
     Q_OBJECT
 public:
+    LaserRect(LaserDocument* doc, QTransform transform = QTransform(), int layerIndex = 1);
     LaserRect(const QRect rect, int cornerRadius, LaserDocument* doc, 
         QTransform transform = QTransform(), int layerIndex = 1, int cornerRadiusType = CRT_Round);
     virtual ~LaserRect() {}
