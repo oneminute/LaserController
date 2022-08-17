@@ -77,13 +77,13 @@ LaserDocument* LaserPrimitive::document() const
 }
 
 //PolyLine or Polygon
-QVector<QLineF> LaserPrimitive::edges(QPainterPath path, bool isPolyline)
+QVector<QLine> LaserPrimitive::edges(QPainterPath path, bool isPolyline)
 {
-	QPolygonF polygon = path.toFillPolygon();
-	QVector<QLineF> edgeList;
+	QPolygon polygon = path.toFillPolygon().toPolygon();
+	QVector<QLine> edgeList;
 	for (int i = 0; i < polygon.count()-1; i++) {
 		
-		QLineF edge;
+		QLine edge;
 		if (!isPolyline) {
 			//polygon
 			edge.setPoints(polygon.at(i), polygon.at(i + 1));
@@ -104,9 +104,9 @@ QVector<QLineF> LaserPrimitive::edges(QPainterPath path, bool isPolyline)
 	return edgeList;
 }
 
-QVector<QLineF> LaserPrimitive::edges()
+QVector<QLine> LaserPrimitive::edges()
 {
-	return QVector<QLineF>();
+	return QVector<QLine>();
 }
 
 void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
@@ -122,7 +122,6 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
         if (!visible())
             return;
     }
-
 
     painter->save();
     painter->setRenderHint(QPainter::HighQualityAntialiasing, true);
@@ -152,9 +151,10 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
     if (Config::Debug::showPrimitiveFirstPoint())
         painter->drawEllipse(startPos, 2, 2);
 
-    if (d->layer)
+    LaserLayer* layer = this->layer();
+    if (layer)
     {
-        color = d->layer->color();
+        color = layer->color();
         if (!exportable())
         {
             color = Qt::lightGray;
@@ -189,7 +189,7 @@ void LaserPrimitive::paint(QPainter * painter, const QStyleOptionGraphicsItem * 
         painter->setPen(pen);
     }
 
-    if (layer() && layer()->type() == LLT_FILLING)
+    if (layer && layer->type() == LLT_FILLING)
     {
         QBrush brush(color, Qt::SolidPattern);
         painter->setBrush(brush);
@@ -263,9 +263,9 @@ QPainterPath LaserPrimitive::getScenePath()
     return sceneTransform().map(d->path);
 }
 
-QPolygonF LaserPrimitive::sceneOriginalBoundingPolygon(qreal extendPixel)
+QPolygon LaserPrimitive::sceneOriginalBoundingPolygon(qreal extendPixel)
 {
-	QPolygonF bounding = sceneTransform().map(boundingRect());
+	QPolygon bounding = sceneTransform().map(QRectF(boundingRect())).toPolygon();
 	
 	if (extendPixel != 0) {
 		QVector2D p12 = QVector2D(bounding[1] - bounding[0]).normalized() * extendPixel;
@@ -273,12 +273,12 @@ QPolygonF LaserPrimitive::sceneOriginalBoundingPolygon(qreal extendPixel)
 		QVector2D p34 = QVector2D(bounding[3] - bounding[2]).normalized() * extendPixel;
 		QVector2D p41 = QVector2D(bounding[0] - bounding[3]).normalized() * extendPixel;
 
-		QPointF newP1 = bounding[0] - p12.toPointF() + p41.toPointF();
-		QPointF newP2 = bounding[1] + p12.toPointF() - p23.toPointF();
-		QPointF newP3 = bounding[2] - p34.toPointF() + p23.toPointF();
-		QPointF newP4 = bounding[3] + p34.toPointF() - p41.toPointF();
+		QPoint newP1 = bounding[0] - p12.toPoint() + p41.toPoint();
+		QPoint newP2 = bounding[1] + p12.toPoint() - p23.toPoint();
+		QPoint newP3 = bounding[2] - p34.toPoint() + p23.toPoint();
+		QPoint newP4 = bounding[3] + p34.toPoint() - p41.toPoint();
 
-		QPolygonF newBounding;
+		QPolygon newBounding;
 		newBounding.append(newP1);
 		newBounding.append(newP2);
 		newBounding.append(newP3);
@@ -547,6 +547,7 @@ LaserPrimitive* LaserPrimitive::clone()
     LaserPrimitive* primitive = cloneImplement();
     primitive->setId(this->id());
     primitive->setName(this->name());
+    primitive->setLayer(this->layer());
     primitive->setEditing(this->isEditing());
     return primitive;
 }
@@ -603,17 +604,21 @@ void LaserPrimitive::setAlignTarget(bool value)
 LaserLayer* LaserPrimitive::layer() const
 {
     Q_D(const LaserPrimitive);
-    return d->layer; 
+    LaserLayer* layer = d->doc->layerById(d->layerId);
+    if (!layer)
+        layer = d->doc->layerByIndex(d->layerIndex);
+    return layer;
 }
 
 void LaserPrimitive::setLayer(LaserLayer* layer) 
 {
     Q_D(LaserPrimitive);
     
-    d->layer = layer;
+    //d->layer = layer;
 	if (layer) {
         
 		d->layerIndex = layer->index();
+        d->layerId = layer->id();
         //d->layer->primitives().append(this);
 	}
 	else {
@@ -621,6 +626,7 @@ void LaserPrimitive::setLayer(LaserLayer* layer)
         //如果重置为-1，则删除后需要重新添加到层中
         //if (!whenNullLayerKeepIndex) {
         d->layerIndex = -1;
+        d->layerId = QString();
         //}
 	}
 }

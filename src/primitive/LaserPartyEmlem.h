@@ -13,7 +13,7 @@ public:
     virtual LaserPrimitiveType type() { return LPT_PARTYEMBLEM; }
     virtual QString typeName() { return tr("PartyEmblem"); }
     virtual QJsonObject toJson();
-    QVector<QLineF> edges();
+    virtual QVector<QLine> edges();
     void computePath();
     qreal radius();
     virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;

@@ -16,7 +16,7 @@ public:
     virtual LaserPrimitiveType type() { return LPT_FRAME; }
     virtual QString typeName() { return tr("Frame"); }
     virtual QJsonObject toJson();
-    QVector<QLineF> edges();
+    virtual QVector<QLine> edges();
     void setInner(bool bl);
     bool isInner();
     QPainterPath outerPath();

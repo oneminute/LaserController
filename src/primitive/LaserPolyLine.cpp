@@ -235,7 +235,7 @@ QJsonObject LaserPolyline::toJson()
 	return object;
 }
 
-QVector<QLineF> LaserPolyline::edges()
+QVector<QLine> LaserPolyline::edges()
 {
 	Q_D(const LaserPolyline);
 	QPainterPath path;
@@ -273,38 +273,55 @@ void LaserPolyline::sceneMouseReleaseEvent(
     bool isPressed)
 {
     Q_D(LaserPolyline);
+    LaserLayer* layer = this->layer();
     if (event->button() == Qt::LeftButton)
     {
+        // if there's no points in current polygon/polyline
         if (d->points.isEmpty())
         {
             setEditing(true);
+
+            // the current operation includs two sub commands:
+            //   1. add the LaserPolyline primitive object;
+            //   2. add a point to it;
+            // so we create a parent QUndoCommand to comibine the two commands
+            // togather as one step.
             QUndoCommand* cmd = new QUndoCommand(tr("Add Polyline"));
+
             PrimitiveAddingCommand* cmdAdding = new PrimitiveAddingCommand(
-                tr("Add Polyline"), viewer, scene, document(), id(), d->layer->id(), this, cmd);
+                tr("Add Polyline"), viewer, scene, this->document(), this->id(), 
+                layer->id(), this, cmd);
+
+            // we must ensure that when we undo the adding operation we should 
+            // end the editing state in LaserViewer
             cmdAdding->setUndoCallback([=]()
                 {
-                    viewer->endEditing();
+                    emit viewer->endEditing();
                 }
             );
+            // as we adding and editing the polyline, we must ensure that the
+            // LaserViewer know it's in editing state
             cmdAdding->setRedoCallback([=]()
                 {
                     viewer->setEditingPrimitiveId(id());
-                    emit viewer->creatingPolygon();
+                    emit viewer->beginEditing();
                 }
             );
 
             PolylineAddPointCommand* cmdAddPoint = new PolylineAddPointCommand(
                 tr("Add Point to Polyline"), viewer, scene, document(), 
-                id(), d->editingPoint, d->points.size(), cmd);
+                id(), point, d->points.size(), cmd);
             viewer->addUndoCommand(cmd);
         }
+        // there're more than one point in the current editing polygon
         else
         {
             if (d->editingPoint == d->points.last())
                 return;
 
+            // if the editing point is equal to the first point these points
+            // form a closed shape
             if (d->editingPoint == d->points.first()) {
-                LaserLayer* layer = document()->getCurrentOrCapableLayer(LPT_POLYGON);
                 if (layer)
                 {
                     QUndoCommand* cmd = new QUndoCommand(tr("Add Polygon"));
@@ -315,7 +332,8 @@ void LaserPolyline::sceneMouseReleaseEvent(
                     );
                     cmdRemoving->setUndoCallback([=]()
                         {
-                            emit viewer->creatingPolygon();
+                            viewer->setEditingPrimitiveId(cmdRemoving->primitiveId());
+                            emit viewer->beginEditing();
                         }
                     );
 
@@ -329,8 +347,7 @@ void LaserPolyline::sceneMouseReleaseEvent(
                     viewer->addUndoCommand(cmd);
                     setCursor(Qt::ArrowCursor);
                     setEditing(false);
-                    viewer->endEditing();
-                    emit viewer->readyPolygon();
+                    emit viewer->endEditing();
                 }
             }
             else
@@ -347,19 +364,18 @@ void LaserPolyline::sceneMouseReleaseEvent(
         if (d->points.size() <= 1)
         {
             PrimitiveRemovingCommand* cmdRemoving = new PrimitiveRemovingCommand(
-                tr("Remove Polyline"), viewer, scene, document(), id(), layer()->id(), this);
+                tr("Remove Polyline"), viewer, scene, document(), id(), layer->id(), this);
             cmdRemoving->setUndoCallback([=]()
                 {
-                    emit viewer->creatingPolygon();
+                    emit viewer->beginEditing();
                 }
             );
             viewer->addUndoCommand(cmdRemoving);
         }
         else
         {
-            viewer->endEditing();
             setEditing(false);
-            emit viewer->readyPolygon();
+            emit viewer->endEditing();
         }
     }
 }

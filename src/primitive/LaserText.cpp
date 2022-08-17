@@ -105,7 +105,7 @@ QPainterPath LaserText::path() const
     return d->path;
 }
 
-QVector<QLineF> LaserText::edges()
+QVector<QLine> LaserText::edges()
 {
     Q_D(const LaserText);
     return  LaserPrimitive::edges(sceneTransform().map(path()));

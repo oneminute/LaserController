@@ -142,7 +142,7 @@ LaserPrimitive * LaserRing::cloneImplement()
     stampBaseClone(ring);
     return ring;
 }
-QVector<QLineF> LaserRing::edges()
+QVector<QLine> LaserRing::edges()
 {
     Q_D(LaserRing);
     //qDebug()<<LaserPrimitive::edges(sceneTransform().map(d->path)).size();

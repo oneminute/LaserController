@@ -124,7 +124,7 @@ QJsonObject LaserRect::toJson()
 	return object;
 }
 
-QVector<QLineF> LaserRect::edges()
+QVector<QLine> LaserRect::edges()
 {
 	Q_D(const LaserRect);
 	return LaserPrimitive::edges(sceneTransform().map(d->path));

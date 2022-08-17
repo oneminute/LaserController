@@ -105,7 +105,7 @@ LaserPrimitive * LaserStar::cloneImplement()
     return star;
 }
 
-QVector<QLineF> LaserStar::edges()
+QVector<QLine> LaserStar::edges()
 {
     Q_D(LaserStar);
     return LaserPrimitive::edges(sceneTransform().map(d->path));

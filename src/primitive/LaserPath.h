@@ -23,7 +23,7 @@ public:
     virtual QJsonObject toJson();
 
 	//virtual void reShape();
-	QVector<QLineF> edges();
+	virtual QVector<QLine> edges();
     virtual bool isClosed() const;
     virtual QPointF position() const;
 private:

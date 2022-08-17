@@ -13,7 +13,7 @@ public:
     virtual LaserPrimitiveType type() { return LPT_STAR; }
     virtual QString typeName() { return tr("Star"); }
     virtual QJsonObject toJson();
-    QVector<QLineF> edges();
+    virtual QVector<QLine> edges();
     void computePath();
     qreal radius();
     //void updatePoints();

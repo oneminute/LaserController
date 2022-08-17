@@ -149,7 +149,7 @@ LaserPrimitive * LaserFrame::cloneImplement()
     stampBaseClone(frame);
     return frame;
 }
-QVector<QLineF> LaserFrame::edges()
+QVector<QLine> LaserFrame::edges()
 {
     Q_D(LaserFrame);
     return LaserPrimitive::edges(sceneTransform().map(d->path));

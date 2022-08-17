@@ -23,7 +23,7 @@ public:
 	//virtual QRect sceneBoundingRect() const;
 	//virtual void reShape();
 	virtual QJsonObject toJson();
-	QVector<QLineF> edges();
+	virtual QVector<QLine> edges();
 
     virtual bool isClosed() const;
     virtual QPointF position() const;

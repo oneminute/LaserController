@@ -68,11 +68,12 @@ QByteArray LaserShape::filling(ProgressItem* progress, QPoint& lastPoint)
 
     cv::Mat src(canvas.height(), canvas.width(), CV_8UC1, (void*)canvas.constBits(), canvas.bytesPerLine());
 
-    int dpi = d->layer->dpi();
+    LaserLayer* layer = this->layer();
+    int dpi = layer->dpi();
     int pixelWidth = boundingRectInDevice.width() * dpi / 25400.0;
     int pixelHeight = boundingRectInDevice.height() * dpi / 25400.0;
 
-    int pixelInterval = layer()->engravingRowInterval();
+    int pixelInterval = layer->engravingRowInterval();
     int outWidth = pixelWidth;
     int outHeight = qCeil(boundingRectInDevice.height() * 1.0 / pixelInterval);
     cv::Mat resized;

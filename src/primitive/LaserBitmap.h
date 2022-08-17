@@ -34,7 +34,7 @@ public:
     virtual void setBoundingRectWidth(qreal width);
     virtual void setBoundingRectHeight(qreal height);
 
-	QVector<QLineF> edges();
+	virtual QVector<QLine> edges();
 
     virtual bool isClosed() const;
     virtual QPointF position() const;

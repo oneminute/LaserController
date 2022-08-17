@@ -88,7 +88,7 @@ LaserPrimitive* LaserPartyEmblem::cloneImplement()
     return p;
 }
 
-QVector<QLineF> LaserPartyEmblem::edges()
+QVector<QLine> LaserPartyEmblem::edges()
 {
     Q_D(LaserPartyEmblem);
     return LaserPrimitive::edges(sceneTransform().map(d->path));

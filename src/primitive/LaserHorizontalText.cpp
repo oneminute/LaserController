@@ -172,7 +172,7 @@ QJsonObject LaserHorizontalText::toJson()
     return object;
 }
 
-QVector<QLineF> LaserHorizontalText::edges()
+QVector<QLine> LaserHorizontalText::edges()
 {
     Q_D(LaserHorizontalText);
     return LaserPrimitive::edges(sceneTransform().map(d->path));

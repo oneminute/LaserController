@@ -13,7 +13,7 @@ public:
     virtual LaserPrimitiveType type() { return LPT_RING; }
     virtual QString typeName() { return tr("Ring"); }
     virtual QJsonObject toJson();
-    QVector<QLineF> edges();
+    virtual QVector<QLine> edges();
     virtual void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent * event) override;
     virtual void mouseReleaseEvent(QGraphicsSceneMouseEvent* event) override;

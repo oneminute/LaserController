@@ -14,7 +14,8 @@ public:
     LaserPrimitivePrivate(LaserPrimitive* ptr)
         : ILaserDocumentItemPrivate(ptr, LNT_PRIMITIVE)
         , doc(nullptr)
-        , layer(nullptr)
+        //, layer(nullptr)
+        , layerId(QString())
         , isEditing(false)
         , isHover(false)
         , primitiveType(LPT_UNKNOWN)
@@ -28,8 +29,9 @@ public:
     {}
 
     LaserDocument* doc;
-    LaserLayer* layer;
+    //LaserLayer* layer;
 	int layerIndex;
+    QString layerId;
     QRect boundingRect;
     LaserPrimitiveType primitiveType;
     bool isEditing;

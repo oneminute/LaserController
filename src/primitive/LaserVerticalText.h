@@ -17,7 +17,7 @@ public:
     virtual LaserPrimitiveType type() { return LPT_VERTICALTEXT; }
     virtual QString typeName() { return tr("VerticalText"); }
     virtual QJsonObject toJson();
-    QVector<QLineF> edges();
+    virtual QVector<QLine> edges();
     virtual void recompute();
     virtual bool isClosed() const;
     virtual QPointF position() const;

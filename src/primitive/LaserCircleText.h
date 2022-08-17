@@ -43,7 +43,7 @@ public:
     virtual LaserPrimitiveType type() { return LPT_CIRCLETEXT; }
     virtual QString typeName() { return tr("CircleText"); }
     virtual QJsonObject toJson();
-    QVector<QLineF> edges();
+    virtual QVector<QLine> edges();
 
     virtual bool isClosed() const;
     virtual QPointF position() const;

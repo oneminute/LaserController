@@ -126,7 +126,7 @@ QJsonObject LaserPolygon::toJson()
 	return object;
 }
 
-QVector<QLineF> LaserPolygon::edges()
+QVector<QLine> LaserPolygon::edges()
 {
 	Q_D(const LaserPolygon);
 	QPainterPath path;

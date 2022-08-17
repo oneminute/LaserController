@@ -18,7 +18,7 @@ public:
     QString content() const;
     void setContent(QString c);
     QPainterPath path() const;
-    QVector<QLineF> edges();
+    virtual QVector<QLine> edges();
     void setFont(QFont font);
     QFont font();
     void setAlignH(int a);

@@ -56,7 +56,7 @@ public:
 	QPainterPath getScenePath();
     virtual QPainterPath getPathForStamp();
     
-	QPolygonF sceneOriginalBoundingPolygon(qreal extendPixel = 0);
+	QPolygon sceneOriginalBoundingPolygon(qreal extendPixel = 0);
     virtual QRectF boundingRect() const override;
     virtual QRect sceneBoundingRect() const;
 
@@ -96,8 +96,8 @@ public:
     virtual QPainterPath outline() const;
 
 	virtual QJsonObject toJson();
-	virtual QVector<QLineF> edges(QPainterPath path, bool isPolyline = false);
-	virtual QVector<QLineF> edges();
+	virtual QVector<QLine> edges(QPainterPath path, bool isPolyline = false);
+	virtual QVector<QLine> edges();
 
     virtual QPointF position() const;
 

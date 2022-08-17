@@ -648,7 +648,7 @@ QJsonObject LaserCircleText::toJson()
     return object;
 }
 
-QVector<QLineF> LaserCircleText::edges()
+QVector<QLine> LaserCircleText::edges()
 {
     Q_D(LaserCircleText);
     return LaserPrimitive::edges(sceneTransform().map(d->path));

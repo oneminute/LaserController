@@ -97,20 +97,21 @@ QByteArray LaserBitmap::engravingImage(ProgressItem* parentProgress, QPoint& las
     QRect boundingRect = sceneBoundingRect();
     cv::Mat src(outImage.height(), outImage.width(), CV_8UC1, (void*)outImage.constBits(), outImage.bytesPerLine());
 
-    int dpi = d->layer->dpi();
+    LaserLayer* layer = this->layer();
+    int dpi = layer->dpi();
     int pixelWidth = boundingRect.width() * dpi / 25400.0;
     int pixelHeight = boundingRect.height() * dpi / 25400.0;
 
-    int gridSize = qRound(dpi * 1.0 / d->layer->lpi());
+    int gridSize = qRound(dpi * 1.0 / layer->lpi());
 
     cv::Mat pixelScaled;
     cv::resize(src, pixelScaled, cv::Size(pixelWidth, pixelHeight), 0.0, 0.0, cv::INTER_NEAREST);
 
     cv::Mat halfToneMat = src;
-    if (layer()->useHalftone())
-        halfToneMat = imageUtils::halftone6(parentProgress, pixelScaled, this->layer()->halftoneAngles(), gridSize);
+    if (layer->useHalftone())
+        halfToneMat = imageUtils::halftone6(parentProgress, pixelScaled, layer->halftoneAngles(), gridSize);
 
-    qreal pixelInterval = layer()->engravingRowInterval();
+    qreal pixelInterval = layer->engravingRowInterval();
 
     int outWidth = pixelWidth;
     int outHeight = qRound(boundingRect.height() / pixelInterval);
@@ -287,7 +288,7 @@ void LaserBitmap::setBoundingRectHeight(qreal height)
 
 }
 
-QVector<QLineF> LaserBitmap::edges()
+QVector<QLine> LaserBitmap::edges()
 {
 	Q_D(const LaserBitmap);
 	QPainterPath path;

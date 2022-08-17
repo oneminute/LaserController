@@ -146,7 +146,7 @@ QJsonObject LaserEllipse::toJson()
 	return object;
 }
 //scene
-QVector<QLineF> LaserEllipse::edges()
+QVector<QLine> LaserEllipse::edges()
 {
 	Q_D(const LaserEllipse);
 	return LaserPrimitive::edges(sceneTransform().map(d->path));

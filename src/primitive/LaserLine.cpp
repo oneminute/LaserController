@@ -95,11 +95,11 @@ QJsonObject LaserLine::toJson()
 	return object;
 }
 
-QVector<QLineF> LaserLine::edges()
+QVector<QLine> LaserLine::edges()
 {
 	Q_D(const LaserLine);
-	QVector<QLineF>list;
-	QLineF line = sceneTransform().map(d->line);
+	QVector<QLine>list;
+	QLine line = sceneTransform().map(d->line);
 	list.append(line);
 	return list;
 }
