@@ -9,7 +9,11 @@
 #include "scene/LaserLayer.h"
 #include "scene/LaserScene.h"
 #include "task/ProgressItem.h"
+#include "undo/LineAddPointCommand.h"
+#include "undo/PrimitiveAddingCommand.h"
+#include "undo/PrimitiveRemovingCommand.h"
 #include "util/MachiningUtils.h"
+#include "widget/LaserViewer.h"
 
 class LaserLinePrivate : public LaserShapePrivate
 {
@@ -20,6 +24,7 @@ public:
     {}
 
     QLine line;
+    QVector<QPoint> points;
     QPoint editingPoint;
 };
 
@@ -71,6 +76,30 @@ QPoint LaserLine::editingPoint() const
     return QPoint();
 }
 
+int LaserLine::appendPoint(const QPoint& point)
+{
+    Q_D(LaserLine);
+    d->editingPoint = point;
+    d->points.append(point);
+    if (d->points.size() == 2)
+    {
+        setLine(QLine(d->points.first(), d->points.last()));
+    }
+    return d->points.size() - 1;
+}
+
+void LaserLine::removeLastPoint()
+{
+    Q_D(LaserLine);
+    d->points.removeLast();
+}
+
+void LaserLine::removePoint(int pointIndex)
+{
+    Q_D(LaserLine);
+    d->points.remove(pointIndex);
+}
+
 QJsonObject LaserLine::toJson()
 {
 	Q_D(const LaserLine);
@@ -112,11 +141,91 @@ void LaserLine::sceneMousePressEvent(LaserViewer* viewer, LaserScene* scene,
 void LaserLine::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scene, 
     const QPoint& point, QMouseEvent* event, bool isPressed)
 {
+    Q_D(LaserLine);
+    if (isEditing())
+    {
+        d->editingPoint = point;
+    }
 }
 
 void LaserLine::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, 
     const QPoint& point, QMouseEvent* event, bool isPressed)
 {
+    Q_D(LaserLine);
+    LaserLayer* layer = this->layer();
+    if (event->button() == Qt::LeftButton)
+    {
+        // if there's no points in current line
+        if (d->points.isEmpty())
+        {
+            setEditing(true);
+
+            // the current operation includs two sub commands:
+            //   1. add the LaserLine primitive object;
+            //   2. add a point to it;
+            // so we create a parent QUndoCommand to comibine the two commands
+            // togather as one step.
+            QUndoCommand* cmd = new QUndoCommand(tr("Add Line"));
+
+            PrimitiveAddingCommand* cmdAdding = new PrimitiveAddingCommand(
+                tr("Add Line"), viewer, scene, this->document(), this->id(), 
+                layer->id(), this, cmd);
+
+            // we must ensure that when we undo the adding operation we should 
+            // end the editing state in LaserViewer
+            cmdAdding->setUndoCallback([=]()
+                {
+                    emit viewer->endEditing();
+                }
+            );
+            // as we adding and editing the line, we must ensure that the
+            // LaserViewer know it's in editing state
+            cmdAdding->setRedoCallback([=]()
+                {
+                    viewer->setEditingPrimitiveId(id());
+                    emit viewer->beginEditing();
+                }
+            );
+
+            LineAddPointCommand* cmdAddPoint = new LineAddPointCommand(
+                tr("Add Point to Line"), viewer, scene, document(), 
+                id(), point, d->points.size(), cmd);
+            viewer->addUndoCommand(cmd);
+        }
+        // there're more than one point in the current editing polygon
+        else
+        {
+            if (d->editingPoint == d->points.last())
+                return;
+
+            LineAddPointCommand* cmd = new LineAddPointCommand(
+                tr("Add Point to Line"), viewer, scene, document(),
+                id(), d->editingPoint, d->points.size());
+            viewer->addUndoCommand(cmd);
+
+            setEditing(false);
+            emit viewer->endEditing();
+        }
+    }
+    else if (event->button() == Qt::RightButton)
+    {
+        if (d->points.size() <= 1)
+        {
+            PrimitiveRemovingCommand* cmdRemoving = new PrimitiveRemovingCommand(
+                tr("Remove Line"), viewer, scene, document(), id(), layer->id(), this);
+            cmdRemoving->setUndoCallback([=]()
+                {
+                    emit viewer->beginEditing();
+                }
+            );
+            viewer->addUndoCommand(cmdRemoving);
+        }
+        else
+        {
+            setEditing(false);
+            emit viewer->endEditing();
+        }
+    }
 }
 
 void LaserLine::sceneKeyPressEvent(LaserViewer* viewer, QKeyEvent* event)
@@ -176,13 +285,13 @@ void LaserLine::draw(QPainter * painter)
     Q_D(LaserLine);
     if (isEditing())
     {
-        painter->drawLine(QLine(d->line.p1(), d->editingPoint));
+        painter->drawLine(QLine(d->points.first(), d->editingPoint));
         QPen oldPen = painter->pen();
         QPen newPen(Qt::red, 1);
         newPen.setCosmetic(true);
         painter->setPen(newPen);
-        painter->drawLine(d->line.p1() + QPoint(-1000, -1000), d->line.p1() + QPoint(1000, 1000));
-        painter->drawLine(d->line.p1() + QPoint(1000, -1000), d->line.p1() + QPoint(-1000, 1000));
+        painter->drawLine(d->points.first() + QPoint(-1000, -1000), d->points.first() + QPoint(1000, 1000));
+        painter->drawLine(d->points.first() + QPoint(1000, -1000), d->points.first() + QPoint(-1000, 1000));
         painter->setPen(oldPen);
     }
     else
@@ -190,15 +299,5 @@ void LaserLine::draw(QPainter * painter)
         painter->drawLine(d->line);
     }
 }
-
-//QRect LaserLine::sceneBoundingRect() const
-//{
-//	Q_D(const LaserLine);
-//	QPainterPath path;
-//	QLineF line = sceneTransform().map(d->line);
-//	path.moveTo(line.p1());
-//	path.lineTo(line.p2());
-//	return path.boundingRect().toRect();
-//}
 
 

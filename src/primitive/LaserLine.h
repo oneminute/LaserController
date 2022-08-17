@@ -16,6 +16,9 @@ public:
     void setLine(const QLine& line);
     void setEditingPoint(const QPoint& point);
     QPoint editingPoint() const;
+    int appendPoint(const QPoint& point);
+    void removeLastPoint();
+    void removePoint(int pointIndex);
 
     virtual LaserPointListList updateMachiningPoints(ProgressItem* parentProgress);
     virtual void draw(QPainter* painter);

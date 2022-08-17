@@ -6112,7 +6112,9 @@ void LaserControllerWindow::onActionEllipse(bool checked)
 void LaserControllerWindow::onActionLine(bool checked)
 {
 	if (checked) {
-		emit readyLine();
+		//emit readyLine();
+        m_viewer->setEditingPrimitiveType(LPT_LINE);
+        emit m_viewer->beginEditing();
 	}
 	else
 	{
