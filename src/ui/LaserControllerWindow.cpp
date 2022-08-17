@@ -6124,7 +6124,9 @@ void LaserControllerWindow::onActionLine(bool checked)
 void LaserControllerWindow::onActionPolygon(bool checked)
 {
 	if (checked) {
-		emit readyPolygon();
+		//emit readyPolygon();
+        m_viewer->setEditingPrimitiveType(LPT_POLYLINE);
+        emit m_viewer->beginEditing();
 	}
 	else
 	{
