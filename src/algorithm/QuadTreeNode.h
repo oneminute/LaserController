@@ -15,10 +15,10 @@ private:
     QuadTreeNode* m_nodeTopRight;
     QuadTreeNode* m_nodeBottomLeft;
     QuadTreeNode* m_nodeBottomRight;
-    QRectF m_topLeftRegion;
-    QRectF m_topRightRegion;
-    QRectF m_bottomLeftRegion;
-    QRectF m_bottomRightRegion;
+    QRect m_topLeftRegion;
+    QRect m_topRightRegion;
+    QRect m_bottomLeftRegion;
+    QRect m_bottomRightRegion;
     QList<QuadTreeNode*> m_targetNodes;
     int m_depth;//为0说明为子节点
     int m_maxDepth = 7;

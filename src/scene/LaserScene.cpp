@@ -24,6 +24,7 @@ LaserScene::LaserScene(QObject* parent)
 	, m_imageBackground(nullptr)
     , m_quadTree(nullptr)
 {
+    setItemIndexMethod(QGraphicsScene::ItemIndexMethod::NoIndex);
 }
 
 LaserScene::~LaserScene()
@@ -117,8 +118,8 @@ void LaserScene::addGroupItemsToTreeNode()
 void LaserScene::removeLaserPrimitive(LaserPrimitive * primitive)
 {
     primitive->removeAllTreeNode();
+    m_quadTree->removePrimitive(primitive);
 	removeItem(primitive);
-    
 }
 
 QList<LaserPrimitive*> LaserScene::selectedPrimitives() const
@@ -284,13 +285,13 @@ QSet<LaserPrimitive*> LaserScene::findPrimitivesByRect(const QRectF& rect)
     return primitives;
 }
 
-void LaserScene::findSelectedByLine(QRectF selection)
+void LaserScene::findSelectedByLine(QRect selection)
 {
     //已经被选中的恢复正常状态
     for (LaserPrimitive* primitive : selectedPrimitives()) {
         primitive->setSelected(false);
     }
-    QList<QLineF> selectionEdges;
+    QList<QLine> selectionEdges;
     utils::rectEdges(selection, selectionEdges);
     //tree 查找
     QList<QuadTreeNode*> nodes = m_quadTree->search(selection);
@@ -455,14 +456,16 @@ void LaserScene::selectedByBounds(QRectF bounds, QRectF selection, LaserPrimitiv
         }
     }
 }
-void LaserScene::selectedByLine(QList<QLineF> selectionEdges, QRectF selection, LaserPrimitive* primitive)
+void LaserScene::selectedByLine(QList<QLine> selectionEdges, QRect selection, LaserPrimitive* primitive)
 {
     bool isIntersected = false;
-    QVector<QLineF> edges = primitive->edges();
-    for (QLineF selectionEdge : selectionEdges) {
-        for (QLineF edge : edges) {
+    QVector<QLine> edges = primitive->edges();
+    for (QLine selectionEdge : selectionEdges) {
+        for (QLine edge : edges) {
+            QLineF l1(selectionEdge);
+            QLineF l2(edge);
             QPointF p;
-            if (selectionEdge.intersect(edge, &p) == QLineF::BoundedIntersection) {
+            if (l1.intersect(l2, &p) == QLineF::BoundedIntersection) {
                 isIntersected = true;
                 if (!primitive->isSelected()) {
                     primitive->setSelected(true);
@@ -472,11 +475,9 @@ void LaserScene::selectedByLine(QList<QLineF> selectionEdges, QRectF selection, 
                             (*p)->setSelected(true);
                         }
                     }
-
                 }
                 break;
             }
-
         }
         if (isIntersected) {
             isIntersected = false;
