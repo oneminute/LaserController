@@ -33,6 +33,9 @@ StateController::StateController(QObject* parent)
 	DEFINE_CHILD_INIT_STATE(documentViewDrag, documentViewDragReady);
 	DEFINE_CHILD_STATE(documentViewDrag, documentViewDraging);
 
+    DEFINE_CHILD_INIT_STATE(documentPrimitive, documentPrimitiveEditing);
+    DEFINE_CHILD_STATE(documentPrimitive, documentPrimitiveEndEditing);
+
 	DEFINE_CHILD_STATE(documentPrimitive, documentPrimitiveRect);
 	DEFINE_CHILD_INIT_STATE(documentPrimitiveRect, documentPrimitiveRectReady);
 	DEFINE_CHILD_STATE(documentPrimitiveRect, documentPrimitiveRectCreating);

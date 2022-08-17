@@ -9,7 +9,7 @@
 #include <QStringList>
 #include <QStyledItemDelegate>
 
-#include "scene/LaserPrimitive.h"
+#include "primitive/LaserPrimitiveHeaders.h"
 #include "scene/LaserDocument.h"
 #include "scene/LaserLayer.h"
 #include "scene/LaserScene.h"

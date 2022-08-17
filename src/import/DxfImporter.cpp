@@ -1,19 +1,21 @@
 ﻿#include "DxfImporter.h"
-
-#include "common/common.h"
 #include "DxfNode.h"
-#include "LaserApplication.h"
-#include "laser/LaserDevice.h"
-#include "scene/LaserDocument.h"
-#include "scene/LaserScene.h"
-#include "task/ProgressItem.h"
-#include "task/ProgressModel.h"
+
 #include <QFile>
 #include <QList>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch> 
 #include <QStack>
 #include <QTextStream>
+
+#include "LaserApplication.h"
+#include "common/common.h"
+#include "laser/LaserDevice.h"
+#include "primitive/LaserPrimitiveHeaders.h"
+#include "scene/LaserDocument.h"
+#include "scene/LaserScene.h"
+#include "task/ProgressItem.h"
+#include "task/ProgressModel.h"
 
 class DxfImporterPrivate
 {

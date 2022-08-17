@@ -1,7 +1,10 @@
 #include "QuadTreeNode.h"
+
 #include <QList>
 #include <QRectF>
 #include <QStack>
+
+#include "primitive/LaserPrimitiveHeaders.h"
 #include "util/utils.h"
 
 QuadTreeNode::QuadTreeNode(QRectF region, int depth)
@@ -18,11 +21,11 @@ QuadTreeNode::QuadTreeNode(QRectF region, int depth)
     qreal left = region.left();
     qreal top = region.top();
 
-    m_region = QRectF(left, top, region.width(), region.height());
-    m_topLeftRegion = QRectF(left, top, widthHalf, heightHalf);
-    m_topRightRegion = QRectF(left + widthHalf, top, widthHalf, heightHalf);
-    m_bottomLeftRegion = QRectF(left, top + heightHalf, widthHalf, heightHalf);
-    m_bottomRightRegion = QRectF(left + widthHalf, top + heightHalf, widthHalf, heightHalf);
+    m_region = QRect(left, top, region.width(), region.height());
+    m_topLeftRegion = QRect(left, top, widthHalf, heightHalf);
+    m_topRightRegion = QRect(left + widthHalf, top, widthHalf, heightHalf);
+    m_bottomLeftRegion = QRect(left, top + heightHalf, widthHalf, heightHalf);
+    m_bottomRightRegion = QRect(left + widthHalf, top + heightHalf, widthHalf, heightHalf);
     //m_node1 = new QuadTreeNode(QRectF(left, top, widthHalf, heightHalf), m_depth);
     //m_node2 = new QuadTreeNode(QRectF(left + widthHalf, top, widthHalf, heightHalf), m_depth);
 }
@@ -34,6 +37,7 @@ QuadTreeNode::~QuadTreeNode()
     m_nodeBottomLeft = nullptr;
     m_nodeBottomRight = nullptr;
 }
+
 bool QuadTreeNode::createChildrenNodes(LaserPrimitive* primitive)
 {
     if (m_depth > m_maxDepth) {
@@ -44,33 +48,35 @@ bool QuadTreeNode::createChildrenNodes(LaserPrimitive* primitive)
     createPrimitiveTreeNode(primitive);
     return true;
 }
+
 void QuadTreeNode::createPrimitiveTreeNode(LaserPrimitive* primitive)
 {
-    QRectF bound = primitive->sceneBoundingRect();
+    QRect bound = primitive->sceneBoundingRect();
     //qDebug() << bound;
     QLineF line1(QPointF(100, 0), QPointF(200, 10));
     QPointF p;
-    int i = line1.intersect(line1, &p);
+    int i = line1.intersects(line1, &p);
     //point
     if (bound.width() == 0 && bound.height() == 0) {
         QPointF p = bound.topLeft();
+        QPoint p2 = p.toPoint();
         //�������ͼԪ
-        if (m_topLeftRegion.contains(p)) {
+        if (m_topLeftRegion.contains(p2)) {
             createNode(Qt::TopLeftCorner);
             //m_nodeTopLeft->addPrimitive(primitive);
             m_nodeTopLeft->createChildrenNodes(primitive);
         }
-        else if (m_topRightRegion.contains(p)) {
+        else if (m_topRightRegion.contains(p2)) {
             createNode(Qt::TopRightCorner);
             //m_nodeTopRight->addPrimitive(primitive);
             m_nodeTopRight->createChildrenNodes(primitive);
         }
-        else if (m_bottomRightRegion.contains(p)) {
+        else if (m_bottomRightRegion.contains(p2)) {
             createNode(Qt::BottomRightCorner);
             //m_nodeBottomRight->addPrimitive(primitive);
             m_nodeBottomRight->createChildrenNodes(primitive);
         }
-        else if (m_bottomLeftRegion.contains(p)) {
+        else if (m_bottomLeftRegion.contains(p2)) {
             createNode(Qt::BottomLeftCorner);
             //m_nodeBottomLeft->addPrimitive(primitive);
             m_nodeBottomLeft->createChildrenNodes(primitive);
@@ -78,8 +84,8 @@ void QuadTreeNode::createPrimitiveTreeNode(LaserPrimitive* primitive)
     }
     //line
     else if (bound.width() == 0 || bound.height() == 0) {
-        QPointF p1 = bound.topLeft();
-        QPointF p2 = QPoint(bound.left() + bound.width(), bound.top() + bound.height());
+        QPoint p1 = bound.topLeft();
+        QPoint p2 = QPoint(bound.left() + bound.width(), bound.top() + bound.height());
         QLineF line(p1, p2);
         //�������ͼԪ
         if (m_topLeftRegion.contains(p1) && m_topLeftRegion.contains(p2)) {
@@ -103,17 +109,17 @@ void QuadTreeNode::createPrimitiveTreeNode(LaserPrimitive* primitive)
             m_nodeBottomLeft->createChildrenNodes(primitive);
         }
         else {
-            QList<QLineF> topLeftRegionEdges;
-            QList<QLineF> topRightRegionEdges;
-            QList<QLineF> bottomLeftRegionEdges;
-            QList<QLineF> bottomRightRegionEdges;
+            QList<QLine> topLeftRegionEdges;
+            QList<QLine> topRightRegionEdges;
+            QList<QLine> bottomLeftRegionEdges;
+            QList<QLine> bottomRightRegionEdges;
             utils::rectEdges(m_topLeftRegion, topLeftRegionEdges);
             utils::rectEdges(m_topRightRegion, topRightRegionEdges);
             utils::rectEdges(m_bottomLeftRegion, bottomLeftRegionEdges);
             utils::rectEdges(m_bottomRightRegion, bottomRightRegionEdges);
             for (QLineF lineTL : topLeftRegionEdges) {
                 QPointF p;
-                if (lineTL.intersect(line, &p)) {
+                if (lineTL.intersects(line, &p)) {
                     createNode(Qt::TopLeftCorner);
                     m_nodeTopLeft->createChildrenNodes(primitive);
                     break;
@@ -121,7 +127,7 @@ void QuadTreeNode::createPrimitiveTreeNode(LaserPrimitive* primitive)
             }
             for (QLineF lineTR : topRightRegionEdges) {
                 QPointF p;
-                if (lineTR.intersect(line, &p)) {
+                if (lineTR.intersects(line, &p)) {
                     createNode(Qt::TopRightCorner);
                     m_nodeTopRight->createChildrenNodes(primitive);
                     break;
@@ -129,7 +135,7 @@ void QuadTreeNode::createPrimitiveTreeNode(LaserPrimitive* primitive)
             }
             for (QLineF lineBL : bottomLeftRegionEdges) {
                 QPointF p;
-                if (lineBL.intersect(line, &p)) {
+                if (lineBL.intersects(line, &p)) {
                     createNode(Qt::BottomLeftCorner);
                     m_nodeBottomLeft->createChildrenNodes(primitive);
                     break;
@@ -137,7 +143,7 @@ void QuadTreeNode::createPrimitiveTreeNode(LaserPrimitive* primitive)
             }
             for (QLineF lineBL : bottomRightRegionEdges) {
                 QPointF p;
-                if (lineBL.intersect(line, &p)) {
+                if (lineBL.intersects(line, &p)) {
                     createNode(Qt::BottomRightCorner);
                     m_nodeBottomRight->createChildrenNodes(primitive);
                     break;

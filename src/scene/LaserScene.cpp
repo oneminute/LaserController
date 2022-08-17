@@ -1,22 +1,21 @@
 #include "LaserScene.h"
 
-#include "LaserDocument.h"
-#include "LaserPrimitive.h"
-#include "LaserLayer.h"
-#include "LaserPrimitiveGroup.h"
-#include "widget/LaserViewer.h"
-#include "laser/LaserDevice.h"
-#include "LaserApplication.h"
-#include "ui/LaserControllerWindow.h"
-
-#include<QGraphicsSceneMouseEvent>
-#include<QGraphicsSceneWheelEvent>
-#include <QScrollBar>
+#include <QGraphicsSceneMouseEvent>
+#include <QGraphicsSceneWheelEvent>
 #include <QInputMethodEvent>
-#include <qmath.h>
 #include <QMessageBox>
-#include "util/Utils.h"
+#include <QScrollBar>
+#include <QtMath>
+
+#include "LaserApplication.h"
 #include "common/Config.h"
+#include "LaserDocument.h"
+#include "LaserLayer.h"
+#include "laser/LaserDevice.h"
+#include "primitive/LaserPrimitiveHeaders.h"
+#include "ui/LaserControllerWindow.h"
+#include "util/Utils.h"
+#include "widget/LaserViewer.h"
 
 LaserScene::LaserScene(QObject* parent)
     : QGraphicsScene(parent)
@@ -25,6 +24,7 @@ LaserScene::LaserScene(QObject* parent)
 	, m_imageBackground(nullptr)
     , m_quadTree(nullptr)
 {
+    setItemIndexMethod(QGraphicsScene::ItemIndexMethod::NoIndex);
 }
 
 LaserScene::~LaserScene()
@@ -71,10 +71,9 @@ void LaserScene::setDocument(LaserDocument * doc)
         m_maxRegion = QRect(rect.left() + left, rect.top() + top, maxSize, maxSize);
         m_quadTree = new QuadTreeNode(m_maxRegion);
     }
-    QMap<QString, LaserPrimitive*> items = m_doc->primitives();
-    for (QMap<QString, LaserPrimitive*>::iterator i = items.begin(); i != items.end(); i++)
+    for (LaserPrimitive* primitive: m_doc->primitives())
     {
-        this->addItem(i.value());
+        this->addItem(primitive);
     }
 }
 
@@ -119,8 +118,8 @@ void LaserScene::addGroupItemsToTreeNode()
 void LaserScene::removeLaserPrimitive(LaserPrimitive * primitive)
 {
     primitive->removeAllTreeNode();
+    m_quadTree->removePrimitive(primitive);
 	removeItem(primitive);
-    
 }
 
 QList<LaserPrimitive*> LaserScene::selectedPrimitives() const
@@ -286,13 +285,13 @@ QSet<LaserPrimitive*> LaserScene::findPrimitivesByRect(const QRectF& rect)
     return primitives;
 }
 
-void LaserScene::findSelectedByLine(QRectF selection)
+void LaserScene::findSelectedByLine(QRect selection)
 {
     //已经被选中的恢复正常状态
     for (LaserPrimitive* primitive : selectedPrimitives()) {
         primitive->setSelected(false);
     }
-    QList<QLineF> selectionEdges;
+    QList<QLine> selectionEdges;
     utils::rectEdges(selection, selectionEdges);
     //tree 查找
     QList<QuadTreeNode*> nodes = m_quadTree->search(selection);
@@ -457,14 +456,16 @@ void LaserScene::selectedByBounds(QRectF bounds, QRectF selection, LaserPrimitiv
         }
     }
 }
-void LaserScene::selectedByLine(QList<QLineF> selectionEdges, QRectF selection, LaserPrimitive* primitive)
+void LaserScene::selectedByLine(QList<QLine> selectionEdges, QRect selection, LaserPrimitive* primitive)
 {
     bool isIntersected = false;
-    QVector<QLineF> edges = primitive->edges();
-    for (QLineF selectionEdge : selectionEdges) {
-        for (QLineF edge : edges) {
+    QVector<QLine> edges = primitive->edges();
+    for (QLine selectionEdge : selectionEdges) {
+        for (QLine edge : edges) {
+            QLineF l1(selectionEdge);
+            QLineF l2(edge);
             QPointF p;
-            if (selectionEdge.intersect(edge, &p) == QLineF::BoundedIntersection) {
+            if (l1.intersect(l2, &p) == QLineF::BoundedIntersection) {
                 isIntersected = true;
                 if (!primitive->isSelected()) {
                     primitive->setSelected(true);
@@ -474,11 +475,9 @@ void LaserScene::selectedByLine(QList<QLineF> selectionEdges, QRectF selection, 
                             (*p)->setSelected(true);
                         }
                     }
-
                 }
                 break;
             }
-
         }
         if (isIntersected) {
             isIntersected = false;
@@ -500,7 +499,7 @@ void LaserScene::selectedByRegion(QRectF selection, LaserPrimitive * primitive)
 
     }
 }
-QRect LaserScene::maxRegion()
+QRect LaserScene::maxRegion() const
 {
     return m_maxRegion;
 }
@@ -652,6 +651,16 @@ QImage LaserScene::thumbnail()
     image.save("tmp/thumbnail.png", "PNG");
 
     return image;
+}
+
+bool LaserScene::pointInAvailableArea(const QPoint& point) const
+{
+    return maxRegion().contains(point);
+}
+
+bool LaserScene::pointInAvailableArea(const QPointF& point) const
+{
+    return pointInAvailableArea(point.toPoint());
 }
 
 

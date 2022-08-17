@@ -1,11 +1,5 @@
 #include "PreviewWindow.h"
 
-#include "common/common.h"
-#include "common/Config.h"
-#include "scene/LaserPrimitive.h"
-#include <LaserApplication.h>
-#include <laser/LaserDevice.h>
-#include <widget/PreviewScene.h>
 #include <QDesktopWidget>
 #include <QEventLoop>
 #include <QMenuBar>
@@ -24,9 +18,16 @@
 #include <DockContainerWidget.h>
 #include <DockSplitter.h>
 #include <DockWidgetTab.h>
+
+#include "LaserApplication.h"
+#include "common/common.h"
+#include "common/Config.h"
+#include "laser/LaserDevice.h"
+#include "primitive/LaserPrimitiveHeaders.h"
+#include "task/ProgressModel.h"
+#include "widget/PreviewScene.h"
 #include "widget/PreviewViewer.h"
 #include "widget/ProgressBarDelegate.h"
-#include "task/ProgressModel.h"
 
 using namespace ads;
 

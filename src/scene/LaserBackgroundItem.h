@@ -14,7 +14,7 @@ public:
 
 	void onChangeGrids();//���¼���nodeֵ
 	void drawGrids(QPainter& painter);
-	bool detectGridNode(QPoint& point, QPointF & mousePoint);//������ʱ�������յ��Ƿ�Ӧ�ñ���Ϊ�����е�node��
+	bool detectGridNode(QPoint& point, QPoint & mousePoint);//������ʱ�������յ��Ƿ�Ӧ�ñ���Ϊ�����е�node��
 	QRect rect();
 
 protected:

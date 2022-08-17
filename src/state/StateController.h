@@ -177,6 +177,9 @@ public:
     DECL_STATE(documentPrintAndCutSelecting)
     DECL_STATE(documentPrintAndCutAligning)
     DECL_STATE(documentPrimitive)
+    DECL_STATE(documentPrimitiveEditing)
+    DECL_STATE(documentPrimitiveEndEditing)
+
 	DECL_STATE(documentPrimitiveRect)
 	DECL_STATE(documentPrimitiveRectReady)
 	DECL_STATE(documentPrimitiveRectCreating)
@@ -205,6 +208,7 @@ public:
     DECL_STATE(documentPrimitiveHorizontalText)
     DECL_STATE(documentPrimitiveVerticalText)
     DECL_STATE(documentPrimitiveArcText)
+
 #pragma endregion documentWorking state
 #pragma region document state
 

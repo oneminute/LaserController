@@ -7,6 +7,10 @@
 #include <QTextEdit>
 #include <QState>
 #include <QUndoStack>
+
+#include "common/common.h"
+
+class BaseUndoCommand;
 class RulerWidget;
 class LaserScene;
 class LaserPrimitiveGroup;
@@ -15,8 +19,8 @@ class LaserBitmap;
 class LaserLayer;
 class LaserText;
 class LaserPolyline;
-struct LaserTextRowPath;
 class LaserControllerWindow;
+struct LaserTextRowPath;
 
 //Spline Node Struct
 struct SplineNodeStruct {
@@ -50,6 +54,11 @@ public:
     LaserPrimitive* mirrorLine();
     void setMirrorLine(LaserPrimitive* l);
 
+	void setEditingPrimitiveId(const QString& primitiveId);
+	LaserPrimitive* getEditingPrimitive() const;
+	void setEditingPrimitiveType(LaserPrimitiveType type);
+	LaserPrimitiveType editingPrimitiveType() const;
+
 	void createSpline();
 	LaserScene* scene();
 	void setHorizontalRuler(RulerWidget* _r);
@@ -63,10 +72,10 @@ public:
 	void resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, qreal _yscale,qreal rotate,
         int _state, int _transformType, int _pp, bool _unitIsMM);//change selection property by tool bar
 	void setAnchorPoint(QPointF point);
-	bool detectIntersectionByMouse(QPointF& result, QPointF mousePoint, bool& isSpecialPoint);//draw
-	QLineF detectItemEdge(LaserPrimitive*& result, QPointF mousePoint, float scop, bool ignoreFillSolid = false);//selection
-	bool detectItemByMouse(LaserPrimitive*& result, QPointF mousePoint);
-	bool detectFillSolidByMouse(LaserPrimitive*& result, QPointF mousePoint);//selection
+	bool detectIntersectionByMouse(QPoint& result, QPoint mousePoint, bool& isSpecialPoint);//draw
+	QLine detectItemEdge(LaserPrimitive*& result, QPoint mousePoint, float scop, bool ignoreFillSolid = false);//selection
+	bool detectItemByMouse(LaserPrimitive*& result, QPoint mousePoint);
+	bool detectFillSolidByMouse(LaserPrimitive*& result, QPoint mousePoint);//selection
     bool detectTextInsertPosition(QPointF insertPoint, LaserText*& text);//被找到的text
 	
 	QMap<QGraphicsItem*, QTransform> clearGroupSelection();
@@ -102,9 +111,12 @@ public:
 
 	bool addPrimitiveAndExamRegionByBounds(LaserPrimitive* primitive);
 	bool addPrimitiveAndExamRegionByBounds(QList<LaserPrimitive*>& primitives, LaserPrimitive* parent = nullptr);
+
+	void addUndoCommand(QUndoCommand* cmd);
 	
-private:
+protected:
     void init();
+
 	void initSpline();
 	//void creatTextEdit();
 	void addText(QString str);
@@ -118,8 +130,8 @@ private:
 	void detectRect(LaserPrimitive& item, int i, int& left, int& right, int& top, int& bottom);
 	//bool detectPoint(QVector<QPointF> points, QList<QLineF> lines, QPointF& point);
 	//bool detectLine(QList<QLineF> lines, QPointF startPoint, QPointF point);
-	bool isRepeatPoint();
-	bool isStartPoint();
+	//bool isRepeatPoint();
+	//bool isStartPoint();
 	qreal leftScaleMirror(qreal rate, qreal x);
 	qreal rightScaleMirror(qreal rate, qreal x);
 	qreal topScaleMirror(qreal rate, qreal y);
@@ -136,7 +148,8 @@ private:
 	//ReshapeUndoCommand* reshapeUndoStackPush();
 	void transformUndoStackPushBefore(LaserPrimitive* item = nullptr);
 	void transformUndoStackPush(LaserPrimitive* item = nullptr);
-    
+
+	void onEndEditing();
     
 public slots:
     void zoomIn();
@@ -155,6 +168,7 @@ public slots:
 	void onReplaceGroup(QList<LaserPrimitive*> primitives);
     //text
     void onEndText();
+
 signals:
     void zoomChanged(const QPointF& topleft);
 	void scaleChanged(qreal scale);
@@ -166,6 +180,8 @@ signals:
 	void beginSelectedEditing();
 	void beginIdelEditing();
 	void endSelectedEditing();
+	void beginEditing();
+	void endEditing();
     void mouseMoved(const QPointF& pos);
 	void creatingRectangle();
 	void readyRectangle();
@@ -187,10 +203,11 @@ signals:
 	void endViewDraging();
 	void selectedSizeChanged();//发生框选，点选时
 
+
 protected:
     virtual void paintEvent(QPaintEvent* event) override;
 	void paintSelectedState(QPainter& painter);
-	int setSelectionArea(const QPointF& _startPoint, const QPointF& _endPoint);
+	int setSelectionArea(const QPoint& _startPoint, const QPoint& _endPoint);
     virtual void wheelEvent(QWheelEvent *event) override;
     
 	void resizeEvent(QResizeEvent *event) override;
@@ -219,8 +236,6 @@ protected:
 
 	virtual void scrollContentsBy(int dx, int dy) override;
 	bool isOnControllHandlers(const QPoint& point, int& handlerIndex, QRectF& handlerRect = QRectF());
-	
-	
 
 private:
 	//QPointF testPoint;
@@ -236,11 +251,11 @@ private:
 	bool m_isGridNode;//是否为网格交点node
 	QPoint m_gridNode;
 	bool m_isPrimitiveInteractPoint;//绘制是否获取附近图元的最近点
-	QPointF m_primitiveInteractPoint;//scene
+	QPoint m_primitiveInteractPoint;//scene
 	//QPointF m_isPrimitiveInteractPoint;
 
-    QPointF m_selectionStartPoint;
-    QPointF m_selectionEndPoint;
+    QPoint m_selectionStartPoint;
+    QPoint m_selectionEndPoint;
 
 	QPointF m_creatingRectStartPoint;
 	QPointF m_creatingRectEndPoint;
@@ -253,15 +268,10 @@ private:
 
 	QPointF m_creatingLineStartPoint;
 	QPointF m_creatingLineEndPoint;
-	//Polygon
-	QPointF m_creatingPolygonStartPoint;
-	QPointF m_creatingPolygonEndPoint;
-	QVector<QPointF> m_creatingPolygonPoints;
-	QList<QLineF> m_creatingPolygonLines;
-	LaserPrimitive* m_lastPolygon;
-	LaserPolyline* m_currentPolyline;
-	/*QRectF m_polygonStartRect;
-	bool m_isMouseInStartRect;*/
+
+	QString m_editingPrimitiveId;
+	LaserPrimitiveType m_editingPrimitiveType;
+
 	//Spline
 	SplineStruct m_handlingSpline;//creating and editing
 	QList<SplineStruct> m_splineList;

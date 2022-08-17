@@ -21,6 +21,8 @@ namespace utils
 {
     QString createUUID(const QString& prefix = "");
 
+    qint64 hash(const QByteArray& data);
+
     int parsePortName(const QString& name);
 
     QFrame* createSeparator(int width = 0, int height = 0, QFrame::Shape shape = QFrame::VLine, QFrame::Shadow shadow = QFrame::Sunken);
@@ -45,11 +47,11 @@ namespace utils
 
     LaserPoint center(const LaserPointList& points);
 
-    void boundingRect(const QList<QGraphicsItem*>& primitives, QRect& bounding, QRect& boundingAcc = QRect(), bool exludeUnexport = true);
+    void boundingRect(const QList<QGraphicsItem*> primitives, QRect& bounding, QRect& boundingAcc = QRect(), bool exludeUnexport = true);
 
-    void boundingRect(const QList<LaserPrimitive*>& primitives, QRect& bounding, QRect& boundingAcc = QRect(), bool exludeUnexport = true);
+    void boundingRect(const QList<LaserPrimitive*> primitives, QRect& bounding, QRect& boundingAcc = QRect(), bool exludeUnexport = true);
 
-    void boundingRect(const QSet<LaserPrimitive*>& primitives, QRect& bounding, QRect& boundingAcc = QRect(), bool exludeUnexport = true);
+    void boundingRect(const QSet<LaserPrimitive*> primitives, QRect& bounding, QRect& boundingAcc = QRect(), bool exludeUnexport = true);
 
     bool computeBoundingRect(LaserPrimitive* primitive, QRect& bounding, QRect& boundingAcc, int& count, int& accCount, bool exludeUnexport = true);
 
@@ -65,7 +67,7 @@ namespace utils
 
     QTransform transformFrom2Points(const PointPairList& pointPairs);
 
-    void rectEdges(QRectF rect, QList<QLineF>& edges);
+    void rectEdges(QRect rect, QList<QLine>& edges);
 
     void warning(const QString& title, const QString& msg, QWidget* parent = nullptr);
 

@@ -2,19 +2,18 @@
 
 #include <QMessageBox>
 #include <QJsonArray>
-#include<QList>
+#include <QList>
 
-#include "common/Config.h"
 #include "LaserApplication.h"
-#include "laser/LaserDevice.h"
 #include "LaserDocument.h"
-#include "LaserPrimitive.h"
 #include "LaserScene.h"
-#include "scene/LaserPrimitiveGroup.h"
-#include "widget/LayerButton.h"
+#include "common/Config.h"
+#include "laser/LaserDevice.h"
+#include "primitive/LaserPrimitiveHeaders.h"
 #include "ui/LaserControllerWindow.h"
 #include "util/Utils.h"
 #include "util/WidgetUtils.h"
+#include "widget/LayerButton.h"
 
 class LaserLayerPrivate: public ILaserDocumentItemPrivate
 {
@@ -101,7 +100,8 @@ public:
     bool visible;
 	bool isDefault;
 
-    QList<LaserPrimitive*> primitives;   
+    QList<LaserPrimitive*> primitives;
+    QMap<QString, LaserPrimitive*> primitiveMap;
 };
 
 LaserLayer::LaserLayer(const QString& name, LaserLayerType type, LaserDocument* document, bool isDefault, QCheckBox* box)
@@ -450,31 +450,76 @@ void LaserLayer::setErrorX(int errorX)
 void LaserLayer::addPrimitive(LaserPrimitive * item)
 {
     Q_D(LaserLayer);
+    if (item->layer() && item->layer() != this) {
+        item->layer()->removePrimitive(item, false);
+    }
     item->setLayer(this);
+    d->primitives.append(item);
+    d->primitiveMap.insert(item->id(), item);
 }
 
-QList<LaserPrimitive*>& LaserLayer::primitives()
+QList<LaserPrimitive*> LaserLayer::primitives()
 {
     Q_D(LaserLayer);
     return d->primitives;
 }
 
-void LaserLayer::removePrimitive(LaserPrimitive * item, bool itemKeepLayer)
+LaserPrimitive* LaserLayer::primitiveById(const QString& id) const
+{
+    Q_D(const LaserLayer);
+    if (d->primitiveMap.contains(id))
+    {
+        return d->primitiveMap[id];
+    }
+    return nullptr;
+}
+
+void LaserLayer::removePrimitive(LaserPrimitive * item, bool release)
 {
     Q_D(LaserLayer);
-    if (itemKeepLayer) {
-        d->primitives.removeOne(item);
+    d->primitives.removeOne(item);
+    d->primitiveMap.remove(item->id());
+    if (release)
+    {
+        item->deleteLater();
     }
-    else {
+    else 
+    {
         item->setLayer(nullptr);
     }
-    d->doc->updateLayersStructure();
+}
+
+void LaserLayer::removePrimitiveById(const QString& id, bool release)
+{
+    Q_D(LaserLayer);
+    if (d->primitiveMap.contains(id))
+    {
+        LaserPrimitive* primitive = d->primitiveMap[id];
+        removePrimitive(primitive, release);
+    }
 }
 
 bool LaserLayer::isEmpty() const
 {
     Q_D(const LaserLayer);
     return d->primitives.isEmpty();
+}
+
+int LaserLayer::count() const
+{
+    Q_D(const LaserLayer);
+    return d->primitives.count();
+}
+
+bool LaserLayer::contains(const QString& id) const
+{
+    Q_D(const LaserLayer);
+    return d->primitiveMap.contains(id);
+}
+
+bool LaserLayer::contains(LaserPrimitive* primitive) const
+{
+    return contains(primitive->id());
 }
 
 QColor LaserLayer::color() const 

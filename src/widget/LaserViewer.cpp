@@ -19,19 +19,22 @@
 #include <QLineEdit>
 
 #include <LaserApplication.h>
+#include "common/Config.h"
 #include "laser/LaserDevice.h"
-#include "scene/LaserPrimitiveGroup.h"
-#include "scene/LaserPrimitive.h"
+#include "primitive/LaserPrimitiveGroup.h"
+#include "primitive/LaserPrimitiveHeaders.h"
 #include "scene/LaserLayer.h"
 #include "scene/LaserScene.h"
 #include "scene/LaserDocument.h"
-#include "ui/LaserControllerWindow.h"
-
 #include "state/StateController.h"
 #include "widget/RulerWidget.h"
-#include "common/Config.h"
 #include "widget/OverstepMessageBoxWarn.h"
 #include "widget/UndoCommand.h";
+#include "ui/LaserControllerWindow.h"
+#include "undo/PolyLineAddPointCommand.h"
+#include "undo/PrimitiveAddingCommand.h"
+#include "undo/PrimitiveRemovingCommand.h"
+#include "undo/PrimitiveTransformationCommand.h"
 #include "util/utils.h"
 #include "util/WidgetUtils.h"
 
@@ -45,6 +48,8 @@ LaserViewer::LaserViewer(QWidget* parent)
 	, m_isItemEdge(false)
 	, m_isItemEdgeCenter(false)
 	//, m_isMouseInStartRect(false)
+    , m_editingPrimitiveId()
+    , m_editingPrimitiveType(LPT_UNKNOWN)
 	, m_splineNodeDrawWidth(3)
 	, m_splineHandlerWidth(5)
 	, m_splineNodeEditWidth(5)
@@ -65,8 +70,8 @@ LaserViewer::LaserViewer(QWidget* parent)
     , m_textAlighV(Qt::AlignBottom)
     , m_isTextMessageBoxShow(false)
     , m_showLaserPos(false)
-    , m_lastPolygon(nullptr)
-    , m_currentPolyline(nullptr)
+    //, m_lastPolygon(nullptr)
+    //, m_currentPolyline(nullptr)
 {
     setScene(m_scene.data());
     init();
@@ -339,36 +344,20 @@ void LaserViewer::paintEvent(QPaintEvent* event)
     //Polygon
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonCreatingState())) {
 		//painter.setRenderHint(QPainter::Antialiasing);
-		painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
-		int size = m_creatingPolygonPoints.size();
-		if (size == 0) {
-			return;
-		}
-		else if (size > 1) {
-			for (int i = 0; i < size; i++) {
-				if (i == size - 1) {
-					break;
-				}
-				//painter.drawLine(mapFromScene(m_creatingPolygonPoints[i]), mapFromScene(m_creatingPolygonPoints[i+1]));
-			}			
-		}
-		painter.drawLine(mapFromScene(m_creatingPolygonPoints[size - 1]), mapFromScene(m_creatingPolygonEndPoint));
-        /*QRectF rect = QRectF(mapFromScene(m_polygonStartRect.topLeft()), mapFromScene(m_polygonStartRect.bottomRight()));
-        if (m_isMouseInStartRect) {
-            painter.fillRect(rect, QBrush(Qt::red, Qt::SolidPattern));
-        }
-        else {
-            painter.fillRect(rect, QBrush(Qt::black, Qt::SolidPattern));
-        }
-        painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
-        for (int i = 0; i < m_creatingPolygonPoints.length(); i++) {
-            QPointF start = mapFromScene(m_creatingPolygonPoints.at(i));
-            if (i < m_creatingPolygonPoints.length() - 1) {
-                QPointF end = mapFromScene(m_creatingPolygonPoints.at(i + 1));
-                painter.drawLine(start, end);
-            }
-        }
-        painter.drawLine(mapFromScene(m_creatingPolygonPoints.at(m_creatingPolygonPoints.length() - 1)), mapFromScene(m_creatingPolygonEndPoint));*/
+		//painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
+		//int size = m_creatingPolygonPoints.size();
+		//if (size == 0) {
+		//	return;
+		//}
+		//else if (size > 1) {
+		//	for (int i = 0; i < size; i++) {
+		//		if (i == size - 1) {
+		//			break;
+		//		}
+		//		//painter.drawLine(mapFromScene(m_creatingPolygonPoints[i]), mapFromScene(m_creatingPolygonPoints[i+1]));
+		//	}			
+		//}
+		//painter.drawLine(mapFromScene(m_creatingPolygonPoints[size - 1]), mapFromScene(m_creatingPolygonEndPoint));
     }
     //Spline
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveSplineCreatingState())) {
@@ -491,7 +480,7 @@ QRect LaserViewer::selectedItemsSceneBoundingRect() {
 
 QRect LaserViewer::AllItemsSceneBoundingRect()
 {
-    QList<LaserPrimitive*> list = m_scene->document()->primitives().values();
+    QList<LaserPrimitive*> list = m_scene->document()->primitives();
     if (list.isEmpty()) {
         return QRect();
     }
@@ -782,11 +771,14 @@ void LaserViewer::resetSelectedItemsGroupRect(QRectF _sceneRect, qreal _xscale, 
         m_undoStack->push(cmd);
 	}
 }
+
 void LaserViewer::setAnchorPoint(QPointF point)
 {
 	m_anchorPoint = point;
 }
-bool LaserViewer::detectIntersectionByMouse(QPointF& result, QPointF mousePoint, bool& isSpecialPoint)
+
+bool LaserViewer::detectIntersectionByMouse(QPoint& result, QPoint mousePoint,
+    bool& isSpecialPoint)
 {
 	isSpecialPoint = false;
 	qreal delta = Config::Ui::objectShapeDistance() * (1 / zoomValue());
@@ -795,7 +787,7 @@ bool LaserViewer::detectIntersectionByMouse(QPointF& result, QPointF mousePoint,
 	}
 	LaserPrimitive *primitive = nullptr;
 	//返回的是在scene中的坐标
-	QLineF edge = detectItemEdge(primitive, mapFromScene(mousePoint), delta);
+	QLine edge = detectItemEdge(primitive, mapFromScene(mousePoint), delta);
 	if (!primitive) {
 		return false;
 	}
@@ -803,34 +795,22 @@ bool LaserViewer::detectIntersectionByMouse(QPointF& result, QPointF mousePoint,
 		qDebug() << "true";
 	}*/
 	//QPointF point = mapToScene(mousePoint.toPoint());
-	QPointF point = mousePoint;
+	QPoint point = mousePoint;
 	QVector2D v1 = QVector2D(point - edge.p1());
 	QVector2D v2 = QVector2D(edge.p2() - edge.p1()).normalized();
 	float projectorDistance = QVector2D::dotProduct(v1, v2);
 	
-	/*if (projectorDistance < 0) {
-		float dis1 = QVector2D(point - edge.p1()).lengthSquared();
-		float dis2 = QVector2D(point - edge.p2()).lengthSquared();
-		if (dis1 < dis2) {
-			result = edge.p1();
-			isSpecialPoint = true;
-		}
-		else {
-			result = edge.p2();
-			isSpecialPoint = true;
-		}
-
-	}*/
 	QVector2D projectorV = v2 * projectorDistance;
-	result = edge.p1() + projectorV.toPointF();
+	result = edge.p1() + projectorV.toPoint();
 	QString className = primitive->metaObject()->className();
 	if (className == "LaserEllipse") {
 		LaserEllipse* ellipse = qgraphicsitem_cast<LaserEllipse*>(primitive);
-		QPolygonF rect = ellipse->sceneTransform().map(ellipse->boundingRect());
-		QLineF top = QLineF(rect[0], rect[1]);
-		QLineF bottom = QLineF(rect[1], rect[2]);
-		QLineF left = QLineF(rect[2], rect[3]);
-		QLineF right = QLineF(rect[3], rect[0]);
+		QPolygon rect = ellipse->sceneTransform()
+            .map(QRectF(ellipse->boundingRect())).toPolygon();
+		QLine top = QLine(rect[0], rect[1]);
+		QLine bottom = QLine(rect[1], rect[2]);
+		QLine left = QLine(rect[2], rect[3]);
+		QLine right = QLine(rect[3], rect[0]);
 		if (utils::checkTwoPointEqueal(top.center(), result, delta)) {
 			result = top.center();
 			isSpecialPoint = true;
@@ -865,10 +845,12 @@ bool LaserViewer::detectIntersectionByMouse(QPointF& result, QPointF mousePoint,
 	
 	return true;
 }
-QLineF LaserViewer::detectItemEdge(LaserPrimitive *& result, QPointF mousePoint, float scop, bool ignoreFillSolid)
+
+QLine LaserViewer::detectItemEdge(LaserPrimitive *& result, QPoint mousePoint,
+    float scop, bool ignoreFillSolid)
 {
 	QLine line;
-	QList <LaserPrimitive*> list = m_scene->document()->primitives().values();
+	QList <LaserPrimitive*> list = m_scene->document()->primitives();
 	//先遍历新添加的
 	for(QList<LaserPrimitive*>::Iterator i = list.end()-1; i != list.begin()-1; i--){
 	//for each(LaserPrimitive* primitive in list) {
@@ -879,19 +861,19 @@ QLineF LaserViewer::detectItemEdge(LaserPrimitive *& result, QPointF mousePoint,
             if (type == LPT_BITMAP || type == LPT_STAR || type == LPT_PARTYEMBLEM || type == LPT_STAMPBITMAP){
                 //|| type == LPT_RING || type == LPT_FRAME) {
                 result = nullptr;
-                return QLineF();
+                return QLine();
             }
         }
         
-		QVector<QLineF> edgeList = primitive->edges();
+		QVector<QLine> edgeList = primitive->edges();
 		//先判断边框
 		QPolygonF bounding = mapFromScene(primitive->sceneOriginalBoundingPolygon(scop));
 		//testBoundinRect = bounding;
 		if (bounding.containsPoint(mousePoint, Qt::OddEvenFill)) {
 
 			//然后判断边
-			for each(QLineF edge in edgeList) {
-				QVector2D vec(QPointF(edge.p1() - edge.p2()));
+			for each(QLine edge in edgeList) {
+				QVector2D vec(QPoint(edge.p1() - edge.p2()));
 
 				//edges's vertical vector
 				QVector2D verticalV1(-vec.y(), vec.x());
@@ -900,12 +882,12 @@ QLineF LaserViewer::detectItemEdge(LaserPrimitive *& result, QPointF mousePoint,
 				verticalV2 = verticalV2.normalized() * scop;
 				QVector2D vecNormal = vec.normalized();
 
-				QPointF newP1 = edge.p1() + (vecNormal * scop).toPointF();
-				QPointF newP2 = edge.p2() - (vecNormal * scop).toPointF();
-				QPointF newP1_1 = newP1 + verticalV1.toPointF();
-				QPointF newP1_2 = newP1 + verticalV2.toPointF();
-				QPointF newP2_1 = newP2 + verticalV1.toPointF();
-				QPointF newP2_2 = newP2 + verticalV2.toPointF();
+				QPoint newP1 = edge.p1() + (vecNormal * scop).toPoint();
+				QPoint newP2 = edge.p2() - (vecNormal * scop).toPoint();
+				QPoint newP1_1 = newP1 + verticalV1.toPoint();
+				QPoint newP1_2 = newP1 + verticalV2.toPoint();
+				QPoint newP2_1 = newP2 + verticalV1.toPoint();
+				QPoint newP2_2 = newP2 + verticalV2.toPoint();
 
 				//QPainterPath path;
 				//QPolygonF polygon = path.toFillPolygon;
@@ -931,7 +913,7 @@ QLineF LaserViewer::detectItemEdge(LaserPrimitive *& result, QPointF mousePoint,
 
 	return line;
 }
-bool LaserViewer::detectItemByMouse(LaserPrimitive*& result, QPointF mousePoint)
+bool LaserViewer::detectItemByMouse(LaserPrimitive*& result, QPoint mousePoint)
 {
 	qreal delta = Config::Ui::clickSelectionTolerance() * (1 / zoomValue());
 	if (delta <= 0) {
@@ -945,12 +927,13 @@ bool LaserViewer::detectItemByMouse(LaserPrimitive*& result, QPointF mousePoint)
     
 	return false;
 }
-bool LaserViewer::detectFillSolidByMouse(LaserPrimitive *& result, QPointF mousePoint)
+bool LaserViewer::detectFillSolidByMouse(LaserPrimitive *& result, QPoint mousePoint)
 {
-    QPointF sceneMousePoint = mapToScene(mousePoint.toPoint());
+    QPoint sceneMousePoint = mapToScene(mousePoint).toPoint();
 	QList<QGraphicsItem*> items = m_scene->items(sceneMousePoint);
 	for each(QGraphicsItem* item in items) {
-		LaserPrimitive* primitive = qobject_cast<LaserPrimitive*> (item->toGraphicsObject());
+		LaserPrimitive* primitive = 
+            qobject_cast<LaserPrimitive*> (item->toGraphicsObject());
 		if (primitive != nullptr) {
 			if (LaserBitmap* bitmap = qobject_cast<LaserBitmap*> (primitive)) {
 				result = bitmap;
@@ -1013,7 +996,7 @@ bool LaserViewer::detectFillSolidByMouse(LaserPrimitive *& result, QPointF mouse
     qDebug() << m_textFont.pixelSize();
     
     //先遍历整个外框
-    for (LaserPrimitive* primitive : m_scene->document()->primitives().values()) {
+    for (LaserPrimitive* primitive : m_scene->document()->primitives()) {
         QString name = primitive->metaObject()->className();
         if ( name != "LaserText") {
             continue;
@@ -1026,7 +1009,7 @@ bool LaserViewer::detectFillSolidByMouse(LaserPrimitive *& result, QPointF mouse
         qDebug() << text->content().length();
         laserText = text;
         if (text->content().trimmed().isEmpty()) {
-            m_scene->document()->removePrimitive(laserText, false, false);
+            m_scene->document()->removePrimitive(laserText, false, false, false);
             laserText = nullptr;
             m_insertIndex = -1;
             return false;
@@ -1269,7 +1252,7 @@ void LaserViewer::selectLayer(LaserLayer* layer)
     }
     for (LaserPrimitive* primitive : layer->primitives())
     {
-        if (!m_scene->document()->primitives().contains(primitive->id())) {
+        if (!m_scene->document()->containsPrimitive(primitive)) {
             continue;
         }
         primitive->setSelected(true);
@@ -1565,12 +1548,12 @@ void LaserViewer::paintSelectedState(QPainter& painter)
     
 }
 
-int LaserViewer::setSelectionArea(const QPointF& _startPoint, const QPointF& _endPoint)
+int LaserViewer::setSelectionArea(const QPoint& _startPoint, const QPoint& _endPoint)
 {
 	//m_selectionStartPoint, m_selectionEndPoint
 	QPainterPath selectionPath;
 	//QRectF rect = QRectF(mapToScene(_startPoint.toPoint()), mapToScene(_endPoint.toPoint()));
-	QRectF rect = QRectF(mapToScene(_startPoint.toPoint()), mapToScene(_endPoint.toPoint()));
+	QRect rect = QRect(mapToScene(_startPoint).toPoint(), mapToScene(_endPoint).toPoint());
 	selectionPath.addRect(rect);
 	//selectionPath.addRect(rect);
 	//m_scene->setSelectionArea(mapToScene(selectionPath));
@@ -1944,8 +1927,8 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
         //Polygon Ready
         else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonReadyState())) {
             m_mousePressState = StateControllerInst.documentPrimitivePolygonReadyState();
-            m_lastPolygon = nullptr;
-            m_creatingPolygonPoints.clear();
+            //m_lastPolygon = nullptr;
+            //m_creatingPolygonPoints.clear();
             //clear
             //m_creatingPolygonPoints.clear();
             //m_creatingPolygonLines.clear();
@@ -1994,44 +1977,59 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
 void LaserViewer::mouseMoveEvent(QMouseEvent* event)
 {
 	m_mousePoint = event->pos();
+    QPoint point = mapToScene(m_mousePoint).toPoint();
     //ruler
     m_horizontalRuler->setMousePoint(m_mousePoint);
     m_verticalRuler->setMousePoint(m_mousePoint);
     m_horizontalRuler->repaint();
     m_verticalRuler->repaint();
+
 	m_isPrimitiveInteractPoint = false;
 	m_isGridNode = false;
+
+    // common editing state
 	//所有的图元draw
 	if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveState())) {
 		//获取鼠标附近图元的最近点
 		bool isSpecailPoint = false;
-		m_isPrimitiveInteractPoint = detectIntersectionByMouse(m_primitiveInteractPoint, mapToScene(event->pos()), isSpecailPoint);
-		//testPoint = mapFromScene(m_primitiveInteractPoint);
-		viewport()->repaint();
+        QPoint ajustedPoint = point;
+		m_isPrimitiveInteractPoint = detectIntersectionByMouse(
+            m_primitiveInteractPoint, point, isSpecailPoint);
 		if (m_isPrimitiveInteractPoint) {
-			if (!isSpecailPoint) {
-				QPixmap cMap(":/ui/icons/images/lineCursor.png");
-				this->setCursor(cMap.scaled(20, 20, Qt::KeepAspectRatio));
-			}
-			else {
+			if (isSpecailPoint) {
 				QPixmap cMap(":/ui/icons/images/center.png");
 				this->setCursor(cMap.scaled(20, 20, Qt::KeepAspectRatio));
 			}
-			
+			else {
+				QPixmap cMap(":/ui/icons/images/lineCursor.png");
+				this->setCursor(cMap.scaled(20, 20, Qt::KeepAspectRatio));
+			}
+			ajustedPoint = m_primitiveInteractPoint;
 		}
-		else {
+		else
+        {
 			this->setCursor(Qt::ArrowCursor);
 			//是否为网格上的点
 			//网格点吸附判断
 			LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
 			if (backgroundItem) {
-				m_isGridNode = backgroundItem->detectGridNode(m_gridNode, mapToScene(event->pos()));
+				m_isGridNode = backgroundItem->detectGridNode(m_gridNode, 
+                    point);
+                if (m_isGridNode)
+			        ajustedPoint = m_gridNode;
 			}
 		}
 		
-	}
+        LaserPrimitive* editingPrimitive = this->getEditingPrimitive();
+        if (editingPrimitive)
+        {
+            editingPrimitive->sceneMouseMoveEvent(this, m_scene.data(), 
+                ajustedPoint, event, m_mousePressed);
+        }
+		this->viewport()->repaint();
+    }
     // 当在DocumentSelecting状态时
-	if (StateControllerInst.isInState(StateControllerInst.documentIdleState())){
+	else if (StateControllerInst.isInState(StateControllerInst.documentIdleState())){
 		
 		m_detectedPrimitive = nullptr;
         if (event->button() == Qt::NoButton) {
@@ -2308,25 +2306,6 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
 		this->viewport()->repaint();
         return;
     }
-    //Polygon
-    else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonCreatingState())) {
-        m_creatingPolygonEndPoint = mapToScene(m_mousePoint);
-		if (m_isPrimitiveInteractPoint) {
-			m_creatingPolygonEndPoint = m_primitiveInteractPoint;
-		}
-		//是否网格点
-		if (m_isGridNode) {
-			m_creatingPolygonEndPoint = m_gridNode;
-		}
-		/*if (detectPoint(m_creatingPolygonPoints, m_creatingPolygonLines, m_creatingPolygonEndPoint)) {
-			this->setCursor(Qt::CrossCursor);
-		}
-		else {
-			this->setCursor(Qt::ArrowCursor);
-		}*/
-		this->viewport()->repaint();
-		return;
-    }
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveStarState())) {
         QPixmap cMap(":/ui/icons/images/posCursor.png");
         this->setCursor(cMap.scaled(30, 30, Qt::KeepAspectRatio));
@@ -2367,23 +2346,22 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
 			m_creatingSplineMousePos = m_gridNode;
 		}
 	}
-	else {
+    else {
 		//setAnchorPoint(mapFromScene(QPointF(0, 0)));
 	}
 	
-    QPointF pos = mapToScene(m_mousePoint);
-    emit mouseMoved(pos);
+    emit mouseMoved(event->pos());
 }
 
 
 void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
 {
-	//QGraphicsView::mouseReleaseEvent(event);
-	LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
-	if (!backgroundItem) {
-		
-		return;
-	}
+    //QGraphicsView::mouseReleaseEvent(event);
+    LaserBackgroundItem* backgroundItem = m_scene->backgroundItem();
+    if (!backgroundItem) {
+
+        return;
+    }
 
     int layerIndex = m_scene->document()->currentLayerIndex();
     if (StateControllerInst.isInState(StateControllerInst.documentPrintAndCutSelectingState()))
@@ -2399,113 +2377,114 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
             return;
         }
 
-        QRectF areaRect(mapToScene(m_selectionStartPoint.toPoint()), 
-            mapToScene(m_selectionEndPoint.toPoint()));
-        LaserApplication::mainWindow->findPrintAndCutPoints(areaRect.toRect());
+        QRect areaRect(mapToScene(m_selectionStartPoint).toPoint(),
+            mapToScene(m_selectionEndPoint).toPoint());
+        LaserApplication::mainWindow->findPrintAndCutPoints(areaRect);
         viewport()->update();
     }
     //select
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectingState()))
     {
-		QGraphicsView::mouseReleaseEvent(event);
-        
+        QGraphicsView::mouseReleaseEvent(event);
+
         if (utils::checkTwoPointEqueal(m_selectionStartPoint, m_selectionEndPoint))
         {
-			//点中空白且press与release同一个点
-			selectingReleaseInBlank();
+            //点中空白且press与release同一个点
+            selectingReleaseInBlank();
             //选取区域的属性面板
             LaserApplication::mainWindow->onLaserPrimitiveGroupItemTransformChanged();
             //emit selectedSizeChanged();
-			return;
+            return;
         }
-		//undo before
-		selectionUndoStackPushBefore();
-		//框选前被选中的
-		QList<LaserPrimitive*> selectedList = m_scene->document()->selectedPrimitives();
+        //undo before
+        selectionUndoStackPushBefore();
+        //框选前被选中的
+        QList<LaserPrimitive*> selectedList = m_scene->document()->selectedPrimitives();
         //框选前先将item从group中移除
         //不然修改完group内的item的selected属性再从group中移除的话，
         //group子对象selected不论true/false都设为group的isSelected值
         resetGroup();
-		//框选区域内被选中的
-		setSelectionArea(m_selectionStartPoint, m_selectionEndPoint);
-		QList<LaserPrimitive*> newSelectedList = m_scene->document()->selectedPrimitives();
-		//框选区域，分情况处理selectionUndo
-		if (m_isKeyCtrlPress) {
+        //框选区域内被选中的
+        setSelectionArea(m_selectionStartPoint, m_selectionEndPoint);
+        QList<LaserPrimitive*> newSelectedList = m_scene->document()->selectedPrimitives();
+        //框选区域，分情况处理selectionUndo
+        if (m_isKeyCtrlPress) {
             //update tree  
-			for each(LaserPrimitive* item in selectedList) {
-				item->setSelected(true);
-			}
-			for each(LaserPrimitive* newItem in newSelectedList) {
-				if (selectedList.contains(newItem)) {
+            for each (LaserPrimitive * item in selectedList) {
+                item->setSelected(true);
+            }
+            for each (LaserPrimitive * newItem in newSelectedList) {
+                if (selectedList.contains(newItem)) {
                     newItem->setSelected(false);
-				}
-				else {
+                }
+                else {
                     newItem->setSelected(true);
-				}
-			}
-			onEndSelectionFillGroup();
-			//undo redo
-			selectionUndoStackPush();
-            
-		}
-		else {
-			if (selectedList == newSelectedList) {
-				onEndSelectionFillGroup();
-				return;
-			}
-			else {
-				onEndSelectionFillGroup();
-				//undo redo
-				selectionUndoStackPush();
-				
-			}
-		}
+                }
+            }
+            onEndSelectionFillGroup();
+            //undo redo
+            selectionUndoStackPush();
+
+        }
+        else {
+            if (selectedList == newSelectedList) {
+                onEndSelectionFillGroup();
+                return;
+            }
+            else {
+                onEndSelectionFillGroup();
+                //undo redo
+                selectionUndoStackPush();
+
+            }
+        }
         //选取区域的属性面板
         LaserApplication::mainWindow->onLaserPrimitiveGroupItemTransformChanged();
         //emit selectedSizeChanged();
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentSelectedEditingState())) {
-		
-		m_selectedEditCount = 0;
-		m_radians = 0;
-		//group中没有被选中的item，返回idle状态
-		//if (m_group->isEmpty()) {
+
+        m_selectedEditCount = 0;
+        m_radians = 0;
+        //group中没有被选中的item，返回idle状态
+        //if (m_group->isEmpty()) {
         if (m_scene->selectedPrimitives().isEmpty()) {
-			emit selectionToIdle();
-		}
-		//group中有被选中的item，返回selected状态
-		else {
-			emit endSelectedEditing();
-		}
-		//undo
-		//如果是图元点选
-		if (m_detectedPrimitive != nullptr) {
-			if (m_group->isAncestorOf(m_detectedPrimitive)) {
-				transformUndoStackPush();
-			}
-			else {
-				transformUndoStackPush(m_detectedPrimitive);
-			}
-		}
-		else if (m_detectedFillSolid != nullptr) {
-			if (m_group->isAncestorOf(m_detectedFillSolid)) {
-				transformUndoStackPush();
-			}
-			else {
-				transformUndoStackPush(m_detectedFillSolid);
-			}
-		}
-		else {
-			transformUndoStackPush();
-		}
+            emit selectionToIdle();
+        }
+        //group中有被选中的item，返回selected状态
+        else {
+            emit endSelectedEditing();
+        }
+        //undo
+        //如果是图元点选
+        if (m_detectedPrimitive != nullptr) {
+            if (m_group->isAncestorOf(m_detectedPrimitive)) {
+                transformUndoStackPush();
+            }
+            else {
+                transformUndoStackPush(m_detectedPrimitive);
+            }
+        }
+        else if (m_detectedFillSolid != nullptr) {
+            if (m_group->isAncestorOf(m_detectedFillSolid)) {
+                transformUndoStackPush();
+            }
+            else {
+                transformUndoStackPush(m_detectedFillSolid);
+            }
+        }
+        else {
+            transformUndoStackPush();
+        }
         //选取区域的属性面板
         LaserApplication::mainWindow->onLaserPrimitiveGroupItemTransformChanged();
         //emit selectedSizeChanged();
-		this->viewport()->repaint();
-		return;
+        this->viewport()->repaint();
+        return;
     }
-    else if (StateControllerInst.isInState(StateControllerInst.documentSelectedState())) {
-        QList<LaserPrimitive*> pList = m_scene->document()->primitives().values();
+    else if (StateControllerInst.isInState(StateControllerInst.documentSelectedState()))
+    {
+        QList<LaserPrimitive*> pList = m_scene->document()->primitives();
         QList<LaserPrimitive*> selectedList = m_scene->document()->selectedPrimitives();
         LaserPrimitive* selectedOnlyLine = nullptr;
         if (selectedList.size() == 1) {
@@ -2522,32 +2501,29 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                     m_mirrorLine = m_detectedPrimitive;
                 }
             }
-           
+
         }
-        
     }
-	//View Drag Ready
-	else if (StateControllerInst.isInState(StateControllerInst.documentViewDragingState())) {
-		//setInteractive(true);
-		QGraphicsView::mouseReleaseEvent(event);
-		QPixmap cMap(":/ui/icons/images/drag_hand.png");
-		this->setCursor(cMap.scaled(30, 30, Qt::KeepAspectRatio));
-		emit endViewDraging();
-	}
+    //View Drag Ready
+    else if (StateControllerInst.isInState(StateControllerInst.documentViewDragingState())) {
+        //setInteractive(true);
+        QGraphicsView::mouseReleaseEvent(event);
+        QPixmap cMap(":/ui/icons/images/drag_hand.png");
+        this->setCursor(cMap.scaled(30, 30, Qt::KeepAspectRatio));
+        emit endViewDraging();
+    }
     //Rect
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectCreatingState())) {
-		
-		if (utils::checkTwoPointEqueal(m_creatingRectStartPoint, m_creatingRectEndPoint)) {
-			emit readyRectangle();
-			return;
-		}
-		
-        /*QRectF rect(backgroundItem->QGraphicsItemGroup::mapFromScene(m_creatingRectStartPoint),
-			backgroundItem->QGraphicsItemGroup::mapFromScene(m_creatingRectEndPoint));*/
+
+        if (utils::checkTwoPointEqueal(m_creatingRectStartPoint, m_creatingRectEndPoint)) {
+            emit readyRectangle();
+            return;
+        }
+
         //防止宽高为负值
         QPointF p1 = backgroundItem->QGraphicsItemGroup::mapFromScene(m_creatingRectStartPoint);
         QPointF p2 = backgroundItem->QGraphicsItemGroup::mapFromScene(m_creatingRectEndPoint);
-        qreal left = 0, top = 0, right = 0,bottom = 0;
+        qreal left = 0, top = 0, right = 0, bottom = 0;
         if (p1.x() < p2.x()) {
             left = p1.x();
             right = p2.x();
@@ -2590,10 +2566,10 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
     }
     //Ellipse
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveEllipseCreatingState())) {
-		if (utils::checkTwoPointEqueal(m_creatingEllipseStartPoint, m_EllipseEndPoint)) {
-			emit readyEllipse();
-			return;
-		}
+        if (utils::checkTwoPointEqueal(m_creatingEllipseStartPoint, m_EllipseEndPoint)) {
+            emit readyEllipse();
+            return;
+        }
         QRectF rect(m_creatingEllipseStartPoint, m_EllipseEndPoint);
         LaserEllipse* ellipseItem = new LaserEllipse(rect.toRect(), m_scene->document(), QTransform(), layerIndex);
         //m_scene->addLaserPrimitive(ellipseItem);
@@ -2611,32 +2587,31 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         }
         emit readyEllipse();
     }
-	
-	//Line
-	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveLineReadyState())) {
-		if (event->button() == Qt::LeftButton) {
-			m_creatingLineStartPoint = mapToScene(m_mousePoint);
-			if (m_isPrimitiveInteractPoint) {
-				m_creatingLineStartPoint = m_primitiveInteractPoint;
-			}
-			//是否网格点
-			if (m_isGridNode) {
-				m_creatingLineStartPoint = m_gridNode;
-			}
-			m_creatingLineEndPoint = m_creatingLineStartPoint;
-			emit creatingLine();
-		}
-		
-	}
-	//Line
-	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveLineCreatingState())) {
-		if (m_creatingLineStartPoint != m_creatingLineEndPoint) {
-			if (event->button() == Qt::LeftButton) {
-				QLineF line(m_creatingLineStartPoint, m_creatingLineEndPoint);
-				LaserLine* lineItem = new LaserLine(line.toLine(), m_scene->document(), QTransform(), layerIndex);
-				//m_scene->addLaserPrimitive(lineItem);
+    //Line
+    else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveLineReadyState())) {
+        if (event->button() == Qt::LeftButton) {
+            m_creatingLineStartPoint = mapToScene(m_mousePoint);
+            if (m_isPrimitiveInteractPoint) {
+                m_creatingLineStartPoint = m_primitiveInteractPoint;
+            }
+            //是否网格点
+            if (m_isGridNode) {
+                m_creatingLineStartPoint = m_gridNode;
+            }
+            m_creatingLineEndPoint = m_creatingLineStartPoint;
+            emit creatingLine();
+        }
+
+    }
+    //Line
+    else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveLineCreatingState())) {
+        if (m_creatingLineStartPoint != m_creatingLineEndPoint) {
+            if (event->button() == Qt::LeftButton) {
+                QLineF line(m_creatingLineStartPoint, m_creatingLineEndPoint);
+                LaserLine* lineItem = new LaserLine(line.toLine(), m_scene->document(), QTransform(), layerIndex);
+                //m_scene->addLaserPrimitive(lineItem);
                 //判断是否在4叉树的有效区域内
-                if (m_scene->maxRegion().contains(m_creatingLineStartPoint.toPoint()) && 
+                if (m_scene->maxRegion().contains(m_creatingLineStartPoint.toPoint()) &&
                     m_scene->maxRegion().contains(m_creatingLineEndPoint.toPoint())) {
                     //undo 创建完后会执行redo
                     QList<QGraphicsItem*> list;
@@ -2644,132 +2619,15 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                     AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene.data(), list);
                     m_undoStack->push(addCmd);
                     onReplaceGroup(lineItem);
-                    
                 }
                 else {
                     QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
                 }
                 emit readyLine();
-			}
-			else if (event->button() == Qt::RightButton) {
-				emit readyLine();
-			}
-		}
-	}
-
-    //Polygon Start
-    /*else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonStartRectState())) {
-        //init
-        m_creatingPolygonStartPoint = mapToScene(event->pos());
-        m_creatingPolygonEndPoint = m_creatingPolygonStartPoint;
-        m_creatingPolygonPoints.append(m_creatingPolygonStartPoint);
-
-        qreal m_width = 5;
-        qreal halfWidth = m_width * 0.5;
-        m_polygonStartRect = QRectF(m_creatingPolygonStartPoint.x() - halfWidth, m_creatingPolygonStartPoint.y() - halfWidth, m_width, m_width);
-
-        emit creatingPolygon();
-    }*/
-    //Polygon
-	else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonReadyState())) {
-		if (event->button() == Qt::LeftButton) {
-			m_creatingPolygonStartPoint = mapToScene(event->pos());
-			if (m_isPrimitiveInteractPoint) {
-				m_creatingPolygonStartPoint = m_primitiveInteractPoint;
-			}
-			//是否网格点
-			if (m_isGridNode) {
-				m_creatingPolygonStartPoint = m_gridNode;
-			}
-			m_creatingPolygonEndPoint = m_creatingPolygonStartPoint;
-			m_creatingPolygonPoints.append(m_creatingPolygonStartPoint);
-			emit creatingPolygon();
-			
-		}
-		else if (event->button() == Qt::RightButton) {
-			emit readyPolygon();
-		}
-	}
-    else if (StateControllerInst.isInState(StateControllerInst.documentPrimitivePolygonCreatingState())) {
-		
-		if (event->button() == Qt::LeftButton) {
-            if (!isRepeatPoint()) {
-                LaserLayer* layer = nullptr;
-                if (m_currentPolyline == nullptr)
-                {
-                    layer = m_scene->document()->findCapableLayer(LPT_POLYLINE);
-                }
-                else
-                {
-                    layer = m_currentPolyline->layer();
-                }
-                if (layer)
-                {
-                    m_creatingPolygonLines.append(QLineF(m_creatingPolygonPoints[m_creatingPolygonPoints.size() - 1], m_creatingPolygonEndPoint));
-                    m_creatingPolygonPoints.append(m_creatingPolygonEndPoint);
-                    LaserPrimitive* primitive;
-                    LaserPolyline* curPolyline = new LaserPolyline(QPolygonF(m_creatingPolygonPoints).toPolygon(), m_scene->document(),
-                        QTransform(), layerIndex);
-                    //m_scene->addLaserPrimitive(curPolyline);
-                    primitive = curPolyline;
-                    m_currentPolyline = curPolyline;
-                    if (m_creatingPolygonEndPoint.toPoint() == m_creatingPolygonStartPoint.toPoint()) {
-                        layer = m_scene->document()->findCapableLayer(LPT_POLYGON);
-                        if (layer)
-                        {
-                            LaserPolygon* polygon = new LaserPolygon(QPolygonF(m_creatingPolygonPoints).toPolygon(), m_scene->document(),
-                                QTransform(), layer->index());
-                            //m_scene->addLaserPrimitive(polygon);
-                            //onReplaceGroup(polygon);
-                            emit readyPolygon();
-                            primitive = polygon;
-                        }
-                        m_creatingPolygonPoints.clear();
-                        m_currentPolyline = nullptr;
-                        setCursor(Qt::ArrowCursor);
-                    }
-                    //判断是否在4叉树的有效区域内
-                    if (m_scene->maxRegion().contains(m_creatingPolygonEndPoint.toPoint())) {
-                        //undo
-                        PolygonUndoCommand* polyCmd = new PolygonUndoCommand(m_scene.data(), m_lastPolygon, primitive);
-                        m_undoStack->push(polyCmd);
-                        m_lastPolygon = primitive;
-                    }
-                    else {
-                        QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
-                        m_creatingPolygonPoints.removeLast();
-                    }
-                }
             }
-		}
-        else if (event->button() == Qt::RightButton) {
-            if (m_creatingPolygonPoints.size() > 0) {
-                LaserLayer* layer = m_scene->document()->findCapableLayer(LPT_POLYGON);
-                if (layer)
-                {
-                    LaserPolyline* polyLine = new LaserPolyline(QPolygonF(m_creatingPolygonPoints).toPolygon(), m_scene->document(),
-                        QTransform(), layer->index());
-                    //m_scene->addLaserPrimitive(polyLine);
-                    //onReplaceGroup(polyLine);
-                    //undo
-                    //判断是否在4叉树的有效区域内
-                    if (m_scene->maxRegion().contains(m_creatingPolygonEndPoint.toPoint())) {
-                        //undo
-                        PolygonUndoCommand* polyCmd = new PolygonUndoCommand(m_scene.data(), m_lastPolygon, polyLine);
-                        m_undoStack->push(polyCmd);
-                        m_lastPolygon = polyLine;
-                    }
-                    else {
-                        QMessageBox::warning(this, ltr("WargingOverstepTitle"), ltr("WargingOverstepText"));
-                        m_creatingPolygonPoints.removeLast();
-                    }
-                    //m_undoStack->push(polyCmd);
-                }
+            else if (event->button() == Qt::RightButton) {
+                emit readyLine();
             }
-            m_currentPolyline = nullptr;
-            m_creatingPolygonPoints.clear();
-            setCursor(Qt::ArrowCursor);
-            emit readyPolygon();
         }
     }
     //text
@@ -2826,7 +2684,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
             LaserPrimitive* cursorIn = nullptr;
             cursorIn = cursorInLaserPrimitive(mapToScene(event->pos()));
             //create
-            LaserPartyEmblem* pe = new LaserPartyEmblem(m_scene->document(), mapToScene(event->pos()).toPoint(), 5500,false,  QTransform(), layerIndex);
+            LaserPartyEmblem* pe = new LaserPartyEmblem(m_scene->document(), mapToScene(event->pos()).toPoint(), 5500, false, QTransform(), layerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(pe);
             emit LaserApplication::mainWindow->isIdle();
@@ -2842,7 +2700,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
             QPointF point = mapToScene(event->pos());
             //create
             QRect rect(point.x(), point.y(), 40 * 1000, 40 * 1000);
-            LaserFrame* frame = new LaserFrame(m_scene->document(), rect, 2000,3000 ,false,  QTransform(), layerIndex);
+            LaserFrame* frame = new LaserFrame(m_scene->document(), rect, 2000, 3000, false, QTransform(), layerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(frame);
             emit LaserApplication::mainWindow->isIdle();
@@ -2880,7 +2738,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                 if (cursorIn->primitiveType() == LPT_RING) {
                     LaserRing* ring = qgraphicsitem_cast<LaserRing*>(cursorIn);
                     rect = ring->innerRect();
-                    
+
                 }
                 else if (cursorIn->primitiveType() == LPT_FRAME) {
                     LaserFrame* frame = qgraphicsitem_cast<LaserFrame*>(cursorIn);
@@ -2889,7 +2747,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                 transform = cursorIn->sceneTransform();
             }
             //create
-            LaserCircleText* text = new LaserCircleText(m_scene->document(), tr("stampContent"), rect,160, false, false, false, false,"Times New Roman",0, true, 0, 0, QSize(), transform, layerIndex);
+            LaserCircleText* text = new LaserCircleText(m_scene->document(), tr("stampContent"), rect, 160, false, false, false, false, "Times New Roman", 0, true, 0, 0, QSize(), transform, layerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(text);
             emit LaserApplication::mainWindow->isIdle();
@@ -2897,7 +2755,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveHorizontalTextState())) {
         if (event->button() == Qt::LeftButton) {
-            
+
             QPointF point = mapToScene(event->pos());
             QTransform transform;
             //查找鼠标在印章里
@@ -2907,15 +2765,15 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                 transform = cursorIn->sceneTransform();
             }
             //create
-            LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), tr("stampContent"), QSize(3.2*1000, 6*1000), point, false, false, false,false, "Times New Roman", 550, transform, layerIndex);
+            LaserHorizontalText* text = new LaserHorizontalText(m_scene->document(), tr("stampContent"), QSize(3.2 * 1000, 6 * 1000), point, false, false, false, false, "Times New Roman", 550, transform, layerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(text);
             emit LaserApplication::mainWindow->isIdle();
             if (cursorIn) {
-               QPointF diff = cursorIn->sceneBoundingRect().center() - text->sceneBoundingRect().center();
-               text->moveBy(diff.x(), diff.y());
+                QPointF diff = cursorIn->sceneBoundingRect().center() - text->sceneBoundingRect().center();
+                text->moveBy(diff.x(), diff.y());
             }
-            
+
         }
     }
     else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveVerticalTextState())) {
@@ -2928,7 +2786,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
             if (cursorIn) {
                 transform = cursorIn->sceneTransform();
             }
-            LaserVerticalText* text = new LaserVerticalText(m_scene->document(), tr("stampContent"), QSize(3.2 * 1000, 3.2 * 1000), point, false, false,false,false, "Times New Roman", 550, transform, layerIndex);
+            LaserVerticalText* text = new LaserVerticalText(m_scene->document(), tr("stampContent"), QSize(3.2 * 1000, 3.2 * 1000), point, false, false, false, false, "Times New Roman", 550, transform, layerIndex);
             //判断是否在4叉树的有效区域内
             addPrimitiveAndExamRegionByBounds(text);
             emit LaserApplication::mainWindow->isIdle();
@@ -2961,15 +2819,109 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
             path->setVisible(false);
         }
     }
+    // common editing state
+    else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveState()))
+    {
+        QPointF scenePoint = mapToScene(event->pos());
+        QPointF ajustedPoint = scenePoint;
+        if (m_isPrimitiveInteractPoint) {
+            ajustedPoint = m_primitiveInteractPoint;
+        }
+        //是否网格点
+        if (m_isGridNode) {
+            ajustedPoint = m_gridNode;
+        }
+        //判断是否在4叉树的有效区域内
+        bool scenePointInAvailableArea = m_scene->pointInAvailableArea(scenePoint);
+        bool ajustedPointInAvailableArea = m_scene->pointInAvailableArea(ajustedPoint);
+        LaserPrimitive* editingPrimitive = this->getEditingPrimitive();
+
+        // just entering the editing state but even have not pressed mouse button.
+        if (editingPrimitive == nullptr)
+        {
+            if (event->button() == Qt::RightButton)
+            {
+                m_editingPrimitiveId = QString();
+                m_editingPrimitiveType = LPT_UNKNOWN;
+                emit endEditing();
+            }
+            else if (event->button() == Qt::LeftButton)
+            {
+                //判断是否在4叉树的有效区域内
+                if (ajustedPointInAvailableArea)
+                {
+                    // first create Polyline Primitive
+                    LaserLayer* layer = nullptr;
+                    layer = m_scene->document()->findCapableLayer(m_editingPrimitiveType);
+                    layerIndex = layer->index();
+                    if (layer)
+                    {
+                        switch (m_editingPrimitiveType)
+                        {
+                        case LPT_LINE:
+                            editingPrimitive = new LaserLine(m_scene->document(),
+                                QTransform(), layerIndex);
+                            break;
+                        case LPT_ELLIPSE:
+                            editingPrimitive = new LaserEllipse(m_scene->document(),
+                                QTransform(), layerIndex);
+                            break;
+                        case LPT_RECT:
+                            editingPrimitive = new LaserRect(m_scene->document(),
+                                QTransform(), layerIndex);
+                            break;
+                        case LPT_POLYLINE:
+                            editingPrimitive = new LaserPolyline(m_scene->document(),
+                                QTransform(), layerIndex);
+                            break;
+                        case LPT_POLYGON:
+                            editingPrimitive = new LaserPolygon(m_scene->document(),
+                                QTransform(), layerIndex);
+                            break;
+                        case LPT_PATH:
+                            editingPrimitive = new LaserPath(m_scene->document(),
+                                QTransform(), layerIndex);
+                            break;
+                        case LPT_BITMAP:
+                            editingPrimitive = new LaserBitmap(m_scene->document(),
+                                QTransform(), layerIndex);
+                            break;
+                        case LPT_TEXT:
+                            editingPrimitive = new LaserText(m_scene->document(),
+                                QTransform(), layerIndex);
+                            break;
+                        default:
+                            editingPrimitive = nullptr;
+                            break;
+                        }
+
+                        if (editingPrimitive)
+                        {
+                            m_editingPrimitiveId = editingPrimitive->id();
+                            setEditingPrimitiveId(m_editingPrimitiveId);
+                            editingPrimitive->sceneMouseReleaseEvent(this,
+                                m_scene.data(), ajustedPoint.toPoint(), event,
+                                this->m_mousePressed);
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            editingPrimitive->sceneMouseReleaseEvent(this, m_scene.data(),
+                ajustedPoint.toPoint(), event, this->m_mousePressed);
+        }
+    }
     else
     {
-		QGraphicsView::mouseReleaseEvent(event);
+        QGraphicsView::mouseReleaseEvent(event);
     }
-	
+
     //m_mousePressed = false;
     //m_isKeyShiftPressed = false;
     this->viewport()->repaint();
-	//QGraphicsView::mouseReleaseEvent(event);
+    //QGraphicsView::mouseReleaseEvent(event);
 }
 
 void LaserViewer::dragEnterEvent(QDragEnterEvent * event)
@@ -3913,25 +3865,25 @@ bool LaserViewer::detectLine(QList<QLineF> lines, QPointF startPoint, QPointF po
 	return false;
 }*/
 
-bool LaserViewer::isRepeatPoint()
-{
-	bool bl = true;
-	if (m_creatingPolygonPoints.last().toPoint() != m_creatingPolygonEndPoint.toPoint()) {
-		bl = false;
-	}
-	if (bl) {
-		qDebug() << "==";
-	}
-	return bl;
-}
-
-bool LaserViewer::isStartPoint()
-{
-	if (m_creatingPolygonStartPoint.toPoint() != m_creatingPolygonEndPoint.toPoint()) {
-		return false;
-	}
-	return true;
-}
+//bool LaserViewer::isRepeatPoint()
+//{
+//	bool bl = true;
+//	if (m_creatingPolygonPoints.last().toPoint() != m_creatingPolygonEndPoint.toPoint()) {
+//		bl = false;
+//	}
+//	if (bl) {
+//		qDebug() << "==";
+//	}
+//	return bl;
+//}
+//
+//bool LaserViewer::isStartPoint()
+//{
+//	if (m_creatingPolygonStartPoint.toPoint() != m_creatingPolygonEndPoint.toPoint()) {
+//		return false;
+//	}
+//	return true;
+//}
 
 qreal LaserViewer::leftScaleMirror(qreal rate, qreal x)
 {
@@ -4271,7 +4223,11 @@ void LaserViewer::transformUndoStackPush(LaserPrimitive* item)
     
 }
 
-
+void LaserViewer::onEndEditing()
+{
+    m_editingPrimitiveId = QString();
+    m_editingPrimitiveType = LPT_UNKNOWN;
+}
 
 bool LaserViewer::showLaserPos() const
 {
@@ -4329,6 +4285,14 @@ bool LaserViewer::addPrimitiveAndExamRegionByBounds(QList<LaserPrimitive*>& prim
     }
     return true;
 }
+
+void LaserViewer::addUndoCommand(QUndoCommand* cmd)
+{
+    Q_ASSERT(cmd);
+    m_undoStack->push(cmd);
+    qLogD << "undo list size is " << m_undoStack->count();
+}
+
 int LaserViewer::textAlignH()
 {
     return m_textAlighH;
@@ -4476,6 +4440,9 @@ void LaserViewer::init()
 
     ADD_TRANSITION(documentSelectedEditingState, documentSelectedState, this, &LaserViewer::endSelectedEditing);
 
+    ADD_TRANSITION(documentIdleState, documentPrimitiveEditingState, this, &LaserViewer::beginEditing);
+    ADD_TRANSITION(documentPrimitiveEditingState, documentIdleState, this, &LaserViewer::endEditing);
+
     ADD_TRANSITION(documentPrimitiveRectState, documentPrimitiveRectCreatingState, this, SIGNAL(creatingRectangle()));
     ADD_TRANSITION(documentPrimitiveRectCreatingState, documentPrimitiveRectReadyState, this, SIGNAL(readyRectangle()));
     ADD_TRANSITION(documentPrimitiveEllipseState, documentPrimitiveEllipseCreatingState, this, SIGNAL(creatingEllipse()));
@@ -4491,6 +4458,8 @@ void LaserViewer::init()
 	ADD_TRANSITION(documentViewDragReadyState, documentViewDragingState, this, SIGNAL(beginViewDraging()));
 	ADD_TRANSITION(documentViewDragingState, documentViewDragReadyState, this, SIGNAL(endViewDraging()));
 
+    connect(this, &LaserViewer::endEditing, this, &LaserViewer::onEndEditing);
+
 	connect(StateController::instance().documentViewDragState(), &QState::entered,this,  [=] {
 
 		QPixmap cMap(":/ui/icons/images/drag_hand.png");
@@ -4505,10 +4474,34 @@ void LaserViewer::init()
         if (scene() && scene()->document()) {
             onEndText();
         }
-        
     });
+
 	m_group = nullptr;
 
+}
+
+void LaserViewer::setEditingPrimitiveId(const QString& primitiveId)
+{
+    Q_ASSERT(!primitiveId.isEmpty() && !primitiveId.isNull());
+    m_editingPrimitiveId = primitiveId;
+}
+
+LaserPrimitive* LaserViewer::getEditingPrimitive() const 
+{
+    if (m_scene->document())
+        return m_scene->document()->primitiveById(m_editingPrimitiveId);
+    else
+        return nullptr;
+}
+
+void LaserViewer::setEditingPrimitiveType(LaserPrimitiveType type)
+{
+    m_editingPrimitiveType = type;
+}
+
+LaserPrimitiveType LaserViewer::editingPrimitiveType() const
+{
+    return m_editingPrimitiveType;
 }
 
 void LaserViewer::initSpline()
@@ -4585,7 +4578,7 @@ void LaserViewer::removeBackText()
         m_editingText->delPath(m_insertIndex);
         modifyTextCursor();
         if (m_editingText->path().isEmpty()) {
-            m_scene->document()->removePrimitive(m_editingText);
+            m_scene->document()->removePrimitive(m_editingText, true, true, false);
             m_editingText = nullptr;
         }
         viewport()->repaint();
@@ -4605,7 +4598,7 @@ void LaserViewer::removeFrontText()
         m_insertIndex -= 1;
         modifyTextCursor();
         if (m_editingText->path().isEmpty()) {
-            m_scene->document()->removePrimitive(m_editingText);
+            m_scene->document()->removePrimitive(m_editingText, true, true, false);
             m_editingText = nullptr;
         }
         viewport()->repaint();

@@ -1,11 +1,15 @@
 #ifndef UNDOCOMMAND_H
 #define UNDOCOMMAND_H
-#include <QUndoCommand>
-#include <QGraphicsItem>
-#include "LaserViewer.h"
-#include "scene/LaserPrimitive.h"
-#include "widget/LaserDoubleSpinBox.h"
+
 #include <QCheckBox>
+#include <QGraphicsItem>
+#include <QUndoCommand>
+
+#include "algorithm/QuadTreeNode.h"
+#include "primitive/LaserPrimitiveDeclaration.h"
+#include "widget/LaserDoubleSpinBox.h"
+#include "widget/LaserViewer.h"
+
 class SelectionUndoCommand :public QUndoCommand {
 public :
 	SelectionUndoCommand(LaserViewer * viewer,

@@ -10,8 +10,7 @@
 #include <QStyledItemDelegate>
 #include <QPushButton>
 
-#include "scene/LaserPrimitiveGroup.h"
-#include "scene/LaserPrimitive.h"
+#include "primitive/LaserPrimitiveHeaders.h"
 #include "scene/LaserDocument.h"
 #include "scene/LaserLayer.h"
 #include "scene/LaserScene.h"

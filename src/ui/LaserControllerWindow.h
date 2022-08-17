@@ -13,14 +13,14 @@
 #include <opencv2/opencv.hpp>
 
 #include "camera/CameraController.h"
+#include "laser/LaserDriver.h"
+#include "primitive/LaserPrimitiveDeclaration.h"
 #include "scene/LaserLayer.h"
 #include "widget/LayerButton.h"
-#include "laser/LaserDriver.h"
 #include "widget/LaserDoubleSpinBox.h"
 #include "widget/LaserFontComboBox.h"
 #include "widget/LaserToolButton.h"
 #include "ui/LaserMeuu.h"
-#include "scene/LaserPrimitive.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class LaserControllerWindow; }

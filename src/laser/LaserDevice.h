@@ -1,15 +1,15 @@
-#ifndef LASERDEVICE_H
-#define LASERDEVICE_H
+#pragma once
 
-#include "common/common.h"
-#include "LaserRegister.h"
-#include "laser/LaserDefines.h"
 #include <QObject>
 #include <QMutex>
 #include <QTransform>
 #include <QWaitCondition>
 #include <QVector4D>
 #include <QVector3D>
+
+#include "common/common.h"
+#include "LaserRegister.h"
+#include "laser/LaserDefines.h"
 
 class ConfigItem;
 class LaserDriver;
@@ -279,5 +279,3 @@ private:
 
     friend class LaserDriver;
 };
-
-#endif // LASERDEVICE_H

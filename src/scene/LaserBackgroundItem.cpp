@@ -1,4 +1,5 @@
 #include "LaserBackgroundItem.h"
+
 #include <QPainter>
 #include <QDebug>
 #include <QList>
@@ -6,13 +7,13 @@
 #include <QtCore/qmath.h>  
 #include <QTransform>
 #include <QStyleOptionGraphicsItem>
-#include "scene/LaserPrimitive.h"
 
 #include "LaserApplication.h"
-#include "widget//LaserViewer.h"
 #include "common/common.h"
 #include "common/Config.h"
 #include "laser/LaserDevice.h"
+#include "primitive/LaserPrimitiveHeaders.h"
+#include "widget//LaserViewer.h"
 
 LaserBackgroundItem::LaserBackgroundItem(QGraphicsItem * parent)
 	: QGraphicsItemGroup(parent)
@@ -182,7 +183,7 @@ void LaserBackgroundItem::drawGrids(QPainter& painter)
 	}
 	
 }
-bool LaserBackgroundItem::detectGridNode(QPoint & point, QPointF & mousePoint)
+bool LaserBackgroundItem::detectGridNode(QPoint & point, QPoint & mousePoint)
 {
 	QGraphicsScene* scene = this->scene();
 	if (!scene) {
@@ -196,15 +197,15 @@ bool LaserBackgroundItem::detectGridNode(QPoint & point, QPointF & mousePoint)
 		return false;
 	}
 	//point��scene��documentת��
-	QPointF documentPoint = mapFromScene(mousePoint);
+	QPoint documentPoint = mapFromScene(mousePoint).toPoint();
 	qreal distance = Config::Ui::gridShapeDistance();
 	qreal valueX = distance / view->zoomValue();//5������
 	qreal valueY = distance / view->zoomValue();
 	for (int i = 0; i < m_gridNodeXList.size(); i++) {
 		for (int j = 0; j < m_gridNodeYList.size(); j++) {
 			QPoint node = QPoint(m_gridNodeXList[i], m_gridNodeYList[j]);
-			qreal absX = qAbs(node.x() - documentPoint.x());
-			qreal absY = qAbs(node.y() - documentPoint.y());
+			int absX = qAbs(node.x() - documentPoint.x());
+			int absY = qAbs(node.y() - documentPoint.y());
 			if (absX < valueX && absY < valueY) {
 				//node ��documentת����view
 				point = mapToScene(node).toPoint();
@@ -212,9 +213,9 @@ bool LaserBackgroundItem::detectGridNode(QPoint & point, QPointF & mousePoint)
 			}
 		}
 		for (int j2 = 0; j2 < m_gridSecondNodeYList.size(); j2++) {
-			QPointF node = QPointF(m_gridNodeXList[i], m_gridSecondNodeYList[j2]);
-			qreal absX = qAbs(node.x() - documentPoint.x());
-			qreal absY = qAbs(node.y() - documentPoint.y());
+			QPoint node = QPoint(m_gridNodeXList[i], m_gridSecondNodeYList[j2]);
+			int absX = qAbs(node.x() - documentPoint.x());
+			int absY = qAbs(node.y() - documentPoint.y());
 			if (absX < valueX && absY < valueY) {
 				//node ��documentת����view
 				point = mapToScene(node).toPoint();

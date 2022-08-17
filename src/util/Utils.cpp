@@ -1,7 +1,10 @@
 #include "Utils.h"
-#include <QUuid>
-#include <QtMath>
+
+#include <QCryptographicHash>
 #include <QMessageBox>
+#include <QtMath>
+#include <QUuid>
+
 #include "Eigen/Core"
 #include "Eigen/Dense"
 #include "opencv2/features2d.hpp"
@@ -10,7 +13,7 @@
 #include "LaserApplication.h"
 #include "ui/LaserControllerWindow.h"
 #include "laser/LaserDevice.h"
-#include "scene/LaserPrimitive.h"
+#include "primitive/LaserPrimitiveHeaders.h"
 #include "scene/LaserLayer.h"
 
 QString utils::createUUID(const QString& prefix)
@@ -18,6 +21,15 @@ QString utils::createUUID(const QString& prefix)
     QString ret = prefix;
     ret.append(QUuid::createUuid().toString());
     return ret;
+}
+
+qint64 utils::hash(const QByteArray& data)
+{
+    QByteArray hash = QCryptographicHash::hash(data, QCryptographicHash::Md5);
+    QDataStream stream(hash);
+    qint64 a, b;
+    stream >> a >> b;
+    return a ^ b;
 }
 
 int utils::parsePortName(const QString & name)
@@ -185,7 +197,7 @@ LaserPoint utils::center(const LaserPointList& points)
     return center;
 }
 
-void utils::boundingRect(const QList<QGraphicsItem*>& primitives, QRect& bounding, QRect& boundingAcc, bool exludeUnexport)
+void utils::boundingRect(const QList<QGraphicsItem*> primitives, QRect& bounding, QRect& boundingAcc, bool exludeUnexport)
 {
     int count = 0;
     int accCount = 0;
@@ -202,7 +214,7 @@ void utils::boundingRect(const QList<QGraphicsItem*>& primitives, QRect& boundin
     }
 }
 
-void utils::boundingRect(const QList<LaserPrimitive*>& primitives, QRect& bounding, QRect& boundingAcc, bool exludeUnexport)
+void utils::boundingRect(const QList<LaserPrimitive*> primitives, QRect& bounding, QRect& boundingAcc, bool exludeUnexport)
 {
     int count = 0;
     int accCount = 0;
@@ -218,7 +230,7 @@ void utils::boundingRect(const QList<LaserPrimitive*>& primitives, QRect& boundi
     }
 }
 
-void utils::boundingRect(const QSet<LaserPrimitive*>& primitives, QRect & bounding, QRect & boundingAcc, bool exludeUnexport)
+void utils::boundingRect(const QSet<LaserPrimitive*> primitives, QRect & bounding, QRect & boundingAcc, bool exludeUnexport)
 {
     int count = 0;
     int accCount = 0;
@@ -667,13 +679,13 @@ QTransform utils::transformFrom2Points(const PointPairList& pointPairs)
     return t;
 }
 
-void utils::rectEdges(QRectF rect, QList<QLineF>& edges)
+void utils::rectEdges(QRect rect, QList<QLine>& edges)
 {
     //selection lines
-    edges.append(QLineF(rect.topLeft(), rect.topRight()));
-    edges.append(QLineF(rect.topRight(), rect.bottomRight()));
-    edges.append(QLineF(rect.bottomLeft(), rect.bottomRight()));
-    edges.append(QLineF(rect.topLeft(), rect.bottomLeft()));
+    edges.append(QLine(rect.topLeft(), rect.topRight()));
+    edges.append(QLine(rect.topRight(), rect.bottomRight()));
+    edges.append(QLine(rect.bottomLeft(), rect.bottomRight()));
+    edges.append(QLine(rect.topLeft(), rect.bottomLeft()));
 }
 
 void utils::warning(const QString& title, const QString& msg, QWidget* parent)

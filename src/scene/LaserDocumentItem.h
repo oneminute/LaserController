@@ -36,10 +36,13 @@ public:
     OptimizeNode* optimizeNode() const;
 
 protected:
+    void setId(const QString& id);
     QScopedPointer<ILaserDocumentItemPrivate> d_ptr;
 
     Q_DECLARE_PRIVATE(ILaserDocumentItem)
-    Q_DISABLE_COPY(ILaserDocumentItem)
+    Q_DISABLE_COPY(ILaserDocumentItem) 
+
+    friend class LaserPrimitive;
 };
 
 

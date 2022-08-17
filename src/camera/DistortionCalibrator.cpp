@@ -1,17 +1,19 @@
 #include "DistortionCalibrator.h"
 
+#include <QFileDialog>
+#include <QGraphicsScene>
+#include <QGraphicsPixmapItem>
+#include <QImage>
+#include <QMutexLocker>
+#include <QPainter>
+#include <QRect>
+#include <numeric>
+
 #include "common/common.h"
 #include "common/Config.h"
 #include "LaserApplication.h"
 #include "laser/LaserDevice.h"
 #include "ui/LaserControllerWindow.h"
-#include <QImage>
-#include <QPainter>
-#include <QRect>
-#include <QFileDialog>
-#include <QMutexLocker>
-#include <QGraphicsScene>
-#include <numeric>
 
 DistortionCalibrator::DistortionCalibrator(QObject* parent)
     : QObject(parent)

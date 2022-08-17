@@ -8,9 +8,9 @@
 #include <QLabel>
 
 #include "scene/LaserDocument.h"
-#include "scene/LaserPrimitive.h"
 #include "LaserApplication.h"
 #include "LaserHeaderView.h"
+#include "primitive/LaserPrimitiveHeaders.h"
 #include "scene/LaserScene.h"
 #include "widget/LaserViewer.h"
 #include "widget/UndoCommand.h"

@@ -1,9 +1,5 @@
 ﻿#include "LaserControllerWindow.h"
 #include "ui_LaserControllerWindow.h"
-#include "widget/UndoCommand.h"
-#include "util/Utils.h"
-#include "widget/OverstepMessageBoxWarn.h"
-#include "scene/LaserPrimitive.h"
 
 #include <DockAreaTabBar.h>
 #include <DockAreaTitleBar.h>
@@ -12,9 +8,9 @@
 #include <DockContainerWidget.h>
 #include <DockSplitter.h>
 #include <DockWidgetTab.h>
-#include <QFileDialog> 
 #include <FloatingDockContainer.h>
 #include <QCheckBox>
+#include <QFileDialog> 
 #include <QTextCodec>
 #include <QComboBox>
 #include <QDesktopServices>
@@ -58,14 +54,16 @@
 #include "common/Config.h"
 #include "import/Importer.h"
 #include "laser/LaserDevice.h"
+#include "primitive/LaserPrimitiveHeaders.h"
 #include "scene/LaserDocument.h"
 #include "scene/LaserLayer.h"
-#include "scene/LaserPrimitive.h"
-#include "scene/LaserPrimitiveGroup.h"
 #include "scene/LaserScene.h"
-#include "scene/LaserPrimitive.h"
 #include "state/StateController.h"
 #include "task/ProgressModel.h"
+#include "ui/StampFrameDialog.h"
+#include "ui/StampCircleDialog.h"
+#include "ui/StampStripDialog.h"
+#include "ui/SplashScreen.h"
 #include "ui/ConfigDialog.h"
 #include "ui/HalftoneDialog.h"
 #include "ui/LaserLayerDialog.h"
@@ -83,6 +81,8 @@
 #include "util/Utils.h"
 #include "util/MachiningUtils.h"
 #include "util/WidgetUtils.h"
+#include "widget/UndoCommand.h"
+#include "widget/OverstepMessageBoxWarn.h"
 #include "widget/FloatEditDualSlider.h"
 #include "widget/FloatEditSlider.h"
 #include "widget/ImageViewer.h"
@@ -101,10 +101,6 @@
 
 #include "opencv2/features2d.hpp"
 #include "opencv2/xfeatures2d.hpp"
-#include <ui/StampFrameDialog.h>
-#include <ui/StampCircleDialog.h>
-#include <ui/StampStripDialog.h>
-#include <ui/SplashScreen.h>
 
 using namespace ads;
 
@@ -5264,16 +5260,19 @@ LaserDocument* LaserControllerWindow::getMachiningDocument(bool& stamp)
 }
 
 void LaserControllerWindow::onActionUndo(bool checked) {
-	int index = m_viewer->undoStack()->index();
+	/*int index = m_viewer->undoStack()->index();
 	if (index <= 0) {
 		return;
 	}
-	m_viewer->undoStack()->setIndex(index - 1);
+	m_viewer->undoStack()->setIndex(index - 1);*/
+    m_viewer->undoStack()->undo();
+
 }
 
 void LaserControllerWindow::onActionRedo(bool checked) {
-	int index = m_viewer->undoStack()->index();	
-	m_viewer->undoStack()->setIndex(index + 1);
+	//int index = m_viewer->undoStack()->index();	
+	//m_viewer->undoStack()->setIndex(index + 1);
+    m_viewer->undoStack()->redo();
 }
 
 void LaserControllerWindow::onActionImport(bool checked)
@@ -6125,7 +6124,9 @@ void LaserControllerWindow::onActionLine(bool checked)
 void LaserControllerWindow::onActionPolygon(bool checked)
 {
 	if (checked) {
-		emit readyPolygon();
+		//emit readyPolygon();
+        m_viewer->setEditingPrimitiveType(LPT_POLYLINE);
+        emit m_viewer->beginEditing();
 	}
 	else
 	{
@@ -6434,7 +6435,7 @@ void LaserControllerWindow::onActionPrintAndCutFetchCanvas(bool checked)
 
     QRect bounding = laserRect->sceneBoundingRect();
     //QRectF boundingViewer = m_viewer->mapFromScene(bounding).boundingRect();
-    m_scene->document()->removePrimitive(rectPrimitive);
+    m_scene->document()->removePrimitive(rectPrimitive, true, true, false);
 
     m_printAndCutCandidatePoints = findCanvasPointsWithinRect(bounding);
     

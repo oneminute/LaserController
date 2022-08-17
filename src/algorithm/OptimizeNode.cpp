@@ -1,15 +1,17 @@
 ﻿#include "OptimizeEdge.h"
-#include "LaserApplication.h"
-#include "common/Config.h"
-#include <laser/LaserDevice.h>
-#include "scene/LaserPrimitive.h"
-#include "scene/LaserDocument.h"
-#include "scene/LaserLayer.h"
-#include "util/TypeUtils.h"
+#include "OptimizeNode.h"
+
 #include <QRandomGenerator>
 #include <QStack>
 
-#include "OptimizeNode.h"
+#include "LaserApplication.h"
+#include "common/Config.h"
+#include "laser/LaserDevice.h"
+#include "primitive/LaserPrimitiveHeaders.h"
+#include "scene/LaserDocument.h"
+#include "scene/LaserLayer.h"
+#include "util/TypeUtils.h"
+
 
 class OptimizeNodePrivate
 {

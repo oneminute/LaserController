@@ -21,11 +21,12 @@
 #include "camera/DistortionCalibrator.h"
 #include "LaserApplication.h"
 #include "laser/LaserDevice.h"
-#include "widget/ImageViewer.h"
+#include "primitive/LaserPrimitiveHeaders.h"
 #include "scene/LaserDocument.h"
 #include "scene/LaserScene.h"
-#include "widget/GraphicsViewEx.h"
 #include "ui/LaserControllerWindow.h"
+#include "widget/GraphicsViewEx.h"
+#include "widget/ImageViewer.h"
 
 CameraAlignmentDialog::CameraAlignmentDialog(CameraController* cameraController, DistortionCalibrator* calibrator, QWidget* parent)
     : WizardDialog(parent)

@@ -1,12 +1,14 @@
 #include "MultiDuplicationDialog.h"
 #include "ui_MultiDuplicationDialog.h"
+
+#include <QSpinBox>
+
 #include "LaserApplication.h"
 #include "common/common.h"
-#include "widget/LaserViewer.h"
+#include "primitive/LaserPrimitiveHeaders.h"
 #include "scene/LaserScene.h"
-#include "scene/LaserPrimitiveGroup.h"
+#include "widget/LaserViewer.h"
 #include "widget/UndoCommand.h"
-#include <QSpinBox>
 
 MultiDuplicationDialog::MultiDuplicationDialog(
     LaserViewer* view, 
@@ -186,7 +188,8 @@ void MultiDuplicationDialog::accept()
             QTransform t = primitive->sceneTransform();
             QTransform t1;
             t1 = t1.translate(count * translateX, count * translateY);      
-            LaserPrimitive* newPrimitive = primitive->clone(t * t1);
+            LaserPrimitive* newPrimitive = primitive->clone();
+            newPrimitive->setAllTransform(t * t1);
             if (!m_viewer->detectBoundsInMaxRegion(newPrimitive->sceneBoundingRect())) {
                 return;
             }
