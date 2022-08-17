@@ -114,7 +114,10 @@ bool LaserDocument::addPrimitive(LaserPrimitive* item, bool addToQuadTree, bool 
 bool LaserDocument::addPrimitive(LaserPrimitive* item, LaserLayer* layer, bool addToQuadTree, bool updateDocBounding)
 {
     Q_D(LaserDocument);
-    if (layer && layer->isEmpty())
+    if (!layer)
+        return false;
+
+    if (layer->isEmpty())
     {
         if (item->isStamp())
         {
@@ -133,7 +136,7 @@ bool LaserDocument::addPrimitive(LaserPrimitive* item, LaserLayer* layer, bool a
             layer->setType(LLT_FILLING);
         }
     }
-    if (item->layer() != layer)
+    else
     {
         // check whether the adding item is capable with the layer
         if (item->isShape() && layer->type() != LLT_CUTTING && layer->type() != LLT_FILLING)
@@ -144,20 +147,21 @@ bool LaserDocument::addPrimitive(LaserPrimitive* item, LaserLayer* layer, bool a
             return false;
         else if (item->isStamp() && layer->type() != LLT_STAMP)
             return false;
-
-        if (item->layer()) 
-        {
-            // remove the adding primitive from it's previouse layer
-            item->layer()->removePrimitive(item, false);
-        }
-        
-        layer->addPrimitive(item);
-        if (d->scene)
-            d->scene->addLaserPrimitive(item, addToQuadTree);
-        if (updateDocBounding)
-            updateDocumentBounding();
-        updateLayersStructure();
     }
+
+    LaserLayer* oldLayer = item->layer();
+    if (oldLayer && oldLayer != layer)
+    {
+        // remove the adding primitive from it's previouse layer
+        oldLayer->removePrimitive(item, false);
+    }
+
+    layer->addPrimitive(item);
+    if (d->scene)
+        d->scene->addLaserPrimitive(item, addToQuadTree);
+    if (updateDocBounding)
+        updateDocumentBounding();
+    updateLayersStructure();
     return true;
 }
 
