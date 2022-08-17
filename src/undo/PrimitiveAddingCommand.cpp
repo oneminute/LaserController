@@ -3,6 +3,7 @@
 #include "primitive/LaserPrimitiveHeaders.h"
 #include "scene/LaserDocument.h"
 #include "scene/LaserLayer.h"
+#include "scene/LaserScene.h"
 #include "widget/LaserViewer.h"
 
 PrimitiveAddingCommand::PrimitiveAddingCommand(

@@ -2,6 +2,7 @@
 
 #include "primitive/LaserPolyline.h"
 #include "scene/LaserDocument.h"
+#include "state/StateController.h"
 #include "widget/LaserViewer.h"
 
 PolylineAddPointCommand::PolylineAddPointCommand(
@@ -34,10 +35,10 @@ void PolylineAddPointCommand::undo()
     }
     target->setEditing(true);
     target->removePoint(m_pointIndex);
-    if (!viewer()->isEditing())
+    if (!StateControllerInst.isInState(StateControllerInst.documentPrimitiveState()))
     {
-        viewer()->beginEditing(target);
-        emit viewer()->creatingPolygon();
+        viewer()->setEditingPrimitiveId(m_primitiveId);
+        emit viewer()->beginEditing();
     }
 }
 
@@ -50,10 +51,10 @@ void PolylineAddPointCommand::redo()
         return;
     }
     target->setEditing(true);
-    if (!viewer()->isEditing())
+    if (!StateControllerInst.isInState(StateControllerInst.documentPrimitiveState()))
     {
-        viewer()->beginEditing(target);
-        emit viewer()->creatingPolygon();
+        viewer()->setEditingPrimitiveId(m_primitiveId);
+        emit viewer()->beginEditing();
     }
     target->appendPoint(m_point);
 }

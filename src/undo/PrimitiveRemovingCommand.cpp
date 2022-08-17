@@ -57,7 +57,7 @@ void PrimitiveRemovingCommand::redo()
     }
     document()->removePrimitive(primitive, false, true, true);
     m_added = nullptr;
-    viewer()->endEditing();
+    emit viewer()->endEditing();
     callRedoCallback();
 }
 

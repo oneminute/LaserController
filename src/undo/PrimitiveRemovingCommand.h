@@ -15,12 +15,14 @@ public:
         const QString& primitiveId,
         const QString& layerId,
         LaserPrimitive* target,
-        QUndoCommand* parent
+        QUndoCommand* parent = nullptr
     );
     ~PrimitiveRemovingCommand();
 
     virtual void undo() override;
     virtual void redo() override;
+
+    QString primitiveId() const { return m_primitiveId; }
 
 private:
     QString m_primitiveId;
