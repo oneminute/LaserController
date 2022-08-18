@@ -9,7 +9,10 @@
 #include "scene/LaserLayer.h"
 #include "scene/LaserScene.h"
 #include "task/ProgressItem.h"
+#include "undo/PrimitiveAddingCommand.h"
 #include "util/MachiningUtils.h"
+#include "util/Utils.h"
+#include "widget/LaserViewer.h"
 
 class LaserEllipsePrivate : public LaserShapePrivate
 {
@@ -18,6 +21,8 @@ public:
     LaserEllipsePrivate(LaserEllipse* ptr)
         : LaserShapePrivate(ptr)
     {}
+    QPoint point1;
+    QPoint point2;
 };
 
 LaserEllipse::LaserEllipse(LaserDocument* doc, QTransform transform, int layerIndex)
@@ -31,7 +36,6 @@ LaserEllipse::LaserEllipse(const QRect bounds, LaserDocument * doc, QTransform s
 	
     Q_D(LaserEllipse);
     d->boundingRect = bounds;
-	//d->originalBoundingRect = bounds;
 	sceneTransformToItemTransform(saveTransform);
 	d->path.addEllipse(bounds);
 	d->boundingRect = d->path.boundingRect().toRect();
@@ -48,7 +52,6 @@ void LaserEllipse::setBounds(const QRect& bounds)
 {
     Q_D(LaserEllipse);
     d->boundingRect = bounds; 
-	//d->originalBoundingRect = bounds;
     d->path = QPainterPath();
 	d->path.addEllipse(d->boundingRect);
     d->outline = QPainterPath();
@@ -100,31 +103,31 @@ LaserPointListList LaserEllipse::updateMachiningPoints(ProgressItem* parentProgr
 void LaserEllipse::draw(QPainter* painter)
 {
     Q_D(LaserEllipse);
-	painter->drawPath(d->path);
-	painter->setPen(QPen(Qt::black, 1));
+    if (isEditing())
+    {
+        QRect rect(d->point1, d->point2);
+        qLogD << rect;
+        painter->drawEllipse(rect);
+         QPen oldPen = painter->pen();
+        QPen newPen(Qt::red, 1);
+        newPen.setCosmetic(true);
+        painter->setPen(newPen);
+        utils::drawCrossingLines(rect.topLeft(), 1000, painter);
+        utils::drawCrossingLines(rect.topRight(), 1000, painter);
+        utils::drawCrossingLines(rect.bottomLeft(), 1000, painter);
+        utils::drawCrossingLines(rect.bottomRight(), 1000, painter);
+        painter->setPen(oldPen);
+    }
+    else
+    {
+        painter->drawPath(d->path);
+    }
 }
-
-//QRect LaserEllipse::sceneBoundingRect() const
-//{
-//	Q_D(const LaserEllipse);
-//	return sceneTransform().mapRect(d->boundingRect);
-//}
-
-/*void LaserEllipse::reShape()
-{
-	Q_D(LaserEllipse);
-	d->path = transform().map(d->path);
-	d->boundingRect = d->path.boundingRect();
-	d->allTransform = d->allTransform * transform();
-	setTransform(QTransform());
-}*/
 
 QJsonObject LaserEllipse::toJson()
 {
 	Q_D(const LaserEllipse);
 	QJsonObject object;
-	//QJsonArray position = { pos() .x(), pos() .y()};
-	//QTransform transform = d->allTransform;
 	QTransform transform = QTransform();
 	QJsonArray matrix = { 
 		transform.m11(), transform.m12(), transform.m13(), 
@@ -136,7 +139,6 @@ QJsonObject LaserEllipse::toJson()
 	object.insert("parentMatrix", parentMatrix);
 	//bounds
 	QJsonArray bounds = { d->boundingRect.x(), d->boundingRect.y(),d->boundingRect.width(), d->boundingRect.height() };
-	QJsonArray();
 	object.insert("name", name());
 	object.insert("className", this->metaObject()->className());
 	//object.insert("position", position);
@@ -145,11 +147,71 @@ QJsonObject LaserEllipse::toJson()
 	object.insert("layerIndex", layerIndex());
 	return object;
 }
+
 //scene
 QVector<QLine> LaserEllipse::edges()
 {
 	Q_D(const LaserEllipse);
 	return LaserPrimitive::edges(sceneTransform().map(d->path));
+}
+
+void LaserEllipse::sceneMousePressEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event)
+{
+    Q_D(LaserEllipse);
+    if (isEditing())
+    {
+        d->point1 = point;
+        d->point2 = point;
+
+        document()->addPrimitive(this, true, true);
+    }
+}
+
+void LaserEllipse::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed)
+{
+    Q_D(LaserEllipse);
+    if (isEditing())
+    {
+        d->point2 = point;
+    }
+}
+
+void LaserEllipse::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed)
+{
+    Q_D(LaserEllipse);
+    if (isEditing())
+    {
+        d->point2 = point;
+        QPoint diff = d->point2 - d->point1;
+        QRect rect = QRect(d->point1, QSize(qAbs(diff.x()), qAbs(diff.y())));
+        //qLogD << d->point1 << ", " << d->point2 << ", " << rect;
+        if (rect.isNull() || rect.isEmpty() || !rect.isValid())
+        {
+            document()->removePrimitive(this, true, true, true);
+        }
+        else
+        {
+            setEditing(false);
+            setBounds(rect);
+            LaserLayer* layer = this->layer();
+            PrimitiveAddingCommand* cmdAdding = new PrimitiveAddingCommand(
+                tr("Add Ellipse"), viewer, scene, this->document(), this->id(),
+                layer->id(), this);
+            document()->removePrimitive(this, false, true, true);
+
+            viewer->addUndoCommand(cmdAdding);
+        }
+
+        emit viewer->endEditing();
+    }
+}
+
+void LaserEllipse::sceneKeyPressEvent(LaserViewer* viewer, QKeyEvent* event)
+{
+}
+
+void LaserEllipse::sceneKeyReleaseEvent(LaserViewer* viewer, QKeyEvent* event)
+{
 }
 
 LaserPrimitive * LaserEllipse::cloneImplement()

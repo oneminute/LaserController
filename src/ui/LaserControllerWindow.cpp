@@ -6103,7 +6103,9 @@ void LaserControllerWindow::onActionRectangle(bool checked)
 void LaserControllerWindow::onActionEllipse(bool checked)
 {
 	if (checked) {
-		emit readyEllipse();
+		//emit readyEllipse();
+        m_viewer->setEditingPrimitiveType(LPT_ELLIPSE);
+        emit m_viewer->beginEditing();
 	}
 	else
 	{

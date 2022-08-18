@@ -69,11 +69,13 @@ void LaserLine::setLine(const QLine& line)
 void LaserLine::setEditingPoint(const QPoint& point)
 {
     Q_D(LaserLine);
+    d->editingPoint = point;
 }
 
 QPoint LaserLine::editingPoint() const
 {
-    return QPoint();
+    Q_D(const LaserLine);
+    return d->editingPoint;
 }
 
 int LaserLine::appendPoint(const QPoint& point)
@@ -203,7 +205,6 @@ void LaserLine::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
                 id(), d->editingPoint, d->points.size());
             viewer->addUndoCommand(cmd);
 
-            d->points.clear();
             setEditing(false);
             emit viewer->endEditing();
         }
@@ -223,7 +224,6 @@ void LaserLine::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
         }
         else
         {
-            d->points.clear();
             setEditing(false);
             emit viewer->endEditing();
         }
