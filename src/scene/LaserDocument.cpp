@@ -175,11 +175,9 @@ void LaserDocument::removePrimitive(LaserPrimitive* item, bool keepLayer, bool u
     Q_D(LaserDocument);
     if (d->scene)
         d->scene->removeLaserPrimitive(item);
+    item->layer()->removePrimitive(item, release);
     if (updateDocBounding)
         updateDocumentBounding();
-    // because of the risk of releasing memory of the primitive, 
-    // removePrimitive must be called after other cleaning operations.
-    item->layer()->removePrimitive(item, release);
     updateLayersStructure();
 }
 
