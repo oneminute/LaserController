@@ -38,12 +38,12 @@ LaserLine::LaserLine(const QLine & line, LaserDocument * doc, QTransform saveTra
 {
     Q_D(LaserLine);
     d->line = line;
-	sceneTransformToItemTransform(saveTransform);
     d->path.moveTo(d->line.p1());
     d->path.lineTo(d->line.p2());
     d->boundingRect = d->path.boundingRect().toRect();
     d->outline.moveTo(d->line.p1());
     d->outline.lineTo(d->line.p2());
+	sceneTransformToItemTransform(saveTransform);
 }
 
 QLine LaserLine::line() const 
