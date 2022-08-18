@@ -203,8 +203,14 @@ void LaserRect::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
     if (isEditing())
     {
         d->point2 = point;
-        QPoint diff = d->point2 - d->point1;
-        QRect rect = QRect(d->point1, QSize(qAbs(diff.x()), qAbs(diff.y())));
+        //防止宽高为负值
+        int left = qMin(d->point1.x(), d->point2.x());
+        int top = qMin(d->point1.y(), d->point2.y());
+        int right = qMax(d->point1.x(), d->point2.x());
+        int bottom = qMax(d->point1.y(), d->point2.y());
+        int width = right - left;
+        int height = bottom - top;
+        QRect rect = QRect(QPoint(left, top), QSize(width, height));
         //qLogD << d->point1 << ", " << d->point2 << ", " << rect;
         if (rect.isNull() || rect.isEmpty() || !rect.isValid())
         {
