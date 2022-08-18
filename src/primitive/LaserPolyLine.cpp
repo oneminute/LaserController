@@ -185,8 +185,7 @@ LaserPointListList LaserPolyline::updateMachiningPoints(ProgressItem* parentProg
 void LaserPolyline::draw(QPainter * painter)
 {
     Q_D(LaserPolyline);
-    if (d->points.count() > 1)
-	    painter->drawPath(d->path);
+	painter->drawPath(d->path);
 
     if (isEditing())
     {
@@ -346,7 +345,6 @@ void LaserPolyline::sceneMouseReleaseEvent(
 
                     viewer->addUndoCommand(cmd);
                     setCursor(Qt::ArrowCursor);
-                    d->points.clear();
                     setEditing(false);
                     emit viewer->endEditing();
                 }
@@ -375,7 +373,7 @@ void LaserPolyline::sceneMouseReleaseEvent(
         }
         else
         {
-            d->points.clear();
+            this->updatePath();
             setEditing(false);
             emit viewer->endEditing();
         }
