@@ -38,10 +38,9 @@ LaserRect::LaserRect(const QRect rect, int cornerRadius, LaserDocument * doc,
     : LaserShape(new LaserRectPrivate(this), doc, LPT_RECT, layerIndex, saveTransform)
 {
     Q_D(LaserRect);
-    d->boundingRect = rect;
     setCornerRadius(qAbs(cornerRadius), cornerRadiusType);
 	sceneTransformToItemTransform(saveTransform);
-    d->outline.addRect(rect);
+    setRect(rect);
 }
 
 QRect LaserRect::rect() const 
@@ -92,7 +91,6 @@ void LaserRect::draw(QPainter* painter)
     if (isEditing())
     {
         QRect rect(d->point1, d->point2);
-        qLogD << rect;
         painter->drawRect(rect);
          QPen oldPen = painter->pen();
         QPen newPen(Qt::red, 1);
@@ -214,32 +212,17 @@ void LaserRect::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
         }
         else
         {
+            setEditing(false);
             setRect(rect);
             LaserLayer* layer = this->layer();
             PrimitiveAddingCommand* cmdAdding = new PrimitiveAddingCommand(
                 tr("Add Rect"), viewer, scene, this->document(), this->id(),
                 layer->id(), this);
-
-            // we must ensure that when we undo the adding operation we should 
-            // end the editing state in LaserViewer
-            cmdAdding->setUndoCallback([=]()
-                {
-                    emit viewer->endEditing();
-                }
-            );
-            // as we adding and editing the line, we must ensure that the
-            // LaserViewer know it's in editing state
-            cmdAdding->setRedoCallback([=]()
-                {
-                    viewer->setEditingPrimitiveId(id());
-                    emit viewer->beginEditing();
-                }
-            );
+            document()->removePrimitive(this, false, true, true);
 
             viewer->addUndoCommand(cmdAdding);
         }
 
-        setEditing(false);
         emit viewer->endEditing();
     }
 }
