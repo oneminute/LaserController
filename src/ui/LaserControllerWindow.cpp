@@ -6090,7 +6090,9 @@ void LaserControllerWindow::onActionViewDrag(bool checked)
 void LaserControllerWindow::onActionRectangle(bool checked)
 {
 	if (checked) {
-        emit readyRectangle();
+        //emit readyRectangle();
+        m_viewer->setEditingPrimitiveType(LPT_RECT);
+        emit m_viewer->beginEditing();
 	}
     else
     {

@@ -9,8 +9,10 @@
 #include "scene/LaserLayer.h"
 #include "scene/LaserScene.h"
 #include "task/ProgressItem.h"
+#include "undo/PrimitiveAddingCommand.h"
 #include "util/MachiningUtils.h"
 #include "util/Utils.h"
+#include "widget/LaserViewer.h"
 
 class LaserRectPrivate : public LaserShapePrivate
 {
@@ -22,6 +24,8 @@ public:
     {}
     int cornerType;
     int cornerRadius;
+    QPoint point1;
+    QPoint point2;
 };
 
 LaserRect::LaserRect(LaserDocument* doc, QTransform transform, int layerIndex)
@@ -35,7 +39,6 @@ LaserRect::LaserRect(const QRect rect, int cornerRadius, LaserDocument * doc,
 {
     Q_D(LaserRect);
     d->boundingRect = rect;
-	//d->originalBoundingRect = rect;
     setCornerRadius(qAbs(cornerRadius), cornerRadiusType);
 	sceneTransformToItemTransform(saveTransform);
     d->outline.addRect(rect);
@@ -51,7 +54,6 @@ void LaserRect::setRect(const QRect& rect)
 {
     Q_D(LaserRect);
     d->boundingRect = rect; 
-	//d->originalBoundingRect = rect;
 	d->path = QPainterPath();
 	d->path.addRect(d->boundingRect);
     d->outline = QPainterPath();
@@ -87,15 +89,26 @@ bool LaserRect::isRoundedRect() const
 void LaserRect::draw(QPainter* painter)
 {
     Q_D(LaserRect);
-    painter->drawPath(d->path);
+    if (isEditing())
+    {
+        QRect rect(d->point1, d->point2);
+        qLogD << rect;
+        painter->drawRect(rect);
+         QPen oldPen = painter->pen();
+        QPen newPen(Qt::red, 1);
+        newPen.setCosmetic(true);
+        painter->setPen(newPen);
+        utils::drawCrossingLines(rect.topLeft(), 1000, painter);
+        utils::drawCrossingLines(rect.topRight(), 1000, painter);
+        utils::drawCrossingLines(rect.bottomLeft(), 1000, painter);
+        utils::drawCrossingLines(rect.bottomRight(), 1000, painter);
+        painter->setPen(oldPen);
+    }
+    else
+    {
+        painter->drawPath(d->path);
+    }
 }
-
-//QRect LaserRect::sceneBoundingRect() const
-//{
-//	Q_D(const LaserRect);
-//    QTransform t = sceneTransform();
-//	return t.mapRect(d->boundingRect);
-//}
 
 QJsonObject LaserRect::toJson()
 {
@@ -160,6 +173,83 @@ QPointF LaserRect::position() const
 {
     Q_D(const LaserRect);
     return sceneTransform().map(d->boundingRect.topLeft());
+}
+
+void LaserRect::sceneMousePressEvent(LaserViewer* viewer, LaserScene* scene,
+    const QPoint& point, QMouseEvent* event)
+{
+    Q_D(LaserRect);
+    if (isEditing())
+    {
+        d->point1 = point;
+        d->point2 = point;
+
+        document()->addPrimitive(this, true, true);
+    }
+}
+
+void LaserRect::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scene,
+    const QPoint& point, QMouseEvent* event, bool isPressed)
+{
+    Q_D(LaserRect);
+    if (isEditing())
+    {
+        d->point2 = point;
+    }
+}
+
+void LaserRect::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
+    const QPoint& point, QMouseEvent* event, bool isPressed)
+{
+    Q_D(LaserRect);
+    if (isEditing())
+    {
+        d->point2 = point;
+        QPoint diff = d->point2 - d->point1;
+        QRect rect = QRect(d->point1, QSize(qAbs(diff.x()), qAbs(diff.y())));
+        //qLogD << d->point1 << ", " << d->point2 << ", " << rect;
+        if (rect.isNull() || rect.isEmpty() || !rect.isValid())
+        {
+            document()->removePrimitive(this, true, true, true);
+        }
+        else
+        {
+            setRect(rect);
+            LaserLayer* layer = this->layer();
+            PrimitiveAddingCommand* cmdAdding = new PrimitiveAddingCommand(
+                tr("Add Rect"), viewer, scene, this->document(), this->id(),
+                layer->id(), this);
+
+            // we must ensure that when we undo the adding operation we should 
+            // end the editing state in LaserViewer
+            cmdAdding->setUndoCallback([=]()
+                {
+                    emit viewer->endEditing();
+                }
+            );
+            // as we adding and editing the line, we must ensure that the
+            // LaserViewer know it's in editing state
+            cmdAdding->setRedoCallback([=]()
+                {
+                    viewer->setEditingPrimitiveId(id());
+                    emit viewer->beginEditing();
+                }
+            );
+
+            viewer->addUndoCommand(cmdAdding);
+        }
+
+        setEditing(false);
+        emit viewer->endEditing();
+    }
+}
+
+void LaserRect::sceneKeyPressEvent(LaserViewer* viewer, QKeyEvent* event)
+{
+}
+
+void LaserRect::sceneKeyReleaseEvent(LaserViewer* viewer, QKeyEvent* event)
+{
 }
 
 LaserPointListList LaserRect::updateMachiningPoints(ProgressItem* parentProgress)

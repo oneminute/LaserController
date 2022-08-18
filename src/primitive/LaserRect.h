@@ -31,6 +31,33 @@ public:
     virtual void setBoundingRectHeight(qreal height);
     virtual bool isClosed() const;
     virtual QPointF position() const;
+
+protected:
+    // the following functions only used in editing mode.
+    virtual void sceneMousePressEvent(
+        LaserViewer* viewer,
+        LaserScene* scene, 
+        const QPoint& point,
+        QMouseEvent* event) override;
+    virtual void sceneMouseMoveEvent(
+        LaserViewer* viewer,
+        LaserScene* scene,
+        const QPoint& point,
+        QMouseEvent* event,
+        bool isPressed) override;
+    virtual void sceneMouseReleaseEvent(
+        LaserViewer* viewer,
+        LaserScene* scene,
+        const QPoint& point,
+        QMouseEvent* event,
+        bool isPressed) override;
+	virtual void sceneKeyPressEvent(
+        LaserViewer* viewer,
+        QKeyEvent *event);
+	virtual void sceneKeyReleaseEvent(
+        LaserViewer* viewer,
+        QKeyEvent *event);
+
 private:
 	virtual virtual LaserPrimitive* cloneImplement() override;
 

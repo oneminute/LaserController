@@ -346,6 +346,7 @@ void LaserPolyline::sceneMouseReleaseEvent(
 
                     viewer->addUndoCommand(cmd);
                     setCursor(Qt::ArrowCursor);
+                    d->points.clear();
                     setEditing(false);
                     emit viewer->endEditing();
                 }
@@ -374,6 +375,7 @@ void LaserPolyline::sceneMouseReleaseEvent(
         }
         else
         {
+            d->points.clear();
             setEditing(false);
             emit viewer->endEditing();
         }

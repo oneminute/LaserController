@@ -203,6 +203,7 @@ void LaserLine::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
                 id(), d->editingPoint, d->points.size());
             viewer->addUndoCommand(cmd);
 
+            d->points.clear();
             setEditing(false);
             emit viewer->endEditing();
         }
@@ -222,6 +223,7 @@ void LaserLine::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
         }
         else
         {
+            d->points.clear();
             setEditing(false);
             emit viewer->endEditing();
         }

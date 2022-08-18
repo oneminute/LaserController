@@ -1673,10 +1673,10 @@ void LaserViewer::enterEvent(QEvent* event)
 
 void LaserViewer::mousePressEvent(QMouseEvent* event)
 {
-    
+
     // 处理鼠标左键
     if (event->button() == Qt::LeftButton) {
-        
+
         // 若在DocumentIdle状态下，开始进入选择流程
         if (StateControllerInst.isInState(StateControllerInst.documentIdleState()))
         {
@@ -1696,7 +1696,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
                         (*p)->setSelected(true);
                     }
                 }
-                
+
                 if (onSelectedFillGroup()) {
                     m_curSelectedHandleIndex = 30;
                     emit beginIdelEditing();
@@ -1726,7 +1726,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
                             (*p)->setSelected(true);
                         }
                     }
-                    
+
                     if (onSelectedFillGroup()) {
                         m_curSelectedHandleIndex = 31;
                         emit beginIdelEditing();
@@ -1850,7 +1850,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
             else
             {
                 m_detectedFillSolid = nullptr;
-                
+
                 //QGraphicsView::mousePressEvent(event);
                 //事件被Item截断 图片点选
                 if (detectFillSolidByMouse(m_detectedFillSolid, event->pos())) {
@@ -1871,7 +1871,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
                 m_selectionStartPoint = event->pos();
                 m_selectionEndPoint = m_selectionStartPoint;
                 emit beginSelecting();
-                
+
             }
         }
         //View Drag Ready
@@ -1963,7 +1963,72 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
             emit readyText();
             viewport()->repaint();
         }
-        else {
+        else if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveEditingState()))
+        {
+            QPointF scenePoint = mapToScene(event->pos());
+            QPointF ajustedPoint = scenePoint;
+            if (m_isPrimitiveInteractPoint) {
+                ajustedPoint = m_primitiveInteractPoint;
+            }
+            //是否网格点
+            if (m_isGridNode) {
+                ajustedPoint = m_gridNode;
+            }
+            //判断是否在4叉树的有效区域内
+            bool scenePointInAvailableArea = m_scene->pointInAvailableArea(scenePoint);
+            bool ajustedPointInAvailableArea = m_scene->pointInAvailableArea(ajustedPoint);
+            LaserPrimitive* editingPrimitive = this->getEditingPrimitive();
+
+            // just entering the editing state but even have not pressed mouse button.
+            if (editingPrimitive == nullptr)
+            {
+                if (event->button() == Qt::RightButton)
+                {
+                    m_editingPrimitiveId = QString();
+                    m_editingPrimitiveType = LPT_UNKNOWN;
+                    emit endEditing();
+                }
+                else if (event->button() == Qt::LeftButton)
+                {
+                    //判断是否在4叉树的有效区域内
+                    if (ajustedPointInAvailableArea)
+                    {
+                        // first create Polyline Primitive
+                        LaserLayer* layer = nullptr;
+                        layer = m_scene->document()->getCurrentOrCapableLayer(m_editingPrimitiveType);
+                        int layerIndex = layer->index();
+                        if (layer)
+                        {
+                            switch (m_editingPrimitiveType)
+                            {
+                            case LPT_ELLIPSE:
+                                editingPrimitive = new LaserEllipse(m_scene->document(),
+                                    QTransform(), layerIndex);
+                                break;
+                            case LPT_RECT:
+                                editingPrimitive = new LaserRect(m_scene->document(),
+                                    QTransform(), layerIndex);
+                                break;
+                            default:
+                                editingPrimitive = nullptr;
+                                break;
+                            }
+
+                            if (editingPrimitive)
+                            {
+                                m_editingPrimitiveId = editingPrimitive->id();
+                                setEditingPrimitiveId(m_editingPrimitiveId);
+                                editingPrimitive->setEditing(true);
+                                editingPrimitive->sceneMousePressEvent(this,
+                                    m_scene.data(), ajustedPoint.toPoint(), event);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
             m_mousePressState = nullptr;
             //QGraphicsView::mousePressEvent(event); 会使画线时出现Bug
             //setInteractive(false);
@@ -1972,6 +2037,7 @@ void LaserViewer::mousePressEvent(QMouseEvent* event)
     else if (event->button() == Qt::RightButton) {
         m_mirrorLine = nullptr;
     }
+    viewport()->repaint();
 }
 
 void LaserViewer::mouseMoveEvent(QMouseEvent* event)
@@ -2016,7 +2082,11 @@ void LaserViewer::mouseMoveEvent(QMouseEvent* event)
 				m_isGridNode = backgroundItem->detectGridNode(m_gridNode, 
                     point);
                 if (m_isGridNode)
-			        ajustedPoint = m_gridNode;
+                {
+                    ajustedPoint = m_gridNode;
+                    QPixmap cMap(":/ui/icons/images/posCursor.png");
+                    this->setCursor(cMap.scaled(20, 20, Qt::KeepAspectRatio));
+                }
 			}
 		}
 		
@@ -2501,7 +2571,6 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                     m_mirrorLine = m_detectedPrimitive;
                 }
             }
-
         }
     }
     //View Drag Ready
@@ -2852,7 +2921,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                 {
                     // first create Polyline Primitive
                     LaserLayer* layer = nullptr;
-                    layer = m_scene->document()->findCapableLayer(m_editingPrimitiveType);
+                    layer = m_scene->document()->getCurrentOrCapableLayer(m_editingPrimitiveType);
                     layerIndex = layer->index();
                     if (layer)
                     {
@@ -2899,6 +2968,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                         {
                             m_editingPrimitiveId = editingPrimitive->id();
                             setEditingPrimitiveId(m_editingPrimitiveId);
+                            editingPrimitive->setEditing(true);
                             editingPrimitive->sceneMouseReleaseEvent(this,
                                 m_scene.data(), ajustedPoint.toPoint(), event,
                                 this->m_mousePressed);
