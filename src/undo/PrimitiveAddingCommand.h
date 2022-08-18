@@ -22,11 +22,11 @@ public:
     virtual void undo() override;
     virtual void redo() override;
 
-    LaserPrimitive* added() const;
+    LaserPrimitive* cloned() const;
 
 private:
     QString m_primitiveId;
     QString m_layerId;
+    LaserPrimitive* m_origin;
     LaserPrimitive* m_cloned;
-    LaserPrimitive* m_added;
 };
