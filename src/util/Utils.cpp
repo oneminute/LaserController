@@ -716,3 +716,9 @@ QList<QPoint> utils::makePointsRelative(const QList<QPoint>& points, const QPoin
     }
     return pointsOut;
 }
+
+void utils::drawCrossingLines(const QPoint& center, int radius, QPainter* painter)
+{
+    painter->drawLine(center + QPoint(-radius, -radius), center + QPoint(radius, radius));
+    painter->drawLine(center + QPoint(radius, -radius), center + QPoint(-radius, radius));
+}

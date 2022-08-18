@@ -74,6 +74,8 @@ namespace utils
     void makePointsRelative(QList<QPoint>& points, const QPoint& startPos);
 
     QList<QPoint> makePointsRelative(const QList<QPoint>& points, const QPoint& startPos);
+
+    void drawCrossingLines(const QPoint& center, int radius, QPainter* painter);
 }
 
 #endif // UTILS_H
