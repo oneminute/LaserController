@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1212</width>
+    <width>1208</width>
     <height>1008</height>
    </rect>
   </property>
@@ -26,7 +26,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1212</width>
+     <width>1208</width>
      <height>21</height>
     </rect>
    </property>
@@ -509,6 +509,9 @@
    </property>
   </action>
   <action name="actionBitmapTool">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="enabled">
     <bool>false</bool>
    </property>

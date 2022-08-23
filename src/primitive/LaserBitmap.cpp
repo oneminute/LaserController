@@ -2,13 +2,19 @@
 #include "LaserShapePrivate.h"
 
 #include <QBuffer>
+#include <QFileDialog>
+#include <QImageReader>
 #include <QJsonArray>
 #include <QPainter>
+#include <QtMath>
 
+#include "LaserApplication.h"
+#include "laser/LaserDevice.h"
 #include "scene/LaserDocument.h"
 #include "scene/LaserLayer.h"
 #include "scene/LaserScene.h"
 #include "task/ProgressItem.h"
+#include "undo/PrimitiveAddingCommand.h"
 #include "util/ImageUtils.h"
 #include "util/Utils.h"
 #include "widget/LaserViewer.h"
@@ -43,7 +49,6 @@ LaserBitmap::LaserBitmap(const QImage & image, const QRect& bounds,
     d->image = image.convertToFormat(QImage::Format_Grayscale8);
     d->boundingRect = bounds;
     d->path.addRect(bounds);
-    d->primitiveType = LPT_BITMAP;
     d->outline.addRect(bounds);
 	sceneTransformToItemTransform(saveTransform);
 	setFlags(ItemIsSelectable | ItemIsMovable);
@@ -295,6 +300,83 @@ QVector<QLine> LaserBitmap::edges()
 	path.addRect(d->boundingRect);
     path = sceneTransform().map(path);
 	return LaserPrimitive::edges(path);
+}
+
+void LaserBitmap::sceneMousePressEvent(LaserViewer* viewer, LaserScene* scene,
+    const QPoint& point, QMouseEvent* event)
+{
+}
+
+void LaserBitmap::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scene,
+    const QPoint& point, QMouseEvent* event, bool isPressed)
+{
+}
+
+void LaserBitmap::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
+    const QPoint& point, QMouseEvent* event, bool isPressed)
+{
+    Q_D(LaserBitmap);
+    if (isEditing())
+    {
+        QString name = QFileDialog::getOpenFileName(nullptr, "open image", ".", "Images (*.jpg *.jpeg *.tif *.bmp *.png *.svg *.ico)");
+        if (name.isEmpty())
+            return;
+        QFile file(name);
+        file.open(QFile::ReadOnly);
+        QByteArray data = file.readAll();
+        QImage image;
+        bool bl = image.loadFromData(data);
+        QImageReader r;
+        r.setFileName(name);
+        QSize size = r.size();
+        qreal w = size.width();
+        qreal h = size.height();
+        qreal ratioWH = w / h;
+        qreal base = 8192;
+        qreal bigger = w;
+        if (bigger < h) {
+            bigger = h;
+            if (bigger > base) {
+                h = base;
+                w = ratioWH * h;
+            }
+        }
+        else {
+            if (bigger > base) {
+                w = base;
+                h = (1 / ratioWH) * w;
+            }
+        }
+
+        r.setScaledSize(QSize(qFloor(w), qFloor(h)));
+        image = r.read();
+        // 这里像素要转微米
+        int width = Global::sceneToMechH(image.size().width());
+        int height = Global::sceneToMechV(image.size().height());
+        QRect layout = LaserApplication::device->layoutRect();
+        QRect bitmapRect(point.x(), point.y(), width, height);
+        this->setImage(image);
+        this->setRect(bitmapRect);
+        LaserLayer* layer = this->layer();
+        if (layer)
+        {
+            PrimitiveAddingCommand* cmdAdding = new PrimitiveAddingCommand(
+                tr("Add Rect"), viewer, scene, this->document(), this->id(),
+                layer->id(), this);
+            document()->removePrimitive(this, false, true, true);
+
+            viewer->addUndoCommand(cmdAdding);
+        }
+        emit viewer->endEditing();
+    }
+}
+
+void LaserBitmap::sceneKeyPressEvent(LaserViewer* viewer, QKeyEvent* event)
+{
+}
+
+void LaserBitmap::sceneKeyReleaseEvent(LaserViewer* viewer, QKeyEvent* event)
+{
 }
 
 LaserPrimitive * LaserBitmap::cloneImplement()

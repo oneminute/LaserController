@@ -523,6 +523,7 @@ LaserControllerWindow::LaserControllerWindow(QWidget* parent)
 	//设置为可选择
     m_ui->actionSelectionTool->setCheckable(true);
 	m_ui->actionRectangleTool->setCheckable(true);
+	m_ui->actionBitmapTool->setCheckable(true);
 	m_ui->actionEllipseTool->setCheckable(true);
 	m_ui->actionLineTool->setCheckable(true);
 	m_ui->actionPolygonTool->setCheckable(true);
@@ -6251,58 +6252,14 @@ void LaserControllerWindow::onActionMoveToUserOrigin(bool checked)
 
 void LaserControllerWindow::onActionBitmap(bool checked)
 {
-	QString name = QFileDialog::getOpenFileName(nullptr, "open image", ".", "Images (*.jpg *.jpeg *.tif *.bmp *.png *.svg *.ico)");
-    if (name.isEmpty())
-        return;
-    QFile file(name);
-    file.open(QFile::ReadOnly);
-    QByteArray data = file.readAll();
-    QImage image;
-    bool bl = image.loadFromData(data);
-    QImageReader r;
-    r.setFileName(name);
-    QSize size = r.size();
-    qreal w = size.width();
-    qreal h = size.height();
-    qreal ratioWH = w / h;
-    qreal base = 8192;
-    qreal bigger = w;
-    if (bigger < h) {
-        bigger = h;
-        if (bigger > base) {
-            h = base;
-            w = ratioWH * h;
-        }
-    }
-    else {
-        if (bigger > base) {
-            w = base;
-            h = (1 / ratioWH) * w;
-        }
-    }
-    
-    r.setScaledSize(QSize(qFloor(w), qFloor(h)));
-    image = r.read();
-    // 这里像素要转微米
-	int width = Global::sceneToMechH(image.size().width());
-	int height = Global::sceneToMechV(image.size().height());
-    QRect layout = LaserApplication::device->layoutRect();
-    QRect bitmapRect(
-        layout.left() + (layout.width() - width) / 2,
-        layout.top() + (layout.height() - height) / 2,
-        width, height);
-    LaserLayer* layer = m_scene->document()->getCurrentOrCapableLayer(LPT_BITMAP);
-    if (layer)
-    {
-        LaserBitmap* bitmap = new LaserBitmap(image, bitmapRect, m_scene->document(), QTransform(), layer->index());
-        //undo 创建完后会执行redo
-        QList<QGraphicsItem*> list;
-        list.append(bitmap);
-        AddDelUndoCommand* addCmd = new AddDelUndoCommand(m_scene, list);
-        m_viewer->undoStack()->push(addCmd);
-        //m_scene->addLaserPrimitive(bitmap);
-        m_viewer->onReplaceGroup(bitmap);
-    }
+    if (checked) {
+        m_viewer->setEditingPrimitiveType(LPT_BITMAP);
+        emit m_viewer->beginEditing();
+	}
+	else
+	{
+		m_ui->actionBitmapTool->setChecked(true);
+	}
 }
 
 void LaserControllerWindow::onActionRegiste(bool checked)
@@ -7012,6 +6969,20 @@ void LaserControllerWindow::onClickedMmOrInch()
     m_viewer->horizontalRuler()->repaint();
     m_viewer->verticalRuler()->repaint();
 }
+
+void LaserControllerWindow::clearToolButtonState()
+{
+    if (!StateControllerInst.isInState(StateControllerInst.documentPrimitiveEditingState()))
+        return;
+
+    m_ui->actionEllipseTool->setChecked(false);
+    m_ui->actionRectangleTool->setChecked(false);
+    m_ui->actionLineTool->setChecked(false);
+    m_ui->actionPolygonTool->setChecked(false);
+    m_ui->actionTextTool->setChecked(false);
+    m_ui->actionBitmapTool->setChecked(false);
+}
+
 //改变的过程中也会执行（例如：移动的整个过程）
 void LaserControllerWindow::onLaserPrimitiveGroupItemTransformChanged()
 {

@@ -433,6 +433,7 @@ public slots:
     //void onJoinedGroupChanged();
     void onLaserToolButtonShowMenu();
     void onClickedMmOrInch();
+    void clearToolButtonState();
 
 private:
     QString getFilename(const QString& title, const QString& filters = "");

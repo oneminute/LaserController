@@ -4063,6 +4063,7 @@ void LaserViewer::onEndEditing()
 {
     m_editingPrimitiveId = QString();
     m_editingPrimitiveType = LPT_UNKNOWN;
+    LaserApplication::mainWindow->clearToolButtonState();
 }
 
 bool LaserViewer::showLaserPos() const
