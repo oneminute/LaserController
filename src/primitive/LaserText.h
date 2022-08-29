@@ -14,6 +14,9 @@ public:
 		int layerIndex = 0);
     virtual ~LaserText();
 
+    bool isFirst() const;
+    void setIsFirst(bool value);
+
     QRect rect() const;
     QString content() const;
     void setContent(QString c);
@@ -26,6 +29,7 @@ public:
     void setAlignV(int a);
     int alignV();
     QPointF startPos();
+    void setStartPos(const QPoint& pos);
     void setSaveTransform(QTransform t);
     QTransform saveTransform();
     //void setAlignType(int type);
@@ -42,6 +46,8 @@ public:
     void modifyPathList();
     QList<LaserTextRowPath> subPathList();
 
+    int detectInsertIndex(const QPoint& insertPoint);
+
     //virtual QRectF boundingRect() const;
     //virtual QRect sceneBoundingRect() const;
     QRectF originalBoundingRect(qreal extendPixel = 0) const;
@@ -54,6 +60,32 @@ public:
     virtual QPointF position() const;
     virtual LaserPointListList updateMachiningPoints(ProgressItem* parentProgress);
     virtual LaserLineListList generateFillData(QPointF& lastPoint);
+
+protected:
+    // the following functions only used in editing mode.
+    virtual void sceneMousePressEvent(
+        LaserViewer* viewer,
+        LaserScene* scene, 
+        const QPoint& point,
+        QMouseEvent* event) override;
+    virtual void sceneMouseMoveEvent(
+        LaserViewer* viewer,
+        LaserScene* scene,
+        const QPoint& point,
+        QMouseEvent* event,
+        bool isPressed) override;
+    virtual void sceneMouseReleaseEvent(
+        LaserViewer* viewer,
+        LaserScene* scene,
+        const QPoint& point,
+        QMouseEvent* event,
+        bool isPressed) override;
+	virtual void sceneKeyPressEvent(
+        LaserViewer* viewer,
+        QKeyEvent *event);
+	virtual void sceneKeyReleaseEvent(
+        LaserViewer* viewer,
+        QKeyEvent *event);
 
 private:
 	virtual LaserPrimitive * cloneImplement() override;

@@ -6168,13 +6168,15 @@ void LaserControllerWindow::onActionText(bool checked)
 {
 	if (checked) {
 
-		emit readyText();
+		//emit readyText();
+        m_viewer->setEditingPrimitiveType(LPT_TEXT);
+        this->setAttribute(Qt::WA_InputMethodEnabled, true);
+        emit m_viewer->beginEditing();
 	}
 	else
 	{
 		m_ui->actionTextTool->setChecked(true);
 	}
-    this->setAttribute(Qt::WA_InputMethodEnabled, true);
 }
 
 void LaserControllerWindow::onActionMainCardInfo(bool checked)

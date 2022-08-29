@@ -722,3 +722,702 @@ void utils::drawCrossingLines(const QPoint& center, int radius, QPainter* painte
     painter->drawLine(center + QPoint(-radius, -radius), center + QPoint(radius, radius));
     painter->drawLine(center + QPoint(radius, -radius), center + QPoint(-radius, radius));
 }
+
+QString utils::keyCodeToString(int key, bool capsLock, bool shiftPressed)
+{
+    QString value;
+    switch (key)
+    {
+        //number
+        case Qt::Key_0: {
+            value = ("0");
+            break;
+        }
+        case Qt::Key_1: {
+            value = ("1");
+            break;
+        }
+        case Qt::Key_2: {
+            value = ("2");
+            break;
+        }
+        case Qt::Key_3: {
+            value = ("3");
+            break;
+        }
+        case Qt::Key_4: {
+            value = ("4");
+            break;
+        }
+        case Qt::Key_5: {
+            value = ("5");
+            break;
+        }
+        case Qt::Key_6: {
+            value = ("6");
+            break;
+        }
+        case Qt::Key_7: {
+            value = ("7");
+            break;
+        }
+        case Qt::Key_8: {
+            value = ("8");
+            break;
+        }
+        case Qt::Key_9: {
+            value = ("9");
+            break;
+        }
+        case Qt::Key_AsciiTilde: {
+            value = ("~");
+            break;
+        }
+        case Qt::Key_Minus: {
+            value = ("-");
+            break;
+        }
+        case Qt::Key_Plus: {
+            value = ("+");
+            break;
+        }
+        case Qt::Key_Underscore: {
+            value = ("_");
+            break;
+        }
+        case Qt::Key_Exclam: {
+            value = ("!");
+            break;
+        }
+        case Qt::Key_QuoteDbl: {
+            value = (QString('"'));
+            break;
+        }
+        case Qt::Key_NumberSign: {
+            value = ("#");
+            break;
+        }
+        case Qt::Key_Dollar: {
+            value = ("$");
+            break;
+        }
+        case Qt::Key_Percent: {
+            value = ("%");
+            break;
+        }
+        case Qt::Key_Ampersand: {
+            value = ("&");
+            break;
+        }
+        case Qt::Key_Apostrophe: {
+            value = ("'");
+            break;
+        }
+        case Qt::Key_ParenLeft: {
+            value = ("(");
+            break;
+        }
+        case Qt::Key_ParenRight: {
+            value = (")");
+            break;
+        }
+        case Qt::Key_Asterisk: {
+            value = ("*");
+            break;
+        }
+        case Qt::Key_Period: {
+            value = (".");
+            break;
+        }
+        case Qt::Key_Slash: {
+            value = ("/");
+            break;
+        }
+        case Qt::Key_Colon: {
+            value = (":");
+            break;
+        }
+        case Qt::Key_Semicolon: {
+            value = (";");
+            break;
+        }case Qt::Key_Less: {
+            value = ("<");
+            break;
+        }case Qt::Key_Equal: {
+            value = ("=");
+            break;
+        }case Qt::Key_Greater: {
+            value = (">");
+            break;
+        }case Qt::Key_Question: {
+            value = ("?");
+            break;
+        }
+        case Qt::Key_At: {
+            value = ("@");
+            break;
+        }
+        case Qt::Key_BracketLeft: {
+            value = ("[");
+            break;
+        }
+        case Qt::Key_Backslash: {
+            value = ("\\");
+            break;
+        }
+        case Qt::Key_BracketRight: {
+            value = ("]");
+            break;
+        }
+        case Qt::Key_AsciiCircum: {
+            value = ("^");
+            break;
+        }
+        case Qt::Key_BraceLeft: {
+            value = ("{");
+            break;
+        }
+        case Qt::Key_QuoteLeft: {
+            value = ("`");
+            break;
+        }
+        case Qt::Key_Bar: {
+            value = ("|");
+            break;
+        }
+        case Qt::Key_BraceRight: {
+            value = ("}");
+            break;
+        }
+        case Qt::Key_Comma: {
+            value = (",");
+            break;
+        }
+        
+        //letter
+        case Qt::Key_A: {
+
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("a");
+                }
+                else {
+                    value = ("A");
+                }
+                
+            }
+            else {
+                if (capsLock) {
+                    value = ("A");
+                }
+                else {
+                    value = ("a");
+                }
+            }
+            break;
+        }
+        case Qt::Key_B: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("b");
+                }
+                else {
+                    value = ("B");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("B");
+                }
+                else {
+                    value = ("b");
+                }
+            }
+            break;
+        }
+        case Qt::Key_C: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("c");
+                }
+                else {
+                    value = ("C");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("C");
+                }
+                else {
+                    value = ("c");
+                }
+            }
+            break;
+        }
+        case Qt::Key_D: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("d");
+                }
+                else {
+                    value = ("D");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("D");
+                }
+                else {
+                    value = ("d");
+                }
+            }
+            break;
+        }
+        case Qt::Key_E: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("e");
+                }
+                else {
+                    value = ("E");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("E");
+                }
+                else {
+                    value = ("e");
+                }
+            }
+            break;
+        }
+        case Qt::Key_F: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("f");
+                }
+                else {
+                    value = ("F");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("F");
+                }
+                else {
+                    value = ("f");
+                }
+            }
+            break;
+        }
+        case Qt::Key_G: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("g");
+                }
+                else {
+                    value = ("G");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("G");
+                }
+                else {
+                    value = ("g");
+                }
+            }
+            break;
+        }
+        case Qt::Key_H: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("h");
+                }
+                else {
+                    value = ("H");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("H");
+                }
+                else {
+                    value = ("h");
+                }
+            }
+            break;
+        }
+
+        case Qt::Key_R: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("r");
+                }
+                else {
+                    value = ("R");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("R");
+                }
+                else {
+                    value = ("r");
+                }
+            }
+            break;
+        }
+        case Qt::Key_J: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("j");
+                }
+                else {
+                    value = ("J");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("J");
+                }
+                else {
+                    value = ("j");
+                }
+            }
+            break;
+        }
+        case Qt::Key_K: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("k");
+                }
+                else {
+                    value = ("K");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("K");
+                }
+                else {
+                    value = ("k");
+                }
+            }
+            break;
+        }
+        case Qt::Key_L: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("l");
+                }
+                else {
+                    value = ("L");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("L");
+                }
+                else {
+                    value = ("l");
+                }
+            }
+            break;
+        }
+        case Qt::Key_M: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("m");
+                }
+                else {
+                    value = ("M");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("M");
+                }
+                else {
+                    value = ("m");
+                }
+            }
+            break;
+        }
+        case Qt::Key_N: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("n");
+                }
+                else {
+                    value = ("N");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("N");
+                }
+                else {
+                    value = ("n");
+                }
+            }
+            break;
+        }
+        case Qt::Key_O: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value =value = ("o");
+                }
+                else {
+                    value = ("O");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("O");
+                }
+                else {
+                    value = ("o");
+                }
+            }
+            break;
+        }
+        case Qt::Key_P: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("p");
+                }
+                else {
+                    value = ("P");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("P");
+                }
+                else {
+                    value = ("p");
+                }
+            }
+            break;
+        }
+        case Qt::Key_Q: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("q");
+                }
+                else {
+                    value = ("Q");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("Q");
+                }
+                else {
+                    value = ("q");
+                }
+            }
+            break;
+        }
+        case Qt::Key_I: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("i");
+                }
+                else {
+                    value = ("I");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("I");
+                }
+                else {
+                    value = ("i");
+                }
+            }
+            break;
+        }
+        case Qt::Key_S: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("s");
+                }
+                else {
+                    value = ("S");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("S");
+                }
+                else {
+                    value = ("s");
+                }
+            }
+            break;
+        }
+        case Qt::Key_T: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("t");
+                }
+                else {
+                    value = ("T");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("T");
+                }
+                else {
+                    value = ("t");
+                }
+            }
+            break;
+        }
+        case Qt::Key_U: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("u");
+                }
+                else {
+                    value = ("U");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("U");
+                }
+                else {
+                    value = ("u");
+                }
+            }
+            break;
+        }
+        case Qt::Key_V: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("v");
+                    
+                }
+                else {
+                    value = ("V");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("V");
+                }
+                else {                    
+                    value = ("v");
+                }
+            }
+            break;
+        }
+        case Qt::Key_W: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("w");
+                }
+                else {
+                    value = ("W");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("W");
+                }
+                else {
+                    value = ("w");
+                }
+            }
+            break;
+        }
+        case Qt::Key_X: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("x");
+                }
+                else {
+                    value = ("X");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("X");
+                }
+                else {
+                    value = ("x");
+                }
+            }
+            break;
+        }
+        case Qt::Key_Y: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("y");
+                }
+                else {
+                    value = ("Y");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("Y");
+                }
+                else {
+                    value = ("y");
+                }
+            }
+            break;
+        }
+        case Qt::Key_Z: {
+            if (shiftPressed) {
+                if (capsLock) {
+                    value = ("z");
+                }
+                else {
+                    value = ("Z");
+                }
+
+            }
+            else {
+                if (capsLock) {
+                    value = ("Z");
+                }
+                else {
+                    value = ("z");
+                }
+            }
+            break;
+        }
+    }
+    return value;
+}

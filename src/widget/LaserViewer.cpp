@@ -986,7 +986,8 @@ bool LaserViewer::detectFillSolidByMouse(LaserPrimitive *& result, QPoint mouseP
 	
 	return false;
 }
- bool LaserViewer::detectTextInsertPosition(QPointF insertPoint, LaserText*& laserText)
+
+bool LaserViewer::detectTextInsertPosition(QPointF insertPoint, LaserText*& laserText)
 {
     QPoint global = QCursor::pos();
     QPointF mousePoint = mapToScene(mapFromGlobal(global));
@@ -996,37 +997,43 @@ bool LaserViewer::detectFillSolidByMouse(LaserPrimitive *& result, QPoint mouseP
     qDebug() << m_textFont.pixelSize();
     
     //先遍历整个外框
-    for (LaserPrimitive* primitive : m_scene->document()->primitives()) {
-        QString name = primitive->metaObject()->className();
-        if ( name != "LaserText") {
+    // iterate all primitives to find LaserText primitives
+    for (LaserPrimitive* primitive : m_scene->document()->primitives()) 
+    {
+        if (primitive->primitiveType() != LPT_TEXT) {
             continue;
         }
-        LaserText* text = qgraphicsitem_cast<LaserText*>(primitive);
-        QRectF rect = text->originalBoundingRect(extend);
+
+        LaserText* textPrimitive = qgraphicsitem_cast<LaserText*>(primitive);
+        QRectF rect = textPrimitive->originalBoundingRect(extend);
+
+        //qDebug() << textPrimitive->content();
+        //qDebug() << textPrimitive->content().length();
+        laserText = textPrimitive;
         //如果只有一个空格
-        //if (rowSize == 1 && text->subPathList()[0].subRowPathlist()[0].isEmpty()) {
-        qDebug() << text->content();
-        qDebug() << text->content().length();
-        laserText = text;
-        if (text->content().trimmed().isEmpty()) {
-            m_scene->document()->removePrimitive(laserText, false, false, false);
+        // if the trimmed content is empty
+        if (textPrimitive->content().trimmed().isEmpty()) {
+            qLogD << "text content is empty.";
+            m_scene->document()->removePrimitive(laserText, false, false, true);
             laserText = nullptr;
             m_insertIndex = -1;
             return false;
         }
         
-        isInAllPathBound = (text->sceneTransform().map(rect)).containsPoint(mousePoint, Qt::OddEvenFill);
+        // determine whether the current text primitive contains mousePoint.
+        // if true, set the text primitive as the current editing primitive.
+        // else continue.
+        isInAllPathBound = (textPrimitive->sceneTransform().map(rect)).containsPoint(mousePoint, Qt::OddEvenFill);
         if (!isInAllPathBound) {
             continue;
         }
         
         QPainterPath lastPath;
-        int rowSize = text->subPathList().size();
-
+        int rowSize = textPrimitive->subPathList().size();
         
         //再遍历每一行的外包框
         for (int i = 0; i < rowSize; i++) {
-            LaserTextRowPath rowPathStruct = text->subPathList()[i];
+            LaserTextRowPath rowPathStruct = textPrimitive->subPathList()[i];
             
             QList<QPainterPath> subRowPathlist = rowPathStruct.subRowPathlist();
             QList<QRectF> subRowBoundList = rowPathStruct.subRowBoundList();
@@ -1040,14 +1047,14 @@ bool LaserViewer::detectFillSolidByMouse(LaserPrimitive *& result, QPoint mouseP
             QRectF extendRowRect;
             if (rowSize > 1) {
                 if (i + 1 < rowSize) {
-                    QRectF nextRowPathBoundingRect = text->subPathList()[i + 1].path().boundingRect();
+                    QRectF nextRowPathBoundingRect = textPrimitive->subPathList()[i + 1].path().boundingRect();
                     halfWBottomSpacing = (nextRowPathBoundingRect.top() - rowPathBoundingRect.bottom()) * 0.5;
                     if (halfWBottomSpacing < 0) {
                         halfWBottomSpacing = 0;
                     }
                 }
                 if (i - 1 >= 0) {
-                    QRectF lastRowPathBoundingRect = text->subPathList()[i - 1].path().boundingRect();
+                    QRectF lastRowPathBoundingRect = textPrimitive->subPathList()[i - 1].path().boundingRect();
                     halfWTopSpacing = (rowPathBoundingRect.top() - lastRowPathBoundingRect.bottom()) * 0.5;
                     if (halfWTopSpacing < 0) {
                         halfWTopSpacing = 0;
@@ -1066,7 +1073,7 @@ bool LaserViewer::detectFillSolidByMouse(LaserPrimitive *& result, QPoint mouseP
                     extendRowRect = QRectF(rowPathBoundingRect.topLeft() + QPointF(-extend, -halfWTopSpacing),
                         rowPathBoundingRect.bottomRight() + QPointF(extend, halfWBottomSpacing));
                 }
-                if (text->sceneTransform().map(extendRowRect).containsPoint(insertPoint, Qt::OddEvenFill)) {
+                if (textPrimitive->sceneTransform().map(extendRowRect).containsPoint(insertPoint, Qt::OddEvenFill)) {
                     isInRowPathBound = true;
                 }
 
@@ -1129,11 +1136,11 @@ bool LaserViewer::detectFillSolidByMouse(LaserPrimitive *& result, QPoint mouseP
                     }
                 }
                 //前面
-                if (text->sceneTransform().map(frontRect).containsPoint(insertPoint, Qt::OddEvenFill)) {
+                if (textPrimitive->sceneTransform().map(frontRect).containsPoint(insertPoint, Qt::OddEvenFill)) {
                     int index = i-1;
                     m_insertIndex = 0;
                     while (index >= 0) {
-                        m_insertIndex += text->subPathList()[index].subRowPathlist().size()+1;
+                        m_insertIndex += textPrimitive->subPathList()[index].subRowPathlist().size()+1;
                         index--;
                     }
                     m_insertIndex += j;
@@ -1141,11 +1148,11 @@ bool LaserViewer::detectFillSolidByMouse(LaserPrimitive *& result, QPoint mouseP
                     return true;
                 }
                 //后面
-                else if(text->sceneTransform().map(backRect).containsPoint(insertPoint, Qt::OddEvenFill)){
+                else if(textPrimitive->sceneTransform().map(backRect).containsPoint(insertPoint, Qt::OddEvenFill)){
                     int index = i-1;
                     m_insertIndex = 0;
                     while (index >= 0) {
-                        m_insertIndex += text->subPathList()[index].subRowPathlist().size()+1;
+                        m_insertIndex += textPrimitive->subPathList()[index].subRowPathlist().size()+1;
                         index--;
                     }
                     m_insertIndex += (j + 1);
@@ -1163,6 +1170,45 @@ bool LaserViewer::detectFillSolidByMouse(LaserPrimitive *& result, QPoint mouseP
     laserText = nullptr;
     return false;  
 }
+
+LaserText* LaserViewer::findLaserTextUnderCursor()
+{
+    QPoint global = QCursor::pos();
+    QPointF mousePoint = mapToScene(mapFromGlobal(global));
+    return findLaserTextUnderPos(mousePoint.toPoint());
+}
+
+LaserText* LaserViewer::findLaserTextUnderPos(const QPoint& pos)
+{
+    bool isInAllPathBound = false;
+    qreal extend = 10.0 * 1000;
+    //QFontMetrics fontMetrics(m_textFont);
+    qDebug() << m_textFont.pixelSize();
+    
+    //先遍历整个外框
+    // iterate all primitives to find LaserText primitives
+    for (LaserPrimitive* primitive : m_scene->document()->primitives())
+    {
+        if (primitive->primitiveType() != LPT_TEXT) {
+            continue;
+        }
+
+        LaserText* textPrimitive = qgraphicsitem_cast<LaserText*>(primitive);
+        QRectF rect = textPrimitive->originalBoundingRect(extend);
+
+        // determine whether the current text primitive contains mousePoint.
+        // if true, set the text primitive as the current editing primitive.
+        // else continue.
+        isInAllPathBound = (textPrimitive->sceneTransform().map(rect)).
+            containsPoint(pos, Qt::OddEvenFill);
+        if (isInAllPathBound)
+        {
+            return textPrimitive;
+        }
+    }
+    return nullptr;
+}
+
 QState* LaserViewer::currentState()
 {
 	QState* currentState = nullptr;
@@ -2722,9 +2768,28 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                                 QTransform(), layerIndex);
                             break;
                         case LPT_TEXT:
-                            editingPrimitive = new LaserText(m_scene->document(),
-                                QTransform(), layerIndex);
+                        {
+                            LaserText* text = findLaserTextUnderCursor();
+                            //detectTextInsertPosition(ajustedPoint.toPoint(), text);
+                            if (text == nullptr)
+                            {
+                                //editingPrimitive = new LaserText(m_scene->document(),
+                                    //QTransform(), layerIndex);
+                                qreal spaceY = qRound(LaserApplication::mainWindow->textSpaceYSpinBox()->value() * 25400.0 / logicalDpiY());
+                                editingPrimitive = new LaserText(m_scene->document(), mapToScene(m_textMousePressPos.toPoint()),
+                                    m_textFont, spaceY, m_textAlighH, m_textAlighV,
+                                    QTransform(), layer->index());
+                            }
+                            else
+                            {
+                                editingPrimitive = text;
+                            }
+                            modifyTextCursor();
+                            this->setAttribute(Qt::WA_InputMethodEnabled, true);
+                            this->setAttribute(Qt::WA_KeyCompression, true);
+                            this->setFocusPolicy(Qt::WheelFocus);
                             break;
+                        }
                         default:
                             editingPrimitive = nullptr;
                             break;
@@ -2817,698 +2882,16 @@ void LaserViewer::keyPressEvent(QKeyEvent* event)
             
             break;
         }
-        //number
-        case Qt::Key_0: {
-            addTextByKeyInput("0");
-            break;
-        }
-        case Qt::Key_1: {
-            addTextByKeyInput("1");
-            break;
-        }
-        case Qt::Key_2: {
-            addTextByKeyInput("2");
-            break;
-        }
-        case Qt::Key_3: {
-            addTextByKeyInput("3");
-            break;
-        }
-        case Qt::Key_4: {
-            addTextByKeyInput("4");
-            break;
-        }
-        case Qt::Key_5: {
-            addTextByKeyInput("5");
-            break;
-        }
-        case Qt::Key_6: {
-            addTextByKeyInput("6");
-            break;
-        }
-        case Qt::Key_7: {
-            addTextByKeyInput("7");
-            break;
-        }
-        case Qt::Key_8: {
-            addTextByKeyInput("8");
-            break;
-        }
-        case Qt::Key_9: {
-            addTextByKeyInput("9");
-            break;
-        }
-        case Qt::Key_AsciiTilde: {
-            addTextByKeyInput("~");
-            break;
-        }
-        case Qt::Key_Minus: {
-            addTextByKeyInput("-");
-            break;
-        }
-        case Qt::Key_Plus: {
-            addTextByKeyInput("+");
-            break;
-        }
-        case Qt::Key_Underscore: {
-            addTextByKeyInput("_");
-            break;
-        }
-        case Qt::Key_Exclam: {
-            addTextByKeyInput("!");
-            break;
-        }
-        case Qt::Key_QuoteDbl: {
-            addTextByKeyInput(QString('"'));
-            break;
-        }
-        case Qt::Key_NumberSign: {
-            addTextByKeyInput("#");
-            break;
-        }
-        case Qt::Key_Dollar: {
-            addTextByKeyInput("$");
-            break;
-        }
-        case Qt::Key_Percent: {
-            addTextByKeyInput("%");
-            break;
-        }
-        case Qt::Key_Ampersand: {
-            addTextByKeyInput("&");
-            break;
-        }
-        case Qt::Key_Apostrophe: {
-            addTextByKeyInput("'");
-            break;
-        }
-        case Qt::Key_ParenLeft: {
-            addTextByKeyInput("(");
-            break;
-        }
-        case Qt::Key_ParenRight: {
-            addTextByKeyInput(")");
-            break;
-        }
-        case Qt::Key_Asterisk: {
-            addTextByKeyInput("*");
-            break;
-        }
-        case Qt::Key_Period: {
-            addTextByKeyInput(".");
-            break;
-        }
-        case Qt::Key_Slash: {
-            addTextByKeyInput("/");
-            break;
-        }
-        case Qt::Key_Colon: {
-            addTextByKeyInput(":");
-            break;
-        }
-        case Qt::Key_Semicolon: {
-            addTextByKeyInput(";");
-            break;
-        }case Qt::Key_Less: {
-            addTextByKeyInput("<");
-            break;
-        }case Qt::Key_Equal: {
-            addTextByKeyInput("=");
-            break;
-        }case Qt::Key_Greater: {
-            addTextByKeyInput(">");
-            break;
-        }case Qt::Key_Question: {
-            addTextByKeyInput("?");
-            break;
-        }
-        case Qt::Key_At: {
-            addTextByKeyInput("@");
-            break;
-        }
-        case Qt::Key_BracketLeft: {
-            addTextByKeyInput("[");
-            break;
-        }
-        case Qt::Key_Backslash: {
-            addTextByKeyInput("\\");
-            break;
-        }
-        case Qt::Key_BracketRight: {
-            addTextByKeyInput("]");
-            break;
-        }
-        case Qt::Key_AsciiCircum: {
-            addTextByKeyInput("^");
-            break;
-        }
-        case Qt::Key_BraceLeft: {
-            addTextByKeyInput("{");
-            break;
-        }
-        case Qt::Key_QuoteLeft: {
-            addTextByKeyInput("`");
-            break;
-        }
-        case Qt::Key_Bar: {
-            addTextByKeyInput("|");
-            break;
-        }
-        case Qt::Key_BraceRight: {
-            addTextByKeyInput("}");
-            break;
-        }
-        case Qt::Key_Comma: {
-            addTextByKeyInput(",");
-            break;
-        }
-        
-        //letter
-        case Qt::Key_A: {
+    }
+    if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveEditingState()))
+    {
+        LaserPrimitive* editingPrimitive = this->getEditingPrimitive();
 
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("a");
-                }
-                else {
-                    addTextByKeyInput("A");
-                }
-                
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("A");
-                }
-                else {
-                    addTextByKeyInput("a");
-                }
-            }
-            break;
-        }
-        case Qt::Key_B: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("b");
-                }
-                else {
-                    addTextByKeyInput("B");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("B");
-                }
-                else {
-                    addTextByKeyInput("b");
-                }
-            }
-            break;
-        }
-        case Qt::Key_C: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("c");
-                }
-                else {
-                    addTextByKeyInput("C");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("C");
-                }
-                else {
-                    addTextByKeyInput("c");
-                }
-            }
-            break;
-        }
-        case Qt::Key_D: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("d");
-                }
-                else {
-                    addTextByKeyInput("D");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("D");
-                }
-                else {
-                    addTextByKeyInput("d");
-                }
-            }
-            break;
-        }
-        case Qt::Key_E: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("e");
-                }
-                else {
-                    addTextByKeyInput("E");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("E");
-                }
-                else {
-                    addTextByKeyInput("e");
-                }
-            }
-            break;
-        }
-        case Qt::Key_F: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("f");
-                }
-                else {
-                    addTextByKeyInput("F");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("F");
-                }
-                else {
-                    addTextByKeyInput("f");
-                }
-            }
-            break;
-        }
-        case Qt::Key_G: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("g");
-                }
-                else {
-                    addTextByKeyInput("G");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("G");
-                }
-                else {
-                    addTextByKeyInput("g");
-                }
-            }
-            break;
-        }
-        case Qt::Key_H: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("h");
-                }
-                else {
-                    addTextByKeyInput("H");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("H");
-                }
-                else {
-                    addTextByKeyInput("h");
-                }
-            }
-            break;
-        }
-
-        case Qt::Key_R: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("r");
-                }
-                else {
-                    addTextByKeyInput("R");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("R");
-                }
-                else {
-                    addTextByKeyInput("r");
-                }
-            }
-            break;
-        }
-        case Qt::Key_J: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("j");
-                }
-                else {
-                    addTextByKeyInput("J");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("J");
-                }
-                else {
-                    addTextByKeyInput("j");
-                }
-            }
-            break;
-        }
-        case Qt::Key_K: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("k");
-                }
-                else {
-                    addTextByKeyInput("K");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("K");
-                }
-                else {
-                    addTextByKeyInput("k");
-                }
-            }
-            break;
-        }
-        case Qt::Key_L: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("l");
-                }
-                else {
-                    addTextByKeyInput("L");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("L");
-                }
-                else {
-                    addTextByKeyInput("l");
-                }
-            }
-            break;
-        }
-        case Qt::Key_M: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("m");
-                }
-                else {
-                    addTextByKeyInput("M");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("M");
-                }
-                else {
-                    addTextByKeyInput("m");
-                }
-            }
-            break;
-        }
-        case Qt::Key_N: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("n");
-                }
-                else {
-                    addTextByKeyInput("N");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("N");
-                }
-                else {
-                    addTextByKeyInput("n");
-                }
-            }
-            break;
-        }
-        case Qt::Key_O: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("o");
-                }
-                else {
-                    addTextByKeyInput("O");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("O");
-                }
-                else {
-                    addTextByKeyInput("o");
-                }
-            }
-            break;
-        }
-        case Qt::Key_P: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("p");
-                }
-                else {
-                    addTextByKeyInput("P");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("P");
-                }
-                else {
-                    addTextByKeyInput("p");
-                }
-            }
-            break;
-        }
-        case Qt::Key_Q: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("q");
-                }
-                else {
-                    addTextByKeyInput("Q");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("Q");
-                }
-                else {
-                    addTextByKeyInput("q");
-                }
-            }
-            break;
-        }
-        case Qt::Key_I: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("i");
-                }
-                else {
-                    addTextByKeyInput("I");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("I");
-                }
-                else {
-                    addTextByKeyInput("i");
-                }
-            }
-            break;
-        }
-        case Qt::Key_S: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("s");
-                }
-                else {
-                    addTextByKeyInput("S");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("S");
-                }
-                else {
-                    addTextByKeyInput("s");
-                }
-            }
-            break;
-        }
-        case Qt::Key_T: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("t");
-                }
-                else {
-                    addTextByKeyInput("T");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("T");
-                }
-                else {
-                    addTextByKeyInput("t");
-                }
-            }
-            break;
-        }
-        case Qt::Key_U: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("u");
-                }
-                else {
-                    addTextByKeyInput("U");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("U");
-                }
-                else {
-                    addTextByKeyInput("u");
-                }
-            }
-            break;
-        }
-        case Qt::Key_V: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("v");
-                    
-                }
-                else {
-                    addTextByKeyInput("V");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("V");
-                }
-                else {                    
-                    addTextByKeyInput("v");
-                }
-            }
-            break;
-        }
-        case Qt::Key_W: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("w");
-                }
-                else {
-                    addTextByKeyInput("W");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("W");
-                }
-                else {
-                    addTextByKeyInput("w");
-                }
-            }
-            break;
-        }
-        case Qt::Key_X: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("x");
-                }
-                else {
-                    addTextByKeyInput("X");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("X");
-                }
-                else {
-                    addTextByKeyInput("x");
-                }
-            }
-            break;
-        }
-        case Qt::Key_Y: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("y");
-                }
-                else {
-                    addTextByKeyInput("Y");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("Y");
-                }
-                else {
-                    addTextByKeyInput("y");
-                }
-            }
-            break;
-        }
-        case Qt::Key_Z: {
-            if (event->modifiers() == Qt::ShiftModifier) {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("z");
-                }
-                else {
-                    addTextByKeyInput("Z");
-                }
-
-            }
-            else {
-                if (m_isCapsLock) {
-                    addTextByKeyInput("Z");
-                }
-                else {
-                    addTextByKeyInput("z");
-                }
-            }
-            break;
+        if (editingPrimitive != nullptr)
+        {
+            editingPrimitive->sceneKeyPressEvent(this, event);
         }
     }
-    //qDebug() << "VVV";
 }
 
 void LaserViewer::keyReleaseEvent(QKeyEvent* event)
@@ -4382,7 +3765,6 @@ void LaserViewer::addText(QString str)
     }
     else 
     {
-        
         m_editingText->addPath(str, m_insertIndex);
         m_insertIndex += str.size();
     }

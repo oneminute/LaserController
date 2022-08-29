@@ -77,6 +77,8 @@ public:
 	bool detectItemByMouse(LaserPrimitive*& result, QPoint mousePoint);
 	bool detectFillSolidByMouse(LaserPrimitive*& result, QPoint mousePoint);//selection
     bool detectTextInsertPosition(QPointF insertPoint, LaserText*& text);//被找到的text
+	LaserText* findLaserTextUnderCursor();
+	LaserText* findLaserTextUnderPos(const QPoint& pos);
 	
 	QMap<QGraphicsItem*, QTransform> clearGroupSelection();
 
@@ -113,6 +115,8 @@ public:
 	bool addPrimitiveAndExamRegionByBounds(QList<LaserPrimitive*>& primitives, LaserPrimitive* parent = nullptr);
 
 	void addUndoCommand(QUndoCommand* cmd);
+
+	bool isCapsLock() const { return m_isCapsLock; }
 	
 protected:
     void init();

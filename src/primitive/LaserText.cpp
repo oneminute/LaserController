@@ -11,6 +11,8 @@
 #include "scene/LaserScene.h"
 #include "task/ProgressItem.h"
 #include "ui/LaserControllerWindow.h"
+#include "undo/PrimitiveAddingCommand.h"
+#include "undo/PrimitiveRemovingCommand.h"
 #include "util/Utils.h"
 #include "util/MachiningUtils.h"
 
@@ -20,6 +22,8 @@ class LaserTextPrivate : public LaserShapePrivate
 public:
     LaserTextPrivate(LaserText* ptr)
         : LaserShapePrivate(ptr)
+        , first(true)
+        , insertIndex(0)
     {
         spaceY = LaserApplication::mainWindow->fontSpaceYDoubleSpinBox()->value();
     }
@@ -38,6 +42,10 @@ public:
     int lastAlignVType;
     QGraphicsView* view;
     qreal spaceY;
+
+    QPoint textMousePressPos;
+    bool first;
+    int insertIndex;
 };
 
 LaserText::LaserText(LaserDocument* doc, QTransform transform, int layerIndex)
@@ -50,7 +58,6 @@ LaserText::LaserText(LaserDocument* doc, QPointF startPos, QFont font, qreal spa
 {
     Q_D(LaserText);
     d->outline.addRect(d->rect);
-    d->startPos = startPos;
     d->font = font;
     d->alignHType = alighHType;
     d->lastAlignHType = alighHType;
@@ -65,6 +72,18 @@ LaserText::LaserText(LaserDocument* doc, QPointF startPos, QFont font, qreal spa
 
 LaserText::~LaserText()
 {
+}
+
+bool LaserText::isFirst() const
+{
+    Q_D(const LaserText);
+    return d->first;
+}
+
+void LaserText::setIsFirst(bool value)
+{
+    Q_D(LaserText);
+    d->first = value;
 }
 
 QRect LaserText::rect() const
@@ -153,6 +172,12 @@ QPointF LaserText::startPos()
 {
     Q_D(LaserText);
     return d->startPos;
+}
+
+void LaserText::setStartPos(const QPoint& pos)
+{
+    Q_D(LaserText);
+    d->startPos = pos;
 }
 
 void LaserText::setSaveTransform(QTransform t)
@@ -395,18 +420,146 @@ QList<LaserTextRowPath> LaserText::subPathList()
     return d->pathList;
 }
 
-//QRectF LaserText::boundingRect() const
-//{
-//    Q_D(const LaserText);
-//    //d->boundingRect = d->path.boundingRect();
-//    return sceneTransform().mapRect(path().boundingRect());
-//}
+int LaserText::detectInsertIndex(const QPoint& insertPoint)
+{
+    Q_D(LaserText);
+    QPainterPath lastPath;
+    int rowSize = d->pathList.size();
+    int line = 0;
+    qreal extend = 10.0 * 1000;
 
-//QRect LaserText::sceneBoundingRect() const
-//{
-//    Q_D(const LaserText);
-//    return sceneTransform().mapRect(d->boundingRect);
-//}
+    //再遍历每一行的外包框
+    for (LaserTextRowPath& rowPathStruct: d->pathList)
+    {
+        QList<QPainterPath> subRowPathlist = rowPathStruct.subRowPathlist();
+        QList<QRectF> subRowBoundList = rowPathStruct.subRowBoundList();
+        int subPathSize = subRowPathlist.size();
+        //qreal worldSpacing = m_textFont.wordSpacing();
+        QRectF rowPathBoundingRect = rowPathStruct.path().boundingRect();
+        qreal halfWTopSpacing = 0;
+        qreal halfWBottomSpacing = 0;
+        //遍历每一行的外包框,只有一行直接遍历字符path
+        bool isInRowPathBound = false;
+        QRectF extendRowRect;
+        if (rowSize > 1) {
+            if (line + 1 < rowSize) {
+                QRectF nextRowPathBoundingRect = rowPathStruct.path().boundingRect();
+                halfWBottomSpacing = (nextRowPathBoundingRect.top() - rowPathBoundingRect.bottom()) * 0.5;
+                if (halfWBottomSpacing < 0) {
+                    halfWBottomSpacing = 0;
+                }
+            }
+            if (line - 1 >= 0) {
+                QRectF lastRowPathBoundingRect = rowPathStruct.path().boundingRect();
+                halfWTopSpacing = (rowPathBoundingRect.top() - lastRowPathBoundingRect.bottom()) * 0.5;
+                if (halfWTopSpacing < 0) {
+                    halfWTopSpacing = 0;
+                }
+            }
+            if (line == 0) {
+                extendRowRect = QRectF(rowPathBoundingRect.topLeft() + QPointF(-extend, -extend),
+                    rowPathBoundingRect.bottomRight() + QPointF(extend, halfWBottomSpacing));
+            }
+            else if (line == rowSize - 1) {
+
+                extendRowRect = QRectF(rowPathBoundingRect.topLeft() + QPointF(-extend, -halfWTopSpacing),
+                    rowPathBoundingRect.bottomRight() + QPointF(extend, extend));
+            }
+            else {
+                extendRowRect = QRectF(rowPathBoundingRect.topLeft() + QPointF(-extend, -halfWTopSpacing),
+                    rowPathBoundingRect.bottomRight() + QPointF(extend, halfWBottomSpacing));
+            }
+            if (sceneTransform().map(extendRowRect).containsPoint(insertPoint, Qt::OddEvenFill)) {
+                isInRowPathBound = true;
+            }
+
+        }
+        else {
+            extendRowRect = QRectF(rowPathBoundingRect.topLeft() + QPointF(-extend, -extend),
+                rowPathBoundingRect.bottomRight() + QPointF(extend, extend));
+            isInRowPathBound = true;
+        }
+        if (!isInRowPathBound) {
+            continue;
+        }
+        //遍历这一行的字符
+        for (int j = 0; j < subPathSize; j++) {
+            QPainterPath subPath = subRowPathlist[j];
+            QRectF rect = subRowBoundList[j];
+            //QRectF extendSubRect;
+            qreal halfLLeftSpacing = 0;
+            qreal halfLRightSpacing = 0;
+            qreal halfWidth = rect.width() * 0.5;
+            QRectF frontRect, backRect;
+            if (j + 1 < subPathSize) {
+                QRectF nextRect = subRowBoundList[j + 1];
+                halfLRightSpacing = nextRect.left() - rect.right();
+                if (halfLRightSpacing < 0) {
+                    halfLRightSpacing = 0;
+                }
+            }
+            if (j - 1 >= 0) {
+                QRectF lastRect = subRowBoundList[j - 1];
+                halfLLeftSpacing = rect.left() - lastRect.right();
+                if (halfLLeftSpacing < 0) {
+                    halfLLeftSpacing = 0;
+                }
+            }
+            if (subPathSize == 1) {
+
+                qreal cx = extendRowRect.left() + extendRowRect.width() * 0.5;
+                frontRect = QRectF(extendRowRect.topLeft(), QPointF(cx, extendRowRect.bottom()));
+                backRect = QRectF(QPointF(cx, extendRowRect.top()), extendRowRect.bottomRight());
+
+            }
+            else {
+                qreal cx = rect.left() + rect.width() * 0.5;
+                if (j == 0) {
+                    frontRect = QRectF(extendRowRect.topLeft(), QPointF(cx, extendRowRect.bottom()));
+                    backRect = QRectF(QPointF(cx, extendRowRect.top()),
+                        QPointF(rect.right() + halfLRightSpacing, extendRowRect.bottom()));
+                }
+                else if (j == subPathSize - 1) {
+                    frontRect = QRectF(QPointF(extendRowRect.left() - halfLLeftSpacing, extendRowRect.top()),
+                        QPointF(QPointF(cx, extendRowRect.bottom())));
+                    backRect = QRectF(QPointF(cx, extendRowRect.top()), extendRowRect.bottomRight());
+                }
+                else {
+                    frontRect = QRectF(QPointF(extendRowRect.left() - halfLLeftSpacing, extendRowRect.top()),
+                        QPointF(QPointF(cx, extendRowRect.bottom())));
+                    backRect = QRectF(QPointF(cx, extendRowRect.top()),
+                        QPointF(rect.right() + halfLRightSpacing, extendRowRect.bottom()));
+                }
+            }
+            //前面
+            if (sceneTransform().map(frontRect).containsPoint(insertPoint, Qt::OddEvenFill)) {
+                int index = line - 1;
+                d->insertIndex = 0;
+                while (index >= 0) {
+                    d->insertIndex += rowPathStruct.subRowPathlist().size() + 1;
+                    index--;
+                }
+                d->insertIndex += j;
+
+                return true;
+            }
+            //后面
+            else if (sceneTransform().map(backRect).containsPoint(insertPoint, Qt::OddEvenFill)) {
+                int index = line - 1;
+                d->insertIndex = 0;
+                while (index >= 0) {
+                    d->insertIndex += subPathList()[index].subRowPathlist().size() + 1;
+                    index--;
+                }
+                d->insertIndex += (j + 1);
+
+                return true;
+
+            }
+        }
+    }
+    return 0;
+}
 
 QRectF LaserText::originalBoundingRect(qreal extendPixel) const
 {
@@ -425,22 +578,78 @@ void LaserText::draw(QPainter * painter)
 {
     Q_D(LaserText);
     painter->drawPath(mapFromScene(sceneTransform().map(path())));
-    //painter->drawPolygon(mapFromScene(sceneTransform().map(originalBoundingRect(Global::mm2PixelsYF(10.0)))));
     
-    /*for (int i = 0; i < d->pathList.size(); i++) {
-        painter->setPen(QPen(Qt::green));
-        QColor c(0, 0, 0, 0);
-        painter->setPen(QPen(c));
-        QList<QPainterPath> rowPathList = d->pathList[i].subRowPathlist();
-        painter->drawPolygon(mapFromScene(sceneTransform().map(d->pathList[i].path().boundingRect())));
-        for (QPainterPath path : rowPathList) {
-            painter->setPen(QPen(Qt::red));
-            //painter->drawPath(mapFromScene(sceneTransform().map(path)));
-            painter->drawPolygon(mapFromScene(sceneTransform().map(path.boundingRect())));
+}
 
+void LaserText::sceneMousePressEvent(LaserViewer* viewer, LaserScene* scene,
+    const QPoint& point, QMouseEvent* event)
+{
+}
+
+void LaserText::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scene,
+    const QPoint& point, QMouseEvent* event, bool isPressed)
+{
+}
+
+void LaserText::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
+    const QPoint& point, QMouseEvent* event, bool isPressed)
+{
+    Q_D(LaserText);
+    if (isEditing())
+    {
+        if (d->first)
+        {
+            d->first = false;
+            LaserLayer* layer = this->layer();
+
+            PrimitiveAddingCommand* cmdAdding = new PrimitiveAddingCommand(
+                tr("Add Line"), viewer, scene, this->document(), this->id(), 
+                layer->id(), this);
+
+            // we must ensure that when we undo the adding operation we should 
+            // end the editing state in LaserViewer
+            cmdAdding->setUndoCallback([=]()
+                {
+                    emit viewer->endEditing();
+                }
+            );
+            // as we adding and editing the line, we must ensure that the
+            // LaserViewer know it's in editing state
+            cmdAdding->setRedoCallback([=]()
+                {
+                    viewer->setEditingPrimitiveId(id());
+                    emit viewer->beginEditing();
+                }
+            );
+
+            viewer->addUndoCommand(cmdAdding);
         }
-    }*/
-    //painter->drawRect(d->boundingRect);
+        if (d->content.trimmed().isEmpty())
+        {
+            this->setStartPos(point);
+        }
+        else
+        {
+            detectInsertIndex(point);
+        }
+    }
+}
+
+void LaserText::sceneKeyPressEvent(LaserViewer* viewer, QKeyEvent* event)
+{
+    Q_D(LaserText);
+    if (isEditing())
+    {
+        QString chr = utils::keyCodeToString(event->key(), viewer->isCapsLock(), 
+            event->modifiers() == Qt::ShiftModifier);
+        
+        addPath(chr, d->insertIndex);
+        d->insertIndex += chr.size();
+    }
+}
+
+void LaserText::sceneKeyReleaseEvent(LaserViewer* viewer, QKeyEvent* event)
+{
 }
 
 LaserPrimitive * LaserText::cloneImplement()
@@ -450,6 +659,7 @@ LaserPrimitive * LaserText::cloneImplement()
         d->alignHType, d->alignVType, sceneTransform(), d->layerIndex);
     text->setContent(d->content);
     text->modifyPathList();
+    text->setIsFirst(isFirst());
 	return text;
 }
 

@@ -61,7 +61,7 @@ LaserPrimitive::LaserPrimitive(LaserPrimitivePrivate* data, LaserDocument* doc,
 	d->allTransform = saveTransform;
 	d->layerIndex = layerIndex;
 
-    qLogD << "primitive " << id() << "created";
+    qLogD << "primitive " << id() << "created. " << typeName();
 }
 
 LaserPrimitive::~LaserPrimitive()
