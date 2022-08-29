@@ -2770,13 +2770,12 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                         case LPT_TEXT:
                         {
                             LaserText* text = findLaserTextUnderCursor();
-                            //detectTextInsertPosition(ajustedPoint.toPoint(), text);
                             if (text == nullptr)
                             {
                                 //editingPrimitive = new LaserText(m_scene->document(),
                                     //QTransform(), layerIndex);
                                 qreal spaceY = qRound(LaserApplication::mainWindow->textSpaceYSpinBox()->value() * 25400.0 / logicalDpiY());
-                                editingPrimitive = new LaserText(m_scene->document(), mapToScene(m_textMousePressPos.toPoint()),
+                                editingPrimitive = new LaserText(m_scene->document(), ajustedPoint,
                                     m_textFont, spaceY, m_textAlighH, m_textAlighV,
                                     QTransform(), layer->index());
                             }
@@ -2784,7 +2783,6 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                             {
                                 editingPrimitive = text;
                             }
-                            modifyTextCursor();
                             this->setAttribute(Qt::WA_InputMethodEnabled, true);
                             this->setAttribute(Qt::WA_KeyCompression, true);
                             this->setFocusPolicy(Qt::WheelFocus);
@@ -2849,7 +2847,7 @@ void LaserViewer::dropEvent(QDropEvent * event)
 void LaserViewer::keyPressEvent(QKeyEvent* event)
 {
     QGraphicsView::keyPressEvent(event);
-    qDebug() << event->key();
+    qDebug() << "key: " << event->key();
     if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextState())) {
         
         

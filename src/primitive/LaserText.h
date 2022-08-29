@@ -47,6 +47,10 @@ public:
     QList<LaserTextRowPath> subPathList();
 
     int detectInsertIndex(const QPoint& insertPoint);
+    void modifyTextCursor(const QPoint& pos);
+
+    QLineF cursorLine() const;
+    void setCursorLine(const QLineF& line);
 
     //virtual QRectF boundingRect() const;
     //virtual QRect sceneBoundingRect() const;

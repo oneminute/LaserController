@@ -31,10 +31,7 @@ public:
     QString content;
     QString lastContent;
     QPointF startPos;
-    //QList<QPainterPath> pathList;
-    //QMap<QPointF, QList<QPainterPath>> pathList;
     QList<LaserTextRowPath> pathList;
-    //QPainterPath allPath;
     QFont font;
     int alignHType;
     int lastAlignHType;
@@ -46,6 +43,7 @@ public:
     QPoint textMousePressPos;
     bool first;
     int insertIndex;
+    QLineF cursorLine;
 };
 
 LaserText::LaserText(LaserDocument* doc, QTransform transform, int layerIndex)
@@ -63,7 +61,7 @@ LaserText::LaserText(LaserDocument* doc, QPointF startPos, QFont font, qreal spa
     d->lastAlignHType = alighHType;
     d->alignVType = alighVType;
     d->lastAlignVType = alighVType;
-    d->startPos = mapFromScene(d->startPos);
+    d->startPos = startPos;
     d->view = doc->scene()->views()[0];
     d->allTransform = saveTransform;
     d->spaceY = spaceY;
@@ -214,7 +212,6 @@ void LaserText::addPath(QString content, int insertIndex)
     Q_D(LaserText);
     insertContent(content, insertIndex);
     modifyPathList();
-    d->view->viewport()->repaint();
 }
 
 void LaserText::delPath(int index)
@@ -258,11 +255,6 @@ void LaserText::modifyPathList()
     
     bool isNewLine = true;
     QRectF lastBound;
-    //QPainterPath allPath;
-    //QPainterPath lastPath;
-    //qDebug() << d->lastContent;
-    //qDebug() << d->content;
-    //for (QChar c : d->content) {
     
     for (int i = 0; i < d->content.size(); i++) {
         QChar c = d->content[i];
@@ -315,9 +307,6 @@ void LaserText::modifyPathList()
             subBoundList.append(*boundListPtr);
             startPosList.append(startP);
         }
-        //allPath.addPath(path);
-        
-        
     }
     qreal allHeight = fontSize * subRowPathList.size() + (subRowPathList.size()-1)* spaceY();
     d->pathList.clear();
@@ -554,11 +543,73 @@ int LaserText::detectInsertIndex(const QPoint& insertPoint)
                 d->insertIndex += (j + 1);
 
                 return true;
-
             }
         }
     }
     return 0;
+}
+
+void LaserText::modifyTextCursor(const QPoint& pos)
+{
+    Q_D(LaserText);
+    if (subPathList().length() > 0) {
+        int index = d->insertIndex;
+        for (int i = 0; i < subPathList().size(); i++) {
+            LaserTextRowPath rowPathstruct = subPathList()[i];
+            QPointF rowLeftTop = rowPathstruct.leftTopPosition();
+            int size = rowPathstruct.subRowPathlist().size();
+            if (index > size) {
+                index -= (size + 1);
+            }
+            else {
+                qreal height = font().pixelSize();
+                qreal bottom = rowLeftTop.y();
+                qreal top = bottom - height;
+                qreal x;
+                if (index > 0) {
+                    QRectF rect = rowPathstruct.subRowBoundList()[index - 1];
+                    x = rect.right();
+                }
+                else if (index == 0) {
+                    x = rowLeftTop.x();
+                }
+                d->cursorLine = sceneTransform().map(QLineF(QPointF(x, top), QPointF(x, bottom)));
+            }
+        }
+    }
+    else {
+        QPointF p1 = pos;
+        qreal height = d->font.pixelSize();
+        switch (d->alignVType) {
+        case Qt::AlignTop: {
+            QPointF p2(p1.x(), p1.y() + height);
+            d->cursorLine = QLineF(QLineF(p1, p2));
+            break;
+        }
+        case Qt::AlignBottom: {
+            QPointF p2(p1.x(), p1.y() - height);
+            d->cursorLine = QLineF(QLineF(p1, p2));
+            break;
+        }
+        case Qt::AlignVCenter: {
+            QPointF p2(p1.x(), p1.y() + height * 0.5);
+            d->cursorLine = QLineF(QLineF(QPointF(p1.x(), p1.y() - height * 0.5), p2));
+            break;
+        }
+        }
+    }
+}
+
+QLineF LaserText::cursorLine() const
+{
+    Q_D(const LaserText);
+    return d->cursorLine;
+}
+
+void LaserText::setCursorLine(const QLineF& line)
+{
+    Q_D(LaserText);
+    d->cursorLine = line;
 }
 
 QRectF LaserText::originalBoundingRect(qreal extendPixel) const
@@ -577,8 +628,18 @@ QRectF LaserText::originalBoundingRect(qreal extendPixel) const
 void LaserText::draw(QPainter * painter)
 {
     Q_D(LaserText);
-    painter->drawPath(mapFromScene(sceneTransform().map(path())));
-    
+    //painter->drawPath(mapFromScene(sceneTransform().map(path())));
+    painter->drawPath(path());
+    if (isEditing())
+    {
+        QPen oldPen = painter->pen();
+        QPen newPen(Qt::black, 1, Qt::SolidLine);
+        newPen.setCosmetic(true);
+        painter->setPen(newPen);
+        QLineF l = QLineF(mapFromScene(d->cursorLine.p1()), mapFromScene(d->cursorLine.p2()));       
+        painter->drawLine(l);
+        painter->setPen(oldPen);
+    }
 }
 
 void LaserText::sceneMousePressEvent(LaserViewer* viewer, LaserScene* scene,
@@ -605,6 +666,8 @@ void LaserText::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
             PrimitiveAddingCommand* cmdAdding = new PrimitiveAddingCommand(
                 tr("Add Line"), viewer, scene, this->document(), this->id(), 
                 layer->id(), this);
+            modifyTextCursor(point);
+            //detectInsertIndex(point);
 
             // we must ensure that when we undo the adding operation we should 
             // end the editing state in LaserViewer
@@ -645,6 +708,8 @@ void LaserText::sceneKeyPressEvent(LaserViewer* viewer, QKeyEvent* event)
         
         addPath(chr, d->insertIndex);
         d->insertIndex += chr.size();
+        modifyTextCursor(d->startPos.toPoint());
+        viewer->viewport()->repaint();
     }
 }
 
@@ -657,6 +722,7 @@ LaserPrimitive * LaserText::cloneImplement()
 	Q_D(LaserText);
 	LaserText* text = new LaserText(document(), d->startPos, d->font, d->spaceY, 
         d->alignHType, d->alignVType, sceneTransform(), d->layerIndex);
+    text->setCursorLine(cursorLine());
     text->setContent(d->content);
     text->modifyPathList();
     text->setIsFirst(isFirst());
