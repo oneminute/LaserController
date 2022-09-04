@@ -663,4 +663,10 @@ bool LaserScene::pointInAvailableArea(const QPointF& point) const
     return pointInAvailableArea(point.toPoint());
 }
 
+//QVariant LaserScene::inputMethodQuery(Qt::InputMethodQuery query) const
+//{
+//    qLogD << "input method query: " << query;
+//    return QVariant();
+//}
+
 

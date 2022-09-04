@@ -65,6 +65,9 @@ public:
     bool pointInAvailableArea(const QPoint& point) const;
     bool pointInAvailableArea(const QPointF& point) const;
 
+protected:
+    //virtual QVariant inputMethodQuery(Qt::InputMethodQuery query) const override;
+
 private:
     LaserDocument* m_doc;
 	LaserBackgroundItem* m_background;

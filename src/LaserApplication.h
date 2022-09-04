@@ -54,6 +54,11 @@ protected slots:
     void onEnterDeviceUnconnectedState();
     void onLanguageChanged(const QVariant& value, void* senderPtr);
 
+    void onIMLocaleChanged();
+    void onIMVisibleChanged();
+    void onIMAnchorRectangleChanged();
+    void onIMCursorRectangleChanged();
+
 signals:
     void languageChanged();
 

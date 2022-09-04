@@ -112,6 +112,9 @@ bool LaserApplication::initialize()
     }
     //splashScreen->setProgress(10);
 
+    connect(inputMethod(), &QInputMethod::localeChanged, this, &LaserApplication::onIMLocaleChanged);
+    connect(inputMethod(), &QInputMethod::visibleChanged, this, &LaserApplication::onIMVisibleChanged);
+
     //splashScreen->setMessage(tr("Loading laser library..."));
     driver = new LaserDriver;
     device = new LaserDevice(driver);
@@ -631,6 +634,26 @@ void LaserApplication::onLanguageChanged(const QVariant& value, void* senderPtr)
 {
     retranslate();
     device->updateDriverLanguage();
+}
+
+void LaserApplication::onIMLocaleChanged()
+{
+    qLogD << "input method locale: " << inputMethod()->locale();
+}
+
+void LaserApplication::onIMVisibleChanged()
+{
+    qLogD << "input method visible: " << inputMethod()->isVisible();
+}
+
+void LaserApplication::onIMAnchorRectangleChanged()
+{
+    qLogD << "input method anchor rect: " << inputMethod()->anchorRectangle();
+}
+
+void LaserApplication::onIMCursorRectangleChanged()
+{
+    qLogD << "input method cursor rect: " << inputMethod()->cursorRectangle();
 }
 
 void LaserApplication::onEnterDeviceUnconnectedState()

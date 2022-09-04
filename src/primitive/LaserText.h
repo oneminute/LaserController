@@ -65,6 +65,8 @@ public:
     virtual LaserPointListList updateMachiningPoints(ProgressItem* parentProgress);
     virtual LaserLineListList generateFillData(QPointF& lastPoint);
 
+    void updateText();
+
 protected:
     // the following functions only used in editing mode.
     virtual void sceneMousePressEvent(
@@ -90,6 +92,16 @@ protected:
 	virtual void sceneKeyReleaseEvent(
         LaserViewer* viewer,
         QKeyEvent *event);
+
+    virtual bool sceneEvent(QEvent* event);
+
+    void inputMethodEvent(QInputMethodEvent * event) override;
+
+    QRectF rectForPosition(int position) const;
+
+public:
+    virtual QVariant inputMethodQuery(Qt::InputMethodQuery query) const override;
+    Q_INVOKABLE virtual QVariant inputMethodQuery(Qt::InputMethodQuery property, QVariant argument) const;
 
 private:
 	virtual LaserPrimitive * cloneImplement() override;

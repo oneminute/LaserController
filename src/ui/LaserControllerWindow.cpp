@@ -2662,6 +2662,7 @@ void LaserControllerWindow::createOperationsDockPanel()
     fifthRow->addRow("", buttonApplyToDoc);
     fifthRow->addRow(Config::Device::finishRunItem()->title(), m_comboBoxFinishRun);
     fifthRow->addRow(Config::Device::switchToUItem()->title(), m_comboBoxSwitchToU);
+    fifthRow->addRow("", new QPlainTextEdit);
 
     QHBoxLayout* sixthRow = new QHBoxLayout;
     sixthRow->setMargin(0);
@@ -6170,7 +6171,7 @@ void LaserControllerWindow::onActionText(bool checked)
 
 		//emit readyText();
         m_viewer->setEditingPrimitiveType(LPT_TEXT);
-        this->setAttribute(Qt::WA_InputMethodEnabled, true);
+        //this->setAttribute(Qt::WA_InputMethodEnabled, true);
         emit m_viewer->beginEditing();
 	}
 	else

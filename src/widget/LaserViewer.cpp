@@ -2783,8 +2783,8 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                             {
                                 editingPrimitive = text;
                             }
-                            this->setAttribute(Qt::WA_InputMethodEnabled, true);
-                            this->setAttribute(Qt::WA_KeyCompression, true);
+                            //this->setAttribute(Qt::WA_InputMethodEnabled, true);
+                            //this->setAttribute(Qt::WA_KeyCompression, true);
                             this->setFocusPolicy(Qt::WheelFocus);
                             break;
                         }
@@ -2817,10 +2817,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         QGraphicsView::mouseReleaseEvent(event);
     }
 
-    //m_mousePressed = false;
-    //m_isKeyShiftPressed = false;
     this->viewport()->repaint();
-    //QGraphicsView::mouseReleaseEvent(event);
 }
 
 void LaserViewer::dragEnterEvent(QDragEnterEvent * event)
@@ -2854,13 +2851,12 @@ void LaserViewer::keyPressEvent(QKeyEvent* event)
     }
     switch (event->key())
     {
-		case Qt::Key_Shift: {
-            if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectState()) ||
-                StateControllerInst.isInState(StateControllerInst.documentPrimitiveEllipseState())) {
-                m_isKeyShiftPressed = true;
-                viewport()->repaint();
-            }
-            
+    case Qt::Key_Shift: {
+        if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveRectState()) ||
+            StateControllerInst.isInState(StateControllerInst.documentPrimitiveEllipseState())) {
+            m_isKeyShiftPressed = true;
+            viewport()->repaint();
+        }
 			break;
 		}
 		case Qt::Key_Delete: {
@@ -2877,30 +2873,33 @@ void LaserViewer::keyPressEvent(QKeyEvent* event)
             else {
                 m_isCapsLock = true;
             }
-            
             break;
-        }
-    }
-    if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveEditingState()))
-    {
-        LaserPrimitive* editingPrimitive = this->getEditingPrimitive();
-
-        if (editingPrimitive != nullptr)
+        default:
         {
-            editingPrimitive->sceneKeyPressEvent(this, event);
+            if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveEditingState()))
+            {
+                LaserPrimitive* editingPrimitive = this->getEditingPrimitive();
+
+                if (editingPrimitive != nullptr)
+                {
+                    editingPrimitive->sceneKeyPressEvent(this, event);
+                }
+            }
+        }
         }
     }
+    
 }
 
 void LaserViewer::keyReleaseEvent(QKeyEvent* event)
 {
     QGraphicsView::keyReleaseEvent(event);
-    if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextState())) {
+    /*if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveTextState())) {
         this->setAttribute(Qt::WA_InputMethodEnabled, true);
     }
     else {
         this->setAttribute(Qt::WA_InputMethodEnabled, false);
-    }
+    }*/
     
     switch (event->key())
     {
@@ -2970,13 +2969,25 @@ void LaserViewer::keyReleaseEvent(QKeyEvent* event)
     
 }
 
-void LaserViewer::inputMethodEvent(QInputMethodEvent * event)
+//void LaserViewer::inputMethodEvent(QInputMethodEvent * event)
+//{
+//    qLogD << "commit string: " << event->commitString();
+//    if (!event->commitString().isEmpty()) {
+//        addTextByKeyInput(event->commitString());
+//    }
+//    QWidget::inputMethodEvent(event);
+//}
+
+void LaserViewer::focusInEvent(QFocusEvent* event)
 {
-    if (!event->commitString().isEmpty()) {
-        addTextByKeyInput(event->commitString());
-        
-    }
-    QWidget::inputMethodEvent(event);
+    setAttribute(Qt::WA_InputMethodEnabled);
+    QGraphicsView::focusInEvent(event);
+    LaserPrimitive* primitive = this->getEditingPrimitive();
+    if (!primitive)
+        return;
+
+    qLogD << "focused";
+    primitive->setFocus();
 }
 
 void LaserViewer::scrollContentsBy(int dx, int dy)

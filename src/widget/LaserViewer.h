@@ -234,7 +234,8 @@ protected:
 	virtual void keyPressEvent(QKeyEvent *event) override;
 	virtual void keyReleaseEvent(QKeyEvent *event) override;
 
-    virtual void inputMethodEvent(QInputMethodEvent *event) override;
+    //virtual void inputMethodEvent(QInputMethodEvent *event) override;
+	virtual void focusInEvent(QFocusEvent* event) override;
 
 	//scroll
 

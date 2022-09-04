@@ -1,7 +1,11 @@
 #include "LaserText.h"
 #include "LaserShapePrivate.h"
 
+#include <QAbstractTextDocumentLayout>
 #include <QPainter>
+#include <QTextDocument>
+#include <QTextBlock>
+#include <QTextLayout>
 
 #include "LaserApplication.h"
 #include "LaserTextRowPath.h"
@@ -24,6 +28,7 @@ public:
         : LaserShapePrivate(ptr)
         , first(true)
         , insertIndex(0)
+        , cursorIndex(-1)
     {
         spaceY = LaserApplication::mainWindow->fontSpaceYDoubleSpinBox()->value();
     }
@@ -44,6 +49,8 @@ public:
     bool first;
     int insertIndex;
     QLineF cursorLine;
+    QTextDocument document;
+    int cursorIndex;
 };
 
 LaserText::LaserText(LaserDocument* doc, QTransform transform, int layerIndex)
@@ -66,6 +73,14 @@ LaserText::LaserText(LaserDocument* doc, QPointF startPos, QFont font, qreal spa
     d->allTransform = saveTransform;
     d->spaceY = spaceY;
     sceneTransformToItemTransform(saveTransform);
+    setInputMethodHints(Qt::ImhMultiLine);
+    this->setFlag(QGraphicsItem::ItemAcceptsInputMethod);
+    this->setFlag(QGraphicsItem::ItemIsFocusable);
+    QTextOption opt;
+    opt.setFlags(QTextOption::ShowTabsAndSpaces);
+    d->document.setDefaultFont(font);
+    d->document.setDefaultTextOption(opt);
+    d->document.setDefaultCursorMoveStyle(Qt::VisualMoveStyle);
 }
 
 LaserText::~LaserText()
@@ -132,7 +147,9 @@ void LaserText::setFont(QFont font)
 {
     Q_D(LaserText);
     d->font = font;
-    modifyPathList();
+    d->document.setDefaultFont(font);
+    updateText();
+    //modifyPathList();
 }
 
 QFont LaserText::font()
@@ -628,18 +645,42 @@ QRectF LaserText::originalBoundingRect(qreal extendPixel) const
 void LaserText::draw(QPainter * painter)
 {
     Q_D(LaserText);
-    //painter->drawPath(mapFromScene(sceneTransform().map(path())));
-    painter->drawPath(path());
-    if (isEditing())
-    {
-        QPen oldPen = painter->pen();
-        QPen newPen(Qt::black, 1, Qt::SolidLine);
-        newPen.setCosmetic(true);
-        painter->setPen(newPen);
-        QLineF l = QLineF(mapFromScene(d->cursorLine.p1()), mapFromScene(d->cursorLine.p2()));       
-        painter->drawLine(l);
-        painter->setPen(oldPen);
-    }
+    QPen oldPen = painter->pen();
+    QPen newPen(Qt::blue, 1, Qt::SolidLine);
+    newPen.setCosmetic(true);
+    QBrush oldBrush = painter->brush();
+    //painter->setBrush(Qt::NoBrush);
+    painter->setPen(newPen);
+
+    QTransform t = painter->transform();
+    painter->setTransform(QTransform::fromTranslate(d->startPos.x(), d->startPos.y()) * t);
+    QAbstractTextDocumentLayout* docLayout = d->document.documentLayout();
+    QAbstractTextDocumentLayout::PaintContext context;
+    context.cursorPosition = d->cursorIndex;
+    QPalette palette;
+    palette.setBrush(QPalette::Text, Qt::blue);
+    context.palette = palette;;
+    docLayout->draw(painter, context);
+    painter->setTransform(t);
+
+    //painter->drawRect(rect);
+    //QTextBlock block = d->document.firstBlock();
+    //int i = 0;
+    //while (block.isValid())
+    //{
+    //    QTextLayout* layout = block.layout();
+    //    /*int textPos = block.position();
+    //    int textEndPos = textPos + block.text().length();
+    //    qLogD << "textPos: " << textPos << " -- textEndPos: " << textEndPos
+    //        << ", pos: " << d->cursorIndex;*/
+    //    layout->draw(painter, d->startPos);
+    //    block = block.next();
+    //    i++;
+    //}
+    QRectF cursorRect = rectForPosition(d->cursorIndex);
+    painter->drawRect(cursorRect);
+    painter->setPen(oldPen);
+    painter->setBrush(oldBrush);
 }
 
 void LaserText::sceneMousePressEvent(LaserViewer* viewer, LaserScene* scene,
@@ -658,6 +699,7 @@ void LaserText::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
     Q_D(LaserText);
     if (isEditing())
     {
+        setFocus();
         if (d->first)
         {
             d->first = false;
@@ -681,11 +723,15 @@ void LaserText::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
             cmdAdding->setRedoCallback([=]()
                 {
                     viewer->setEditingPrimitiveId(id());
+                    //viewer->setFocus();
+                    cmdAdding->cloned()->setFocus(Qt::MouseFocusReason);
+                    qLogD << "hasFocus: " << cmdAdding->cloned()->hasFocus();
                     emit viewer->beginEditing();
                 }
             );
 
             viewer->addUndoCommand(cmdAdding);
+            d->cursorIndex = 0;
         }
         if (d->content.trimmed().isEmpty())
         {
@@ -703,18 +749,159 @@ void LaserText::sceneKeyPressEvent(LaserViewer* viewer, QKeyEvent* event)
     Q_D(LaserText);
     if (isEditing())
     {
-        QString chr = utils::keyCodeToString(event->key(), viewer->isCapsLock(), 
-            event->modifiers() == Qt::ShiftModifier);
-        
-        addPath(chr, d->insertIndex);
-        d->insertIndex += chr.size();
-        modifyTextCursor(d->startPos.toPoint());
-        viewer->viewport()->repaint();
+        QString chr = event->text();
+        if (event->matches(QKeySequence::Back))
+        {
+            d->content.remove(d->content.length() - 1, 1);
+            d->cursorIndex--;
+        }
+        else
+        {
+            switch (event->key())
+            {
+            case Qt::Key_Return:
+                d->content.append("\n");
+                d->cursorIndex++;
+                break;
+            default:
+                d->content.append(chr);
+                d->cursorIndex++;
+            break;
+            }
+        }
+        updateText();
+
+        //addPath(chr, d->insertIndex);
+        //d->insertIndex += chr.size();
+        //modifyTextCursor(d->startPos.toPoint());
+        //viewer->viewport()->repaint();
     }
 }
 
 void LaserText::sceneKeyReleaseEvent(LaserViewer* viewer, QKeyEvent* event)
 {
+}
+
+bool LaserText::sceneEvent(QEvent* event)
+{
+    Q_D(LaserText);
+    QEvent::Type t = event->type();
+    if (t == QEvent::KeyPress || t == QEvent::KeyRelease) {
+        int k = ((QKeyEvent *)event)->key();
+        if (k == Qt::Key_Tab || k == Qt::Key_Backtab) {
+            d->content.append("\t");
+            return true;
+        }
+    }
+    bool result = QGraphicsItem::sceneEvent(event);
+
+    // Ensure input context is updated.
+    switch (event->type()) {
+    case QEvent::ContextMenu:
+    case QEvent::FocusIn:
+    case QEvent::FocusOut:
+    case QEvent::GraphicsSceneDragEnter:
+    case QEvent::GraphicsSceneDragLeave:
+    case QEvent::GraphicsSceneDragMove:
+    case QEvent::GraphicsSceneDrop:
+    case QEvent::GraphicsSceneHoverEnter:
+    case QEvent::GraphicsSceneHoverLeave:
+    case QEvent::GraphicsSceneHoverMove:
+    case QEvent::GraphicsSceneMouseDoubleClick:
+    case QEvent::GraphicsSceneMousePress:
+    case QEvent::GraphicsSceneMouseMove:
+    case QEvent::GraphicsSceneMouseRelease:
+    case QEvent::KeyPress:
+    case QEvent::KeyRelease:
+        // Reset the focus widget's input context, regardless
+        // of how this item gained or lost focus.
+        if (event->type() == QEvent::FocusIn || event->type() == QEvent::FocusOut) {
+            QGuiApplication::inputMethod()->reset();
+        } else {
+            QGuiApplication::inputMethod()->update(Qt::ImQueryInput);
+        }
+        break;
+    case QEvent::ShortcutOverride:
+        return true;
+    default:
+        break;
+    }
+
+    return result;
+}
+
+void LaserText::inputMethodEvent(QInputMethodEvent* event)
+{
+    Q_D(LaserText);
+    QString str = event->commitString();
+    if (str.isEmpty())
+        return;
+    qLogD << "commit string: " << str;
+    d->content.append(str);
+    d->cursorIndex += str.length();
+    updateText();
+}
+
+QRectF LaserText::rectForPosition(int position) const
+{
+    Q_D(const LaserText);
+    QRectF rect;
+    QAbstractTextDocumentLayout* docLayout = d->document.documentLayout();
+    QTextBlock block = d->document.findBlock(position);
+    QFontMetrics metrics(d->font);
+    if (block.isValid())
+    {
+        QTextLayout* layout = block.layout();
+        QRectF bounding = docLayout->blockBoundingRect(block);
+        if (block.contains(position))
+        {
+            int relCursorIndex = position - block.position();
+            QTextLine line = layout->lineForTextPosition(relCursorIndex);
+            if (line.isValid())
+            {
+                qreal x = line.cursorToX(relCursorIndex + 1);
+                qreal y = line.position().y();
+                QPointF cursorPos = bounding.topLeft() + QPointF(x, y);
+                cursorPos += d->startPos;
+                rect = QRectF(cursorPos, cursorPos + QPointF(1, line.height()));
+            }
+        }
+        else
+        {
+            rect = QRectF(bounding.bottomLeft(), bounding.bottomLeft() + QPointF(1, metrics.height()));
+        }
+    }
+    else
+    {
+        rect = QRectF(d->startPos, d->startPos + QPointF(1, metrics.height()));
+    }
+
+    return rect;
+}
+
+QVariant LaserText::inputMethodQuery(Qt::InputMethodQuery query) const
+{
+    Q_D(const LaserText);
+    qLogD << "input method query: " << query;
+    switch (query)
+    {
+    case Qt::ImEnabled:
+        return QVariant(true);
+    case Qt::ImCursorRectangle:
+    {
+        QRectF rect = rectForPosition(d->cursorIndex);
+        qLogD << "cursor rect: " << rect;
+        return rect;
+    }
+    default:
+        return QGraphicsItem::inputMethodQuery(query);
+    }
+}
+
+Q_INVOKABLE QVariant LaserText::inputMethodQuery(Qt::InputMethodQuery property, QVariant argument) const
+{
+    qLogD << "input method query property: " << property << ", argument: " << argument;
+    return QVariant();
 }
 
 LaserPrimitive * LaserText::cloneImplement()
@@ -733,8 +920,6 @@ QJsonObject LaserText::toJson()
 {
     Q_D(const LaserText);
     QJsonObject object;
-    //QJsonArray position = { pos() .x(), pos() .y()};
-    //QTransform transform = d->allTransform;
     QTransform transform = QTransform();
     QJsonArray matrix = {
         transform.m11(), transform.m12(), transform.m13(),
@@ -839,4 +1024,12 @@ LaserLineListList LaserText::generateFillData(QPointF& lastPoint)
     QPainterPath path = sceneTransform().map(d->path);
     LaserLineListList lineList = utils::interLines(path, layer()->fillingRowInterval());
     return lineList;
+}
+
+void LaserText::updateText()
+{
+    Q_D(LaserText);
+    d->document.setPlainText(d->content);
+    d->boundingRect = QRectF(d->startPos, d->document.size()).toRect();
+    scene()->views().first()->viewport()->update();
 }
