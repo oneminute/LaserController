@@ -220,3 +220,31 @@ void LaserVerticalText::setTextWidth(qreal width)
     //d->center = QPointF(d->center.x() - diff * 0.5, d->center.y());
     computeTextPath();
 }
+
+void LaserVerticalText::sceneMousePressEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event)
+{
+}
+
+void LaserVerticalText::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed)
+{
+}
+
+void LaserVerticalText::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed)
+{
+}
+
+void LaserVerticalText::sceneKeyPressEvent(LaserViewer* viewer, QKeyEvent* event)
+{
+}
+
+void LaserVerticalText::sceneKeyReleaseEvent(LaserViewer* viewer, QKeyEvent* event)
+{
+}
+
+void LaserVerticalText::beginCreatingInternal(QUndoCommand* parentCmd, PrimitiveAddingCommand* addingCmd)
+{
+}
+
+void LaserVerticalText::endCreatingInterval(QUndoCommand* parentCmd, PrimitiveRemovingCommand* removingCmd)
+{
+}

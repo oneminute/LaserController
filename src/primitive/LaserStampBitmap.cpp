@@ -357,3 +357,31 @@ void LaserStampBitmap::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
     LaserViewer* viewer = qobject_cast<LaserViewer*> (views[0]);
     viewer->onEndSelecting();
 }
+
+void LaserStampBitmap::sceneMousePressEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event)
+{
+}
+
+void LaserStampBitmap::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed)
+{
+}
+
+void LaserStampBitmap::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed)
+{
+}
+
+void LaserStampBitmap::sceneKeyPressEvent(LaserViewer* viewer, QKeyEvent* event)
+{
+}
+
+void LaserStampBitmap::sceneKeyReleaseEvent(LaserViewer* viewer, QKeyEvent* event)
+{
+}
+
+void LaserStampBitmap::beginCreatingInternal(QUndoCommand* parentCmd, PrimitiveAddingCommand* addingCmd)
+{
+}
+
+void LaserStampBitmap::endCreatingInterval(QUndoCommand* parentCmd, PrimitiveRemovingCommand* removingCmd)
+{
+}

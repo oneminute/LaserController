@@ -254,3 +254,31 @@ void LaserHorizontalText::setTextWidth(qreal width)
     LaserApplication::mainWindow->originalBoundsWidth()->setValue(d->boundingRect.width() * 0.001);
 }
 
+void LaserHorizontalText::sceneMousePressEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event)
+{
+}
+
+void LaserHorizontalText::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed)
+{
+}
+
+void LaserHorizontalText::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed)
+{
+}
+
+void LaserHorizontalText::sceneKeyPressEvent(LaserViewer* viewer, QKeyEvent* event)
+{
+}
+
+void LaserHorizontalText::sceneKeyReleaseEvent(LaserViewer* viewer, QKeyEvent* event)
+{
+}
+
+void LaserHorizontalText::beginCreatingInternal(QUndoCommand* parentCmd, PrimitiveAddingCommand* addingCmd)
+{
+}
+
+void LaserHorizontalText::endCreatingInterval(QUndoCommand* parentCmd, PrimitiveRemovingCommand* removingCmd)
+{
+}
+

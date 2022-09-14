@@ -2662,7 +2662,6 @@ void LaserControllerWindow::createOperationsDockPanel()
     fifthRow->addRow("", buttonApplyToDoc);
     fifthRow->addRow(Config::Device::finishRunItem()->title(), m_comboBoxFinishRun);
     fifthRow->addRow(Config::Device::switchToUItem()->title(), m_comboBoxSwitchToU);
-    fifthRow->addRow("", new QPlainTextEdit);
 
     QHBoxLayout* sixthRow = new QHBoxLayout;
     sixthRow->setMargin(0);
@@ -5261,6 +5260,15 @@ LaserDocument* LaserControllerWindow::getMachiningDocument(bool& stamp)
     return doc;
 }
 
+bool LaserControllerWindow::beginEditing(LaserPrimitiveType type)
+{
+    if (StateControllerInst.isInState(StateControllerInst.documentPrimitiveEditingState()))
+        return false;
+    m_viewer->setEditingPrimitiveType(type);
+    emit m_viewer->beginEditing();
+    return true;
+}
+
 void LaserControllerWindow::onActionUndo(bool checked) {
 	/*int index = m_viewer->undoStack()->index();
 	if (index <= 0) {
@@ -6065,7 +6073,8 @@ void LaserControllerWindow::onActionSelectionTool(bool checked)
 {
     if (checked)
     {
-        emit isIdle();
+        emit m_viewer->endEditing();
+        //emit isIdle();
     }
     else
     {
@@ -6091,10 +6100,9 @@ void LaserControllerWindow::onActionViewDrag(bool checked)
 
 void LaserControllerWindow::onActionRectangle(bool checked)
 {
-	if (checked) {
-        //emit readyRectangle();
-        m_viewer->setEditingPrimitiveType(LPT_RECT);
-        emit m_viewer->beginEditing();
+	if (checked)
+    {
+        beginEditing(LPT_RECT);
 	}
     else
     {
@@ -6104,10 +6112,9 @@ void LaserControllerWindow::onActionRectangle(bool checked)
 
 void LaserControllerWindow::onActionEllipse(bool checked)
 {
-	if (checked) {
-		//emit readyEllipse();
-        m_viewer->setEditingPrimitiveType(LPT_ELLIPSE);
-        emit m_viewer->beginEditing();
+	if (checked)
+    {
+        beginEditing(LPT_ELLIPSE);
 	}
 	else
 	{
@@ -6117,10 +6124,9 @@ void LaserControllerWindow::onActionEllipse(bool checked)
 
 void LaserControllerWindow::onActionLine(bool checked)
 {
-	if (checked) {
-		//emit readyLine();
-        m_viewer->setEditingPrimitiveType(LPT_LINE);
-        emit m_viewer->beginEditing();
+	if (checked)
+    {
+        beginEditing(LPT_LINE);
 	}
 	else
 	{
@@ -6131,10 +6137,9 @@ void LaserControllerWindow::onActionLine(bool checked)
 
 void LaserControllerWindow::onActionPolygon(bool checked)
 {
-	if (checked) {
-		//emit readyPolygon();
-        m_viewer->setEditingPrimitiveType(LPT_POLYLINE);
-        emit m_viewer->beginEditing();
+	if (checked)
+    {
+        beginEditing(LPT_POLYLINE);
 	}
 	else
 	{
@@ -6144,8 +6149,9 @@ void LaserControllerWindow::onActionPolygon(bool checked)
 
 void LaserControllerWindow::onActionSpline(bool checked)
 {
-	if (checked) {
-		emit readySpline();
+	if (checked)
+    {
+        beginEditing(LPT_NURBS);
 	}
 	else
 	{
@@ -6167,12 +6173,9 @@ void LaserControllerWindow::onActionSplineEdit(bool checked)
 
 void LaserControllerWindow::onActionText(bool checked)
 {
-	if (checked) {
-
-		//emit readyText();
-        m_viewer->setEditingPrimitiveType(LPT_TEXT);
-        //this->setAttribute(Qt::WA_InputMethodEnabled, true);
-        emit m_viewer->beginEditing();
+	if (checked)
+    {
+        beginEditing(LPT_TEXT);
 	}
 	else
 	{
@@ -6255,9 +6258,9 @@ void LaserControllerWindow::onActionMoveToUserOrigin(bool checked)
 
 void LaserControllerWindow::onActionBitmap(bool checked)
 {
-    if (checked) {
-        m_viewer->setEditingPrimitiveType(LPT_BITMAP);
-        emit m_viewer->beginEditing();
+    if (checked)
+    {
+        beginEditing(LPT_BITMAP);
 	}
 	else
 	{
@@ -6984,6 +6987,7 @@ void LaserControllerWindow::clearToolButtonState()
     m_ui->actionPolygonTool->setChecked(false);
     m_ui->actionTextTool->setChecked(false);
     m_ui->actionBitmapTool->setChecked(false);
+    m_ui->actionSplineTool->setChecked(false);
 }
 
 //改变的过程中也会执行（例如：移动的整个过程）

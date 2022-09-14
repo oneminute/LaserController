@@ -241,6 +241,16 @@ void LaserRect::sceneKeyReleaseEvent(LaserViewer* viewer, QKeyEvent* event)
 {
 }
 
+void LaserRect::beginCreatingInternal(QUndoCommand* parentCmd,
+    PrimitiveAddingCommand* addingCmd)
+{
+}
+
+void LaserRect::endCreatingInterval(QUndoCommand* parentCmd,
+    PrimitiveRemovingCommand* removingCmd)
+{
+}
+
 LaserPointListList LaserRect::updateMachiningPoints(ProgressItem* parentProgress)
 {
     Q_D(LaserRect);

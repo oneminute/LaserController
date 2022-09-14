@@ -721,3 +721,31 @@ void LaserCircleText::setTextWidth(qreal width)
     //computeTextPath(d->angle, QSize(width, d->size.height()), false);
 }
 
+void LaserCircleText::sceneMousePressEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event)
+{
+}
+
+void LaserCircleText::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed)
+{
+}
+
+void LaserCircleText::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed)
+{
+}
+
+void LaserCircleText::sceneKeyPressEvent(LaserViewer* viewer, QKeyEvent* event)
+{
+}
+
+void LaserCircleText::sceneKeyReleaseEvent(LaserViewer* viewer, QKeyEvent* event)
+{
+}
+
+void LaserCircleText::beginCreatingInternal(QUndoCommand* parentCmd, PrimitiveAddingCommand* addingCmd)
+{
+}
+
+void LaserCircleText::endCreatingInterval(QUndoCommand* parentCmd, PrimitiveRemovingCommand* removingCmd)
+{
+}
+

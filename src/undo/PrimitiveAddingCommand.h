@@ -1,5 +1,6 @@
 #pragma once
 
+#include "common/common.h"
 #include "BaseUndoCommand.h"
 #include "primitive/LaserPrimitiveDeclaration.h"
 
@@ -13,20 +14,18 @@ public:
         LaserViewer* viewer,
         LaserScene* scene,
         LaserDocument* doc,
-        const QString& primitiveId,
-        const QString& layerId,
-        LaserPrimitive* target, 
+        LaserPrimitiveType type,
         QUndoCommand* parent = nullptr);
     ~PrimitiveAddingCommand();
 
     virtual void undo() override;
     virtual void redo() override;
 
-    LaserPrimitive* cloned() const;
+    LaserPrimitive* primitive() const;
 
 private:
+    LaserPrimitiveType m_primitiveType;
     QString m_primitiveId;
     QString m_layerId;
-    LaserPrimitive* m_origin;
-    LaserPrimitive* m_cloned;
+    LaserPrimitive* m_primitive;
 };

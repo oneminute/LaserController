@@ -648,8 +648,6 @@ void LaserText::draw(QPainter * painter)
     QPen oldPen = painter->pen();
     QPen newPen(Qt::blue, 1, Qt::SolidLine);
     newPen.setCosmetic(true);
-    QBrush oldBrush = painter->brush();
-    //painter->setBrush(Qt::NoBrush);
     painter->setPen(newPen);
 
     QTransform t = painter->transform();
@@ -663,6 +661,7 @@ void LaserText::draw(QPainter * painter)
     docLayout->draw(painter, context);
     painter->setTransform(t);
 
+    // 保留本段代码作为手动显示的示例
     //painter->drawRect(rect);
     //QTextBlock block = d->document.firstBlock();
     //int i = 0;
@@ -677,10 +676,19 @@ void LaserText::draw(QPainter * painter)
     //    block = block.next();
     //    i++;
     //}
-    QRectF cursorRect = rectForPosition(d->cursorIndex);
-    painter->drawRect(cursorRect);
+
+    if (isEditing())
+    {
+        QRectF cursorRect = rectForPosition(d->cursorIndex);
+        painter->drawRect(cursorRect);
+
+        QBrush oldBrush = painter->brush();
+        painter->setBrush(Qt::NoBrush);
+        QRectF bounding(d->startPos, d->document.size());
+        painter->drawRect(bounding);
+    }
+
     painter->setPen(oldPen);
-    painter->setBrush(oldBrush);
 }
 
 void LaserText::sceneMousePressEvent(LaserViewer* viewer, LaserScene* scene,
@@ -754,6 +762,17 @@ void LaserText::sceneKeyPressEvent(LaserViewer* viewer, QKeyEvent* event)
         {
             d->content.remove(d->content.length() - 1, 1);
             d->cursorIndex--;
+            if (d->cursorIndex < 0)
+                d->cursorIndex = 0;
+            if (!d->content.isEmpty())
+            {
+                QChar chr = d->content.at(d->cursorIndex);
+                if (chr == '\n')
+                {
+                    d->content.remove(d->content.length() - 1, 1);
+                    d->cursorIndex--;
+                }
+            }
         }
         else
         {
@@ -779,6 +798,16 @@ void LaserText::sceneKeyPressEvent(LaserViewer* viewer, QKeyEvent* event)
 }
 
 void LaserText::sceneKeyReleaseEvent(LaserViewer* viewer, QKeyEvent* event)
+{
+}
+
+void LaserText::beginCreatingInternal(QUndoCommand* parentCmd,
+    PrimitiveAddingCommand* addingCmd)
+{
+}
+
+void LaserText::endCreatingInterval(QUndoCommand* parentCmd,
+    PrimitiveRemovingCommand* removingCmd)
 {
 }
 

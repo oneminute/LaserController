@@ -280,12 +280,7 @@ void LaserPolyline::sceneMouseReleaseEvent(
         {
             setEditing(true);
 
-            // the current operation includs two sub commands:
-            //   1. add the LaserPolyline primitive object;
-            //   2. add a point to it;
-            // so we create a parent QUndoCommand to comibine the two commands
-            // togather as one step.
-            QUndoCommand* cmd = new QUndoCommand(tr("Add Polyline"));
+            
 
             PrimitiveAddingCommand* cmdAdding = new PrimitiveAddingCommand(
                 tr("Add Polyline"), viewer, scene, this->document(), this->id(), 
@@ -302,7 +297,6 @@ void LaserPolyline::sceneMouseReleaseEvent(
             // LaserViewer know it's in editing state
             cmdAdding->setRedoCallback([=]()
                 {
-                    viewer->setEditingPrimitiveId(id());
                     emit viewer->beginEditing();
                 }
             );
@@ -389,6 +383,16 @@ void LaserPolyline::sceneKeyPressEvent(
 void LaserPolyline::sceneKeyReleaseEvent(
     LaserViewer* viewer,
     QKeyEvent* event)
+{
+}
+
+void LaserPolyline::beginCreatingInternal(QUndoCommand* parentCmd,
+    PrimitiveAddingCommand* addingCmd)
+{
+}
+
+void LaserPolyline::endCreatingInterval(QUndoCommand* parentCmd,
+    PrimitiveRemovingCommand* removingCmd)
 {
 }
 

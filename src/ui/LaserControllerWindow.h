@@ -193,6 +193,8 @@ protected:
 
     LaserDocument* getMachiningDocument(bool& stamp);
 
+    bool beginEditing(LaserPrimitiveType type);
+
 protected slots:
 	void onActionUndo(bool checked = false);
 	void onActionRedo(bool checked);
@@ -248,8 +250,8 @@ protected slots:
 	void onActionUngroup(bool checked = false);
 	bool onActionCloseDocument(bool checked = false);
     void onActionSettings(bool checked = false);
+
     void onActionSelectionTool(bool checked = false);
-	void onActionViewDrag(bool checked = false);
 	void onActionRectangle(bool checked = false);
 	void onActionEllipse(bool checked = false);
 	void onActionLine(bool checked = false);
@@ -258,6 +260,8 @@ protected slots:
 	void onActionSplineEdit(bool checked = false);
 	void onActionText(bool checked = false);
 	void onActionBitmap(bool checked = false);
+
+	void onActionViewDrag(bool checked = false);
     void onActionRegiste(bool checked = false);
     void onStatusBarRegisterClicked(bool checked = false);
     void onActionActivate(bool checked = false);

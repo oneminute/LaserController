@@ -23,6 +23,9 @@ class QPaintEvent;
 class LaserViewer;
 class QuadTreeNode;
 class ProgressItem;
+class QUndoCommand;
+class PrimitiveAddingCommand;
+class PrimitiveRemovingCommand;
 
 class LaserPrimitivePrivate;
 class LaserPrimitive : public QGraphicsObject, public ILaserDocumentItem
@@ -39,6 +42,10 @@ public:
 
     bool isEditing() const;
     void setEditing(bool editing);
+    QUndoCommand* beginCreating(const QString& commandName, 
+        LaserViewer* viewer, LaserScene* scene, const QPoint& position);
+    void endCreating(const QString& commandName, LaserViewer* viewer,
+        LaserScene* scene);
 
     bool isShape() const;
     bool isBitmap() const;
@@ -119,8 +126,15 @@ public:
     virtual bool isAvailable() const;
     virtual int smallCircleIndex() const;
 
+    static LaserPrimitive* createPrimitive(LaserPrimitiveType type,
+        LaserDocument* doc);
+
 protected:
 	virtual LaserPrimitive* cloneImplement() = 0;
+    virtual void beginCreatingInternal(QUndoCommand* parentCmd,
+        PrimitiveAddingCommand* addingCmd) = 0;
+    virtual void endCreatingInterval(QUndoCommand* parentCmd,
+        PrimitiveRemovingCommand* removingCmd) = 0;
     void setLayer(LaserLayer* layer);
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent* event) override;
     virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent* event) override;

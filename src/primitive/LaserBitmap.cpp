@@ -379,6 +379,16 @@ void LaserBitmap::sceneKeyReleaseEvent(LaserViewer* viewer, QKeyEvent* event)
 {
 }
 
+void LaserBitmap::beginCreatingInternal(QUndoCommand* parentCmd, 
+    PrimitiveAddingCommand* addingCmd)
+{
+}
+
+void LaserBitmap::endCreatingInterval(QUndoCommand* parentCmd,
+    PrimitiveRemovingCommand* removingCmd)
+{
+}
+
 LaserPrimitive * LaserBitmap::cloneImplement()
 {
 	Q_D(LaserBitmap);

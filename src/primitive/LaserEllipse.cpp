@@ -220,6 +220,16 @@ void LaserEllipse::sceneKeyReleaseEvent(LaserViewer* viewer, QKeyEvent* event)
 {
 }
 
+void LaserEllipse::beginCreatingInternal(QUndoCommand* parentCmd,
+    PrimitiveAddingCommand* addingCmd)
+{
+}
+
+void LaserEllipse::endCreatingInterval(QUndoCommand* parentCmd,
+    PrimitiveRemovingCommand* removingCmd)
+{
+}
+
 LaserPrimitive * LaserEllipse::cloneImplement()
 {
 	Q_D(LaserEllipse);

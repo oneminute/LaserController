@@ -2731,77 +2731,21 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                 //判断是否在4叉树的有效区域内
                 if (ajustedPointInAvailableArea)
                 {
-                    // first create Polyline Primitive
-                    LaserLayer* layer = nullptr;
-                    layer = m_scene->document()->getCurrentOrCapableLayer(m_editingPrimitiveType);
-                    layerIndex = layer->index();
-                    if (layer)
-                    {
-                        switch (m_editingPrimitiveType)
-                        {
-                        case LPT_LINE:
-                            editingPrimitive = new LaserLine(m_scene->document(),
-                                QTransform(), layerIndex);
-                            break;
-                        case LPT_ELLIPSE:
-                            editingPrimitive = new LaserEllipse(m_scene->document(),
-                                QTransform(), layerIndex);
-                            break;
-                        case LPT_RECT:
-                            editingPrimitive = new LaserRect(m_scene->document(),
-                                QTransform(), layerIndex);
-                            break;
-                        case LPT_POLYLINE:
-                            editingPrimitive = new LaserPolyline(m_scene->document(),
-                                QTransform(), layerIndex);
-                            break;
-                        case LPT_POLYGON:
-                            editingPrimitive = new LaserPolygon(m_scene->document(),
-                                QTransform(), layerIndex);
-                            break;
-                        case LPT_PATH:
-                            editingPrimitive = new LaserPath(m_scene->document(),
-                                QTransform(), layerIndex);
-                            break;
-                        case LPT_BITMAP:
-                            editingPrimitive = new LaserBitmap(m_scene->document(),
-                                QTransform(), layerIndex);
-                            break;
-                        case LPT_TEXT:
-                        {
-                            LaserText* text = findLaserTextUnderCursor();
-                            if (text == nullptr)
-                            {
-                                //editingPrimitive = new LaserText(m_scene->document(),
-                                    //QTransform(), layerIndex);
-                                qreal spaceY = qRound(LaserApplication::mainWindow->textSpaceYSpinBox()->value() * 25400.0 / logicalDpiY());
-                                editingPrimitive = new LaserText(m_scene->document(), ajustedPoint,
-                                    m_textFont, spaceY, m_textAlighH, m_textAlighV,
-                                    QTransform(), layer->index());
-                            }
-                            else
-                            {
-                                editingPrimitive = text;
-                            }
-                            //this->setAttribute(Qt::WA_InputMethodEnabled, true);
-                            //this->setAttribute(Qt::WA_KeyCompression, true);
-                            this->setFocusPolicy(Qt::WheelFocus);
-                            break;
-                        }
-                        default:
-                            editingPrimitive = nullptr;
-                            break;
-                        }
+                    // The creating command is always used as the parent command for the undo/redo
+                    // purpose. Like LaserPolyline primitive, it needs a adding point command to
+                    // create the first point, and the two step must be combined as one step.
+                    QUndoCommand* cmd = new QUndoCommand(commandName);
 
-                        if (editingPrimitive)
-                        {
-                            m_editingPrimitiveId = editingPrimitive->id();
-                            setEditingPrimitiveId(m_editingPrimitiveId);
-                            editingPrimitive->setEditing(true);
-                            editingPrimitive->sceneMouseReleaseEvent(this,
-                                m_scene.data(), ajustedPoint.toPoint(), event,
-                                this->m_mousePressed);
-                        }
+                    editingPrimitive = LaserPrimitive::createPrimitive(
+                        m_editingPrimitiveType, m_scene->document());
+                    if (editingPrimitive)
+                    {
+                        m_editingPrimitiveId = editingPrimitive->id();
+                        setEditingPrimitiveId(m_editingPrimitiveId);
+                        editingPrimitive->setEditing(true);
+                        editingPrimitive->sceneMouseReleaseEvent(this,
+                            m_scene.data(), ajustedPoint.toPoint(), event,
+                            this->m_mousePressed);
                     }
                 }
             }
@@ -3453,6 +3397,11 @@ void LaserViewer::transformUndoStackPush(LaserPrimitive* item)
 
 void LaserViewer::onEndEditing()
 {
+    LaserPrimitive* editingPrimitive = this->getEditingPrimitive();
+    if (editingPrimitive != nullptr)
+    {
+        editingPrimitive->setEditing(false);
+    }
     m_editingPrimitiveId = QString();
     m_editingPrimitiveType = LPT_UNKNOWN;
     LaserApplication::mainWindow->clearToolButtonState();

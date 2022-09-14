@@ -154,3 +154,36 @@ QPointF LaserPolygon::position() const
     return sceneTransform().map(d->poly.first());
 }
 
+void LaserPolygon::sceneMousePressEvent(LaserViewer* viewer, LaserScene* scene,
+	const QPoint& point, QMouseEvent* event)
+{
+}
+
+void LaserPolygon::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scene,
+	const QPoint& point, QMouseEvent* event, bool isPressed)
+{
+}
+
+void LaserPolygon::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
+	const QPoint& point, QMouseEvent* event, bool isPressed)
+{
+}
+
+void LaserPolygon::sceneKeyPressEvent(LaserViewer* viewer, QKeyEvent* event)
+{
+}
+
+void LaserPolygon::sceneKeyReleaseEvent(LaserViewer* viewer, QKeyEvent* event)
+{
+}
+
+void LaserPolygon::beginCreatingInternal(QUndoCommand* parentCmd,
+	PrimitiveAddingCommand* addingCmd)
+{
+}
+
+void LaserPolygon::endCreatingInterval(QUndoCommand* parentCmd,
+	PrimitiveRemovingCommand* removingCmd)
+{
+}
+

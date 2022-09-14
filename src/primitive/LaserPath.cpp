@@ -163,3 +163,36 @@ QPointF LaserPath::position() const
     return sceneTransform().map(d->path.pointAtPercent(0));
 }
 
+void LaserPath::sceneMousePressEvent(LaserViewer* viewer, LaserScene* scene,
+    const QPoint& point, QMouseEvent* event)
+{
+}
+
+void LaserPath::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scene,
+    const QPoint& point, QMouseEvent* event, bool isPressed)
+{
+}
+
+void LaserPath::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
+    const QPoint& point, QMouseEvent* event, bool isPressed)
+{
+}
+
+void LaserPath::sceneKeyPressEvent(LaserViewer* viewer, QKeyEvent* event)
+{
+}
+
+void LaserPath::sceneKeyReleaseEvent(LaserViewer* viewer, QKeyEvent* event)
+{
+}
+
+void LaserPath::beginCreatingInternal(QUndoCommand* parentCmd,
+    PrimitiveAddingCommand* addingCmd)
+{
+}
+
+void LaserPath::endCreatingInterval(QUndoCommand* parentCmd,
+    PrimitiveRemovingCommand* removingCmd)
+{
+}
+

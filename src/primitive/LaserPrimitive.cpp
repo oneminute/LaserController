@@ -27,6 +27,7 @@
 #include "laser/LaserDriver.h"
 #include "laser/LaserDevice.h"
 #include "laser/LaserLineList.h"
+#include "primitive/LaserPrimitiveHeaders.h"
 #include "scene/LaserDocument.h"
 #include "scene/LaserLayer.h"
 #include "scene/LaserScene.h"
@@ -233,6 +234,17 @@ void LaserPrimitive::setEditing(bool editing)
 {
     Q_D(LaserPrimitive);
     d->isEditing = editing;
+}
+
+QUndoCommand* LaserPrimitive::beginCreating(const QString& commandName, 
+    LaserViewer* viewer, LaserScene* scene, const QPoint& position)
+{
+    return nullptr;
+}
+
+void LaserPrimitive::endCreating(const QString& commandName,
+    LaserViewer* viewer, LaserScene* scene)
+{
 }
 
 QPainterPath LaserPrimitive::getPath()
@@ -855,6 +867,51 @@ int LaserPrimitive::smallCircleIndex() const
     int length = boundingSize.width() >= boundingSize.height() ? boundingSize.width() : boundingSize.height();
     int index = Config::Export::smallDiagonalLimitation()->indexOf(length / 1000.0);
     return index;
+}
+
+LaserPrimitive* LaserPrimitive::createPrimitive(LaserPrimitiveType type,
+    LaserDocument* doc)
+{
+    LaserPrimitive* primitive = nullptr;
+    LaserLayer* layer = nullptr;
+    layer = doc->getCurrentOrCapableLayer(type);
+    int layerIndex = layer->index();
+    if (layer)
+    {
+        switch (type)
+        {
+        case LPT_LINE:
+            primitive = new LaserLine(doc, QTransform(), layerIndex);
+            break;
+        case LPT_ELLIPSE:
+            primitive = new LaserEllipse(doc, QTransform(), layerIndex);
+            break;
+        case LPT_RECT:
+            primitive = new LaserRect(doc, QTransform(), layerIndex);
+            break;
+        case LPT_POLYLINE:
+            primitive = new LaserPolyline(doc, QTransform(), layerIndex);
+            break;
+        case LPT_POLYGON:
+            primitive = new LaserPolygon(doc, QTransform(), layerIndex);
+            break;
+        case LPT_PATH:
+            primitive = new LaserPath(doc, QTransform(), layerIndex);
+            break;
+        case LPT_BITMAP:
+            primitive = new LaserBitmap(doc, QTransform(), layerIndex);
+            break;
+        case LPT_TEXT:
+        {
+            primitive = new LaserText(doc, QTransform(), layerIndex);
+            break;
+        }
+        default:
+            primitive = nullptr;
+            break;
+        }
+    }
+    return primitive;
 }
 
 void LaserPrimitive::hoverEnterEvent(QGraphicsSceneHoverEvent* event)

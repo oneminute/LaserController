@@ -53,6 +53,11 @@ protected:
         LaserViewer* viewer,
         QKeyEvent *event);
 
+    virtual void beginCreatingInternal(QUndoCommand* parentCmd,
+        PrimitiveAddingCommand* addingCmd) override;
+    virtual void endCreatingInterval(QUndoCommand* parentCmd,
+        PrimitiveRemovingCommand* removingCmd) override;
+
 private:
 	virtual LaserPrimitive * cloneImplement() override;
 

@@ -238,6 +238,16 @@ void LaserLine::sceneKeyReleaseEvent(LaserViewer* viewer, QKeyEvent* event)
 {
 }
 
+void LaserLine::beginCreatingInternal(QUndoCommand* parentCmd,
+    PrimitiveAddingCommand* addingCmd)
+{
+}
+
+void LaserLine::endCreatingInterval(QUndoCommand* parentCmd,
+    PrimitiveRemovingCommand* removingCmd)
+{
+}
+
 LaserPrimitive * LaserLine::cloneImplement()
 {
 	Q_D(const LaserLine);

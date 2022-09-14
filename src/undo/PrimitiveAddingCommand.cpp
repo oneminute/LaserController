@@ -11,15 +11,11 @@ PrimitiveAddingCommand::PrimitiveAddingCommand(
     LaserViewer* viewer,
     LaserScene* scene,
     LaserDocument* doc,
-    const QString& primitiveId,
-    const QString& layerId,
-    LaserPrimitive* target, 
+    LaserPrimitiveType type,
     QUndoCommand* parent)
     : BaseUndoCommand(text, viewer, scene, doc, parent)
-    , m_primitiveId(primitiveId)
-    , m_layerId(layerId)
-    , m_origin(target)
-    , m_cloned(nullptr)
+    , m_primitiveType(type)
+    , m_primitive(nullptr)
 {
 }
 
@@ -42,25 +38,26 @@ void PrimitiveAddingCommand::undo()
         return;
     }
     document()->removePrimitive(primitive, false, true, true);
-    m_cloned = nullptr;
+    m_primitive = nullptr;
     callUndoCallback();
 }
 
 void PrimitiveAddingCommand::redo()
 {
-    LaserLayer* layer = document()->layerById(m_layerId);
-    if (!layer)
+    m_primitive = LaserPrimitive::createPrimitive(m_primitiveType, document());
+    if (!m_primitive)
     {
-        qLogW << "undo adding primitive failure: layer does not exist.";
+        qLogW << "undo adding primitive failure: can not create primitive of type "
+            << m_primitiveType;
         return;
     }
-    m_cloned = m_origin->clone();
-    document()->addPrimitive(m_cloned, layer);
+    LaserLayer* layer = m_primitive->layer();
+    document()->addPrimitive(m_primitive, layer);
     callRedoCallback();
 }
 
-LaserPrimitive* PrimitiveAddingCommand::cloned() const
+LaserPrimitive* PrimitiveAddingCommand::primitive() const
 {
-    return m_cloned;
+    return m_primitive;
 }
 
