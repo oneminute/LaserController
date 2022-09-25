@@ -130,7 +130,7 @@ private:
     int m_cachedGroupCode;
     QString m_cachedVariable;
 
-    ProgressItem* m_progress;
+    //ProgressItem* m_progress;
 
     Q_DISABLE_COPY(DxfStream)
 };

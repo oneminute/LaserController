@@ -22,9 +22,9 @@ DxfStream::DxfStream(QIODevice* device, ProgressItem* parentProgress)
     : QTextStream(device)
     , m_lineNumber(0)
     , m_cached(false)
-    , m_progress(new ProgressItem(QObject::tr("Parse Dxf file"), ProgressItem::PT_Simple, parentProgress))
+    //, m_progress(new ProgressItem(QObject::tr("Parse Dxf file"), ProgressItem::PT_Simple, parentProgress))
 {
-    m_progress->setMaximum(device->bytesAvailable());
+    //m_progress->setMaximum(device->bytesAvailable());
 }
 
 bool DxfStream::readGroup(DxfGroup& pair)
@@ -36,13 +36,18 @@ bool DxfStream::readGroup(DxfGroup& pair)
     else
     {
         m_line = readLine().trimmed();
-        m_progress->setProgress(pos());
+        //m_progress->setProgress(pos());
         m_lineNumber++;
         bool ok;
         m_cachedGroupCode = m_line.toInt(&ok);
         m_lineNumber++;
+        //qLogD << "line: " << m_lineNumber << ", " << m_line;
         if (!ok)
+        {
+            qLogD << "parse error at line " << m_lineNumber << ", line content is '"
+                << m_line << "'";
             return false;
+        }
         m_line = readLine().trimmed();
         if (m_line == "EOF")
             qLogD << "READ EOF";
@@ -51,7 +56,7 @@ bool DxfStream::readGroup(DxfGroup& pair)
     pair.groupCode = m_cachedGroupCode;
     pair.variable = m_cachedVariable;
 
-    m_progress->finish();
+    //m_progress->finish();
     return true;
 }
 

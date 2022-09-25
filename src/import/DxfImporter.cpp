@@ -16,6 +16,8 @@
 #include "scene/LaserScene.h"
 #include "task/ProgressItem.h"
 #include "task/ProgressModel.h"
+#include "ui/LaserControllerWindow.h"
+#include "util/WidgetUtils.h"
 
 class DxfImporterPrivate
 {
@@ -60,9 +62,14 @@ void DxfImporter::importImpl(const QString& filename, LaserScene* scene, QList<L
     d->documentNode = new DxfDocumentNode;
     if (!d->documentNode->parse(&stream))
     {
-        delete d->documentNode;
-        d->documentNode = nullptr;
-        return;
+        //delete d->documentNode;
+        //d->documentNode = nullptr;
+        //return;
+        widgetUtils::showWarningMessage(
+            LaserApplication::mainWindow,
+            tr("Import Error"),
+            tr("Though there are some errors when importing, we still try to import available primitives.")
+            );
     }
 
 #ifdef _DEBUG
@@ -85,6 +92,7 @@ void DxfImporter::importImpl(const QString& filename, LaserScene* scene, QList<L
         LaserPrimitive* primitive = node->convertTo(laserDoc, t);
         if (primitive)
         {
+            qLogD << "primitive: " << primitive->name();
             if (primitive->isAvailable())
                 scene->document()->addPrimitive(primitive, false, false);
             else
