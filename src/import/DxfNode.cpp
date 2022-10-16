@@ -1296,7 +1296,6 @@ bool DxfLWPolylineNode::parseItem(DxfGroup& group)
         if (!group.assign(d->vertexIdentifier, 16))
             return false;
     }
-    
 
     return true;
 }
@@ -1603,6 +1602,199 @@ bool DxfLineNode::parseItem(DxfGroup& group)
         if (!group.assign(d->thickness))
             return false;
     }
+    return true;
+}
+
+class DxfPolylineNodePrivate : public DxfEntityNodePrivate
+{
+    Q_DECLARE_PUBLIC(DxfPolylineNode)
+public:
+    DxfPolylineNodePrivate(DxfPolylineNode* ptr)
+        : DxfEntityNodePrivate(ptr, NT_LWPolyline)
+        , verticesCount(0)
+        , polylineFlag(0)
+        , constantWidth(0)
+        , elevation(0)
+        , thickness(0)
+        , vertexIdentifier(0)
+    {}
+
+    int verticesCount;
+
+    /// <summary>
+    /// Polyline flag (bit-coded); default is 0:
+    /// 1 = Closed; 128 = Plinegen
+    /// </summary>
+    int polylineFlag;
+
+    /// <summary>
+    /// Constant m_width (optional; default = 0). Not used if variable m_width 
+    /// (codes 40 and/or 41) is set 
+    /// </summary>
+    qreal constantWidth;
+
+    /// <summary>
+    /// Elevation (optional; default = 0)
+    /// </summary>
+    qreal elevation;
+
+    /// <summary>
+    /// Thickness(optional; default = 0)
+    /// </summary>
+    qreal thickness;
+
+    /// <summary>
+    /// Vertex coordinates (in OCS), multiple entries; one entry for each vertex
+    /// DXF: X value; APP: 2D point
+    /// DXF: Y value of vertex coordinates(in OCS), multiple entries; one entry 
+    /// for each vertex
+    /// </summary>
+    QList<QPointF> points;
+
+    int vertexIdentifier;
+
+    /// <summary>
+    /// Starting m_width(multiple entries; one entry for each vertex) (optional; 
+    /// default = 0; multiple entries).Not used if constant m_width(code 43) is set
+    /// End m_width (multiple entries; one entry for each vertex) (optional; 
+    /// default = 0; multiple entries). Not used if constant m_width (code 43) is 
+    /// set
+    /// </summary>
+    QList<QVector2D> verticesWidth;
+
+    /// <summary>
+    /// Bulge (multiple entries; one entry for each vertex) (optional; default = 0)
+    /// </summary>
+    QList<qreal> bulges;
+};
+
+
+DxfPolylineNode::DxfPolylineNode(DxfDocumentNode* doc, int groupCode)
+    : DxfEntityNode(doc, groupCode, "POLYLINE", new DxfPolylineNodePrivate(this))
+{
+}
+
+void DxfPolylineNode::debugPrint() const
+{
+    Q_D(const DxfPolylineNode);
+    DxfEntityNode::debugPrint();
+    qLogD << "    verticesCount = " << d->verticesCount << "\n";
+    qLogD << "    polylineFlag = " << d->polylineFlag << "\n";
+    qLogD << "    constantWidth = " << d->constantWidth << "\n";
+    qLogD << "    elevation = " << d->elevation << "\n";
+    qLogD << "    thickness = " << d->thickness << "\n";
+    qLogD << "    points = \n";
+    for (QPointF point : d->points)
+    {
+        qLogD << "      " << point.x() << ", " << point.y() << "\n";
+    }
+    qLogD << "    vertexIdentifier = " << d->vertexIdentifier << "\n";
+    qLogD << "    verticesWidth = \n";
+    for (QVector2D point : d->verticesWidth)
+    {
+        qLogD << "      " << point.x() << ", " << point.y() << "\n";
+    }
+    qLogD << "    bulges = \n";
+    for (qreal bulge : d->bulges)
+    {
+        qLogD << "      " << bulge << "\n";
+    }
+}
+
+LaserPrimitive* DxfPolylineNode::convertTo(LaserDocument* doc, const QTransform& t) const
+{
+    Q_D(const DxfPolylineNode);
+    QPolygonF polygon;
+    LaserPrimitive* primitive;
+    for (QPointF point : d->points)
+    {
+        polygon.append(point);
+    }
+    if (d->polylineFlag == 0)
+    {
+        primitive = new LaserPolyline(t.map(polygon).toPolygon(), doc);
+    }
+    else if (d->polylineFlag == 1)
+    {
+        primitive = new LaserPolygon(t.map(polygon).toPolygon(), doc);
+    }
+    return primitive;
+}
+
+bool DxfPolylineNode::parseItem(DxfGroup& group)
+{
+    Q_D(DxfPolylineNode);
+    if (!DxfEntityNode::parseItem(group))
+        return false;
+    if (group.matched)
+        return true;
+
+    if (group.match(10))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->points.append(QPointF(value, 0));
+    }
+    else if (group.match(20))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->points.last().setY(value);
+    }
+    else if (group.match(38))
+    {
+        if (!group.assign(d->elevation))
+            return false;
+    }
+    else if (group.match(39))
+    {
+        if (!group.assign(d->thickness))
+            return false;
+    }
+    else if (group.match(40))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->verticesWidth.append(QVector2D(value, 0));
+    }
+    else if (group.match(41))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->verticesWidth.last().setY(value);
+    }
+    else if (group.match(42))
+    {
+        qreal value;
+        if (!group.assign(value))
+            return false;
+        d->bulges.append(value);
+    }
+    else if (group.match(43))
+    {
+        if (!group.assign(d->constantWidth))
+            return false;
+    }
+    else if (group.match(70))
+    {
+        if (!group.assign(d->polylineFlag))
+            return false;
+    }
+    else if (group.match(90))
+    {
+        if (!group.assign(d->verticesCount))
+            return false;
+    }
+    else if (group.match(91))
+    {
+        if (!group.assign(d->vertexIdentifier, 16))
+            return false;
+    }
+
     return true;
 }
 
@@ -2769,6 +2961,10 @@ bool DxfEntitiesNode::parse(DxfStream* stream)
         {
             childNode = new DxfSplineNode(d->document, group.groupCode);
         }
+        else if (group.match(0, "POLYLINE"))
+        {
+            childNode = new DxfPolylineNode(d->document, group.groupCode);
+        }
         else if (group.match(0, "IMAGE"))
         {
             childNode = new DxfImageNode(d->document, group.groupCode);
@@ -2861,4 +3057,3 @@ void DxfObjectsNode::debugPrint() const
         node->debugPrint();
     }
 }
-

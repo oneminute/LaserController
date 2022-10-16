@@ -77,6 +77,7 @@
 #include "ui/MultiDuplicationDialog.h"
 #include "ui/CalibrationDialog.h"
 #include "ui/CameraAlignmentDialog.h"
+#include "ui/ImportDialog.h"
 #include "util/ImageUtils.h"
 #include "util/Utils.h"
 #include "util/MachiningUtils.h"
@@ -5284,13 +5285,23 @@ void LaserControllerWindow::onActionImport(bool checked)
     if (filename.isEmpty())
         return;
 
+    ImportDialog dlg;
+    if (dlg.exec() != QDialog::Accepted)
+    {
+        return;
+    }
+
     QFileInfo file(filename);
     QSharedPointer<Importer> importer = Importer::getImporter(this, file.suffix());
     connect(importer.data(), &Importer::imported, m_tableWidgetLayers, &LaserLayerTableWidget::updateItems);
     if (!importer.isNull())
     {
+        QVariantMap params;
+        params["scale_factor"] = dlg.factor();
+        if (dlg.disableViewbox())
+            params["disable_viewbox"] = true;
         ProgressItem* progress = LaserApplication::resetProcess();
-        importer->import(filename, m_scene, progress);
+        importer->import(filename, m_scene, progress, params);
         progress->finish();
     }
 }
