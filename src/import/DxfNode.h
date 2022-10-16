@@ -130,7 +130,7 @@ private:
     int m_cachedGroupCode;
     QString m_cachedVariable;
 
-    ProgressItem* m_progress;
+    //ProgressItem* m_progress;
 
     Q_DISABLE_COPY(DxfStream)
 };
@@ -456,6 +456,25 @@ protected:
 private:
     Q_DECLARE_PRIVATE_D(m_ptr, DxfLineNode)
     Q_DISABLE_COPY(DxfLineNode)
+};
+
+class DxfPolylineNodePrivate;
+class DxfPolylineNode : public DxfEntityNode
+{
+public:
+    explicit DxfPolylineNode(DxfDocumentNode* doc, int groupCode = 0);
+    ~DxfPolylineNode() {}
+
+    virtual void debugPrint() const override;
+
+    virtual LaserPrimitive* convertTo(LaserDocument* doc, const QTransform& t) const override;
+
+protected:
+    virtual bool parseItem(DxfGroup& group) override;
+
+private:
+    Q_DECLARE_PRIVATE_D(m_ptr, DxfPolylineNode)
+    Q_DISABLE_COPY(DxfPolylineNode)
 };
 
 class DxfSplineNodePrivate;

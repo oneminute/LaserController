@@ -53,8 +53,21 @@ void SvgImporter::importImpl(const QString & filename, LaserScene* scene, QList<
     
     QSize svgSize = svgDoc->size();
     // 转换为微米
-    qreal docScaleWidth = svgSize.width() * 1000.0 / viewBox.width();
-    qreal docScaleHeight = svgSize.height() * 1000.0 / viewBox.height();
+    qreal scaleFactor = 1.0;
+    if (params.contains("scale_factor"))
+    {
+        scaleFactor = params["scale_factor"].toReal();
+    }
+
+    qreal viewboxScaleWidth = svgSize.width() * 1000.0 / viewBox.width();
+    qreal viewboxScaleHeight = svgSize.height() * 1000.0 / viewBox.height();
+    if (params.contains("disable_viewbox"))
+    {
+        viewboxScaleWidth = 1000.0;
+        viewboxScaleHeight = 1000.0;
+    }
+    qreal docScaleWidth = viewboxScaleWidth * scaleFactor;
+    qreal docScaleHeight = viewboxScaleHeight * scaleFactor;
 
     QPoint originOffset = -LaserApplication::device->originOffset();
 
