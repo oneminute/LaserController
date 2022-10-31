@@ -220,13 +220,13 @@ void LaserRect::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
         {
             setEditing(false);
             setRect(rect);
-            LaserLayer* layer = this->layer();
+            /*LaserLayer* layer = this->layer();
             PrimitiveAddingCommand* cmdAdding = new PrimitiveAddingCommand(
                 tr("Add Rect"), viewer, scene, this->document(), this->id(),
                 layer->id(), this);
             document()->removePrimitive(this, false, true, true);
 
-            viewer->addUndoCommand(cmdAdding);
+            viewer->addUndoCommand(cmdAdding);*/
         }
 
         emit viewer->endEditing();

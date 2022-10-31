@@ -713,32 +713,32 @@ void LaserText::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
             d->first = false;
             LaserLayer* layer = this->layer();
 
-            PrimitiveAddingCommand* cmdAdding = new PrimitiveAddingCommand(
-                tr("Add Line"), viewer, scene, this->document(), this->id(), 
-                layer->id(), this);
-            modifyTextCursor(point);
-            //detectInsertIndex(point);
+            //PrimitiveAddingCommand* cmdAdding = new PrimitiveAddingCommand(
+            //    tr("Add Line"), viewer, scene, this->document(), this->id(), 
+            //    layer->id(), this);
+            //modifyTextCursor(point);
+            ////detectInsertIndex(point);
 
-            // we must ensure that when we undo the adding operation we should 
-            // end the editing state in LaserViewer
-            cmdAdding->setUndoCallback([=]()
-                {
-                    emit viewer->endEditing();
-                }
-            );
+            //// we must ensure that when we undo the adding operation we should 
+            //// end the editing state in LaserViewer
+            //cmdAdding->setUndoCallback([=]()
+            //    {
+            //        emit viewer->endEditing();
+            //    }
+            //);
             // as we adding and editing the line, we must ensure that the
             // LaserViewer know it's in editing state
-            cmdAdding->setRedoCallback([=]()
-                {
-                    viewer->setEditingPrimitiveId(id());
-                    //viewer->setFocus();
-                    cmdAdding->cloned()->setFocus(Qt::MouseFocusReason);
-                    qLogD << "hasFocus: " << cmdAdding->cloned()->hasFocus();
-                    emit viewer->beginEditing();
-                }
-            );
+            //cmdAdding->setRedoCallback([=]()
+            //    {
+            //        viewer->setEditingPrimitiveId(id());
+            //        //viewer->setFocus();
+            //        cmdAdding->cloned()->setFocus(Qt::MouseFocusReason);
+            //        qLogD << "hasFocus: " << cmdAdding->cloned()->hasFocus();
+            //        emit viewer->beginEditing();
+            //    }
+            //);
 
-            viewer->addUndoCommand(cmdAdding);
+            //viewer->addUndoCommand(cmdAdding);
             d->cursorIndex = 0;
         }
         if (d->content.trimmed().isEmpty())

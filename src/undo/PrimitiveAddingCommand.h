@@ -16,6 +16,13 @@ public:
         LaserDocument* doc,
         LaserPrimitiveType type,
         QUndoCommand* parent = nullptr);
+    explicit PrimitiveAddingCommand(
+        const QString& text,
+        LaserViewer* viewer,
+        LaserScene* scene,
+        LaserDocument* doc,
+        LaserPrimitive* primitive,
+        QUndoCommand* parent = nullptr);
     ~PrimitiveAddingCommand();
 
     virtual void undo() override;

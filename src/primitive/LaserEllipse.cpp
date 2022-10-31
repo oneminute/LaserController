@@ -199,13 +199,6 @@ void LaserEllipse::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene
         {
             setEditing(false);
             setBounds(rect);
-            LaserLayer* layer = this->layer();
-            PrimitiveAddingCommand* cmdAdding = new PrimitiveAddingCommand(
-                tr("Add Ellipse"), viewer, scene, this->document(), this->id(),
-                layer->id(), this);
-            document()->removePrimitive(this, false, true, true);
-
-            viewer->addUndoCommand(cmdAdding);
         }
 
         emit viewer->endEditing();

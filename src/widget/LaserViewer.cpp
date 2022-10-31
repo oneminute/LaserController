@@ -2731,13 +2731,14 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                 //判断是否在4叉树的有效区域内
                 if (ajustedPointInAvailableArea)
                 {
-                    // The creating command is always used as the parent command for the undo/redo
-                    // purpose. Like LaserPolyline primitive, it needs a adding point command to
-                    // create the first point, and the two step must be combined as one step.
-                    QUndoCommand* cmd = new QUndoCommand(commandName);
+                    QString typeName = LaserPrimitive::typeName(m_editingPrimitiveType);
+                    QString cmdName = QString(tr("Add %1")).arg(typeName);
 
-                    editingPrimitive = LaserPrimitive::createPrimitive(
-                        m_editingPrimitiveType, m_scene->document());
+                    PrimitiveAddingCommand* cmdAdding = new PrimitiveAddingCommand(
+                        cmdName, this, scene(), scene()->document(), m_editingPrimitiveType);
+
+                    addUndoCommand(cmdAdding);
+                    editingPrimitive = cmdAdding->primitive();
                     if (editingPrimitive)
                     {
                         m_editingPrimitiveId = editingPrimitive->id();

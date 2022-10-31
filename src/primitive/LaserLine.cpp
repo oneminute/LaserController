@@ -161,38 +161,6 @@ void LaserLine::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
         if (d->points.isEmpty())
         {
             setEditing(true);
-
-            // the current operation includs two sub commands:
-            //   1. add the LaserLine primitive object;
-            //   2. add a point to it;
-            // so we create a parent QUndoCommand to comibine the two commands
-            // togather as one step.
-            QUndoCommand* cmd = new QUndoCommand(tr("Add Line"));
-
-            PrimitiveAddingCommand* cmdAdding = new PrimitiveAddingCommand(
-                tr("Add Line"), viewer, scene, this->document(), this->id(), 
-                layer->id(), this, cmd);
-
-            // we must ensure that when we undo the adding operation we should 
-            // end the editing state in LaserViewer
-            cmdAdding->setUndoCallback([=]()
-                {
-                    emit viewer->endEditing();
-                }
-            );
-            // as we adding and editing the line, we must ensure that the
-            // LaserViewer know it's in editing state
-            cmdAdding->setRedoCallback([=]()
-                {
-                    viewer->setEditingPrimitiveId(id());
-                    emit viewer->beginEditing();
-                }
-            );
-
-            LineAddPointCommand* cmdAddPoint = new LineAddPointCommand(
-                tr("Add Point to Line"), viewer, scene, document(), 
-                id(), point, d->points.size(), cmd);
-            viewer->addUndoCommand(cmd);
         }
         // there're more than one point in the current editing polygon
         else

@@ -42,9 +42,15 @@ public:
 
     bool isEditing() const;
     void setEditing(bool editing);
-    QUndoCommand* beginCreating(const QString& commandName, 
-        LaserViewer* viewer, LaserScene* scene, const QPoint& position);
-    void endCreating(const QString& commandName, LaserViewer* viewer,
+    QUndoCommand* beginCreating(
+        const QString& commandName, 
+        LaserViewer* viewer, 
+        LaserScene* scene, 
+        const QPoint& position);
+
+    void endCreating(
+        const QString& commandName, 
+        LaserViewer* viewer,
         LaserScene* scene);
 
     bool isShape() const;

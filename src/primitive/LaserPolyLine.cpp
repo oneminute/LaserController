@@ -275,39 +275,19 @@ void LaserPolyline::sceneMouseReleaseEvent(
     LaserLayer* layer = this->layer();
     if (event->button() == Qt::LeftButton)
     {
-        // if there's no points in current polygon/polyline
-        if (d->points.isEmpty())
+        if (d->points.isEmpty())    // if there's no points in current polygon/polyline
         {
             setEditing(true);
 
-            
-
-            PrimitiveAddingCommand* cmdAdding = new PrimitiveAddingCommand(
-                tr("Add Polyline"), viewer, scene, this->document(), this->id(), 
-                layer->id(), this, cmd);
-
-            // we must ensure that when we undo the adding operation we should 
-            // end the editing state in LaserViewer
-            cmdAdding->setUndoCallback([=]()
-                {
-                    emit viewer->endEditing();
-                }
-            );
-            // as we adding and editing the polyline, we must ensure that the
-            // LaserViewer know it's in editing state
-            cmdAdding->setRedoCallback([=]()
-                {
-                    emit viewer->beginEditing();
-                }
-            );
+            viewer->beginEditing();
 
             PolylineAddPointCommand* cmdAddPoint = new PolylineAddPointCommand(
                 tr("Add Point to Polyline"), viewer, scene, document(), 
-                id(), point, d->points.size(), cmd);
-            viewer->addUndoCommand(cmd);
+                id(), point, d->points.size());
+            viewer->addUndoCommand(cmdAddPoint);
         }
-        // there're more than one point in the current editing polygon
-        else
+        
+        else    // there're more than one point in the current editing polygon
         {
             if (d->editingPoint == d->points.last())
                 return;
@@ -321,8 +301,7 @@ void LaserPolyline::sceneMouseReleaseEvent(
 
                     PrimitiveRemovingCommand* cmdRemoving = new PrimitiveRemovingCommand(
                         tr("Remove Polyline"), viewer, scene, document(),
-                        this->id(), this->layer()->id(), this, cmd
-                    );
+                        this->id(), this->layer()->id(), this, cmd);
                     cmdRemoving->setUndoCallback([=]()
                         {
                             viewer->setEditingPrimitiveId(cmdRemoving->primitiveId());
@@ -334,8 +313,7 @@ void LaserPolyline::sceneMouseReleaseEvent(
                         QTransform(), layer->index());
                     PrimitiveAddingCommand* cmdAdding = new PrimitiveAddingCommand(
                         tr("Convert to Polygon"), viewer, scene, document(),
-                        polygon->id(), layer->id(), polygon, cmd
-                    );
+                        polygon, cmd);
 
                     viewer->addUndoCommand(cmd);
                     setCursor(Qt::ArrowCursor);
