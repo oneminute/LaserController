@@ -2737,6 +2737,12 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                     PrimitiveAddingCommand* cmdAdding = new PrimitiveAddingCommand(
                         cmdName, this, scene(), scene()->document(), m_editingPrimitiveType);
 
+                    cmdAdding->setUndoCallback([=]()
+                        {
+                            setEditingPrimitiveId("");
+                        }
+                    );
+
                     addUndoCommand(cmdAdding);
                     editingPrimitive = cmdAdding->primitive();
                     if (editingPrimitive)
@@ -3661,7 +3667,6 @@ void LaserViewer::init()
 
 void LaserViewer::setEditingPrimitiveId(const QString& primitiveId)
 {
-    Q_ASSERT(!primitiveId.isEmpty() && !primitiveId.isNull());
     m_editingPrimitiveId = primitiveId;
 }
 
