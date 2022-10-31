@@ -729,7 +729,7 @@ void LaserCircleText::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scene
 {
 }
 
-void LaserCircleText::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed)
+void LaserCircleText::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed, QUndoCommand* parentCmd)
 {
 }
 

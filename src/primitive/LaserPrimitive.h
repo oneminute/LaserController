@@ -165,7 +165,7 @@ protected:
         LaserScene* scene,
         const QPoint& point,
         QMouseEvent* event,
-        bool isPressed);
+        bool isPressed, QUndoCommand* parentCmd) = 0;
 	virtual void sceneKeyPressEvent(
         LaserViewer* viewer,
         QKeyEvent *event);

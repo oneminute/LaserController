@@ -196,8 +196,9 @@ void LaserRect::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scene,
     }
 }
 
-void LaserRect::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
-    const QPoint& point, QMouseEvent* event, bool isPressed)
+void LaserRect::sceneMouseReleaseEvent(LaserViewer* viewer,
+ LaserScene* scene,
+    const QPoint& point, QMouseEvent* event, bool isPressed, QUndoCommand* parentCmd)
 {
     Q_D(LaserRect);
     if (isEditing())

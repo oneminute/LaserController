@@ -701,8 +701,9 @@ void LaserText::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scene,
 {
 }
 
-void LaserText::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
-    const QPoint& point, QMouseEvent* event, bool isPressed)
+void LaserText::sceneMouseReleaseEvent(LaserViewer* viewer,
+ LaserScene* scene,
+    const QPoint& point, QMouseEvent* event, bool isPressed, QUndoCommand* parentCmd)
 {
     Q_D(LaserText);
     if (isEditing())

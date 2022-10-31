@@ -329,7 +329,7 @@ void LaserNurbs::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scene, con
 {
 }
 
-void LaserNurbs::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed)
+void LaserNurbs::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed, QUndoCommand* parentCmd)
 {
 }
 

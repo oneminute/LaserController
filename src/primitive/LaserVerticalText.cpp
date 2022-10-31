@@ -229,7 +229,7 @@ void LaserVerticalText::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* sce
 {
 }
 
-void LaserVerticalText::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed)
+void LaserVerticalText::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed, QUndoCommand* parentCmd)
 {
 }
 

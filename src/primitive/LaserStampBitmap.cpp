@@ -366,7 +366,7 @@ void LaserStampBitmap::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scen
 {
 }
 
-void LaserStampBitmap::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed)
+void LaserStampBitmap::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed, QUndoCommand* parentCmd)
 {
 }
 

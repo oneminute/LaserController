@@ -173,8 +173,9 @@ void LaserPath::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scene,
 {
 }
 
-void LaserPath::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
-    const QPoint& point, QMouseEvent* event, bool isPressed)
+void LaserPath::sceneMouseReleaseEvent(LaserViewer* viewer,
+ LaserScene* scene,
+    const QPoint& point, QMouseEvent* event, bool isPressed, QUndoCommand* parentCmd)
 {
 }
 

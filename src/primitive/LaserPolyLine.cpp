@@ -266,10 +266,13 @@ void LaserPolyline::sceneMouseMoveEvent(
 
 void LaserPolyline::sceneMouseReleaseEvent(
     LaserViewer* viewer,
+
     LaserScene* scene,
+
     const QPoint& point,
+
     QMouseEvent* event,
-    bool isPressed)
+    bool isPressed, QUndoCommand* parentCmd)
 {
     Q_D(LaserPolyline);
     LaserLayer* layer = this->layer();
@@ -281,10 +284,11 @@ void LaserPolyline::sceneMouseReleaseEvent(
 
             viewer->beginEditing();
 
-            PolylineAddPointCommand* cmdAddPoint = new PolylineAddPointCommand(
-                tr("Add Point to Polyline"), viewer, scene, document(), 
-                id(), point, d->points.size());
-            viewer->addUndoCommand(cmdAddPoint);
+            appendPoint(point);
+            //PolylineAddPointCommand* cmdAddPoint = new PolylineAddPointCommand(
+                //tr("Add Point to Polyline"), viewer, scene, document(), 
+                //id(), point, d->points.size());
+            //viewer->addUndoCommand(cmdAddPoint);
         }
         
         else    // there're more than one point in the current editing polygon

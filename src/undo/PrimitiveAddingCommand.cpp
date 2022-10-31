@@ -63,16 +63,19 @@ void PrimitiveAddingCommand::redo()
     if (!m_primitive)
     {
         m_primitive = LaserPrimitive::createPrimitive(m_primitiveType, document());
-    }
+        if (m_primitiveId.isEmpty())
+            m_primitiveId = m_primitive->id();
+        else
+            m_primitive->setId(m_primitiveId);
+        }
     if (!m_primitive)
     {
-        qLogW << "undo adding primitive failure: can not create primitive of type "
+        qLogW << "redo adding primitive failure: can not create primitive of type "
             << m_primitiveType;
         return;
     }
     LaserLayer* layer = m_primitive->layer();
     document()->addPrimitive(m_primitive, layer);
-    m_primitiveId = m_primitive->id();
     m_layerId = layer->id();
     callRedoCallback();
 }

@@ -262,7 +262,7 @@ void LaserHorizontalText::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* s
 {
 }
 
-void LaserHorizontalText::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed)
+void LaserHorizontalText::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed, QUndoCommand* parentCmd)
 {
 }
 

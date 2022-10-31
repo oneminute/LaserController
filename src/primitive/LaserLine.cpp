@@ -150,8 +150,9 @@ void LaserLine::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scene,
     }
 }
 
-void LaserLine::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, 
-    const QPoint& point, QMouseEvent* event, bool isPressed)
+void LaserLine::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
+ 
+    const QPoint& point, QMouseEvent* event, bool isPressed, QUndoCommand* parentCmd)
 {
     Q_D(LaserLine);
     LaserLayer* layer = this->layer();
@@ -161,8 +162,15 @@ void LaserLine::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
         if (d->points.isEmpty())
         {
             setEditing(true);
+            viewer->beginEditing();
+
+            LineAddPointCommand* cmd = new LineAddPointCommand(
+                tr("Add Point to Line"), viewer, scene, document(),
+                id(), point, d->points.size(), parentCmd);
+            cmd->redo();
+            //viewer->addUndoCommand(cmd);
+            //appendPoint(point);
         }
-        // there're more than one point in the current editing polygon
         else
         {
             if (d->editingPoint == d->points.last())
@@ -263,7 +271,7 @@ LaserPointListList LaserLine::updateMachiningPoints(ProgressItem* parentProgress
 void LaserLine::draw(QPainter * painter)
 {
     Q_D(LaserLine);
-    if (isEditing())
+    if (isEditing() && !d->points.isEmpty())
     {
         painter->drawLine(QLine(d->points.first(), d->editingPoint));
         QPen oldPen = painter->pen();

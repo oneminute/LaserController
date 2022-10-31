@@ -164,8 +164,9 @@ void LaserPolygon::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scene,
 {
 }
 
-void LaserPolygon::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
-	const QPoint& point, QMouseEvent* event, bool isPressed)
+void LaserPolygon::sceneMouseReleaseEvent(LaserViewer* viewer,
+ LaserScene* scene,
+	const QPoint& point, QMouseEvent* event, bool isPressed, QUndoCommand* parentCmd)
 {
 }
 

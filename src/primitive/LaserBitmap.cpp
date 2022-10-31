@@ -312,8 +312,9 @@ void LaserBitmap::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scene,
 {
 }
 
-void LaserBitmap::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene,
-    const QPoint& point, QMouseEvent* event, bool isPressed)
+void LaserBitmap::sceneMouseReleaseEvent(LaserViewer* viewer,
+ LaserScene* scene,
+    const QPoint& point, QMouseEvent* event, bool isPressed, QUndoCommand* parentCmd)
 {
     Q_D(LaserBitmap);
     if (isEditing())

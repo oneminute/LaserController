@@ -43,6 +43,7 @@ protected:
     Q_DISABLE_COPY(ILaserDocumentItem) 
 
     friend class LaserPrimitive;
+    friend class PrimitiveAddingCommand;
 };
 
 

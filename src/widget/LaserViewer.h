@@ -115,6 +115,7 @@ public:
 	bool addPrimitiveAndExamRegionByBounds(QList<LaserPrimitive*>& primitives, LaserPrimitive* parent = nullptr);
 
 	void addUndoCommand(QUndoCommand* cmd);
+	void popUndoCommand();
 
 	bool isCapsLock() const { return m_isCapsLock; }
 	

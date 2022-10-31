@@ -235,7 +235,7 @@ void LaserStar::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scene, cons
 {
 }
 
-void LaserStar::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed)
+void LaserStar::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed, QUndoCommand* parentCmd)
 {
 }
 

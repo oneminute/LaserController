@@ -273,7 +273,7 @@ void LaserRing::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scene, cons
 {
 }
 
-void LaserRing::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed)
+void LaserRing::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed, QUndoCommand* parentCmd)
 {
 }
 

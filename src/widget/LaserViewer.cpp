@@ -2734,16 +2734,18 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                     QString typeName = LaserPrimitive::typeName(m_editingPrimitiveType);
                     QString cmdName = QString(tr("Add %1")).arg(typeName);
 
+                    QUndoCommand* cmd = new QUndoCommand;
                     PrimitiveAddingCommand* cmdAdding = new PrimitiveAddingCommand(
-                        cmdName, this, scene(), scene()->document(), m_editingPrimitiveType);
+                        cmdName, this, scene(), scene()->document(),
+                        m_editingPrimitiveType, cmd);
 
                     cmdAdding->setUndoCallback([=]()
-                        {
-                            setEditingPrimitiveId("");
-                        }
+                    {
+                        emit endEditing();
+                    }
                     );
 
-                    addUndoCommand(cmdAdding);
+                    addUndoCommand(cmd);
                     editingPrimitive = cmdAdding->primitive();
                     if (editingPrimitive)
                     {
@@ -2752,7 +2754,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
                         editingPrimitive->setEditing(true);
                         editingPrimitive->sceneMouseReleaseEvent(this,
                             m_scene.data(), ajustedPoint.toPoint(), event,
-                            this->m_mousePressed);
+                            this->m_mousePressed, cmd);
                     }
                 }
             }
@@ -2760,7 +2762,7 @@ void LaserViewer::mouseReleaseEvent(QMouseEvent* event)
         else
         {
             editingPrimitive->sceneMouseReleaseEvent(this, m_scene.data(),
-                ajustedPoint.toPoint(), event, this->m_mousePressed);
+                ajustedPoint.toPoint(), event, this->m_mousePressed, nullptr);
         }
     }
     else
@@ -3404,6 +3406,7 @@ void LaserViewer::transformUndoStackPush(LaserPrimitive* item)
 
 void LaserViewer::onEndEditing()
 {
+    qLogD << "onEndEditing()";
     LaserPrimitive* editingPrimitive = this->getEditingPrimitive();
     if (editingPrimitive != nullptr)
     {
@@ -3475,6 +3478,12 @@ void LaserViewer::addUndoCommand(QUndoCommand* cmd)
 {
     Q_ASSERT(cmd);
     m_undoStack->push(cmd);
+    qLogD << "undo list size is " << m_undoStack->count();
+}
+
+void LaserViewer::popUndoCommand()
+{
+    m_undoStack->undo();
     qLogD << "undo list size is " << m_undoStack->count();
 }
 
@@ -3604,6 +3613,13 @@ void LaserViewer::init()
     setViewportUpdateMode(QGraphicsView::SmartViewportUpdate);
 	//undo stack
 	m_undoStack = new QUndoStack(this);
+    connect(m_undoStack, &QUndoStack::indexChanged, [=](int index)
+    {
+        const QUndoCommand* cmd = m_undoStack->command(index);
+        if (cmd)
+            qLogD << "Undo command: " << cmd->text();
+    }
+    );
 	m_copyedList = QMap<LaserPrimitive*, QTransform>();
 	//arrange
 	m_copyedList = QMap<LaserPrimitive*, QTransform>();

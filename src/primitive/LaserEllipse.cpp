@@ -176,7 +176,7 @@ void LaserEllipse::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scene, c
     }
 }
 
-void LaserEllipse::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed)
+void LaserEllipse::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed, QUndoCommand* parentCmd)
 {
     Q_D(LaserEllipse);
     if (isEditing())

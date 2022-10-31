@@ -47,7 +47,8 @@ protected:
         LaserScene* scene,
         const QPoint& point,
         QMouseEvent* event,
-        bool isPressed) override;
+        bool isPressed,
+        QUndoCommand* parentCmd) override;
 	virtual void sceneKeyPressEvent(
         LaserViewer* viewer,
         QKeyEvent *event);

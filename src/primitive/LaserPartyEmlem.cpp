@@ -242,7 +242,7 @@ void LaserPartyEmblem::sceneMouseMoveEvent(LaserViewer* viewer, LaserScene* scen
 {
 }
 
-void LaserPartyEmblem::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed)
+void LaserPartyEmblem::sceneMouseReleaseEvent(LaserViewer* viewer, LaserScene* scene, const QPoint& point, QMouseEvent* event, bool isPressed, QUndoCommand* parentCmd)
 {
 }
 
